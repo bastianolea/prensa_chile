@@ -97,7 +97,8 @@ enlaces_noticias <- map(enlaces_meses_parcial, \(enlace_mes) {
   })
 })
 
-message(glue("Se obtuvieron {length(unlist(enlaces_noticias))} noticias"))
+message("")
+message(glue("En total, a partir de {length(enlaces_meses_parcial)} enlaces se obtuvieron {length(unlist(enlaces_noticias))} noticias"))
 
 
 # scraping multi ----
