@@ -218,7 +218,7 @@ revisar_scraping <- function(data) {
 
 
 # palabras ----
-stopwords <- readr::read_lines("~/Documents/Apps Shiny/lira_popular/datos/stopwords_español.txt") #tidytext::get_stopwords("es") |> pull(word)
+stopwords <- readr::read_lines("~/R/lira_popular/datos/stopwords_español.txt") #tidytext::get_stopwords("es") |> pull(word)
 
 palabras_eliminar = c("right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
                       "pred", "fs", "us", "april", "flickr", "datawrapper", "data", "fried", "ftx", "medium", "exante", "server", "family", "loc", "lon", "mag", "prof", "lat", "gpt", "banner", "donación",

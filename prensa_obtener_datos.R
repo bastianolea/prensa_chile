@@ -36,7 +36,7 @@ scraping_prensa("modulos/cron_elsiglo.r") #hist
 
 scraping_prensa("modulos/cron_ciper.r") #hist
 
-# scraping_prensa("modulos/cron_emol_h.r") #hist pero por meses
+scraping_prensa("modulos/cron_emol_h.r") #hist pero por meses
 
 scraping_prensa("modulos/cron_diariofinanciero.r") #histórico solo hasta página 20
 
