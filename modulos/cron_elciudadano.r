@@ -11,6 +11,7 @@ source("funciones_scraping.r")
 secciones <- paste0("https://www.elciudadano.com/chile/page/", 1:3); hist = ""
 
 # para descargar hacia atrás
+# secciones <- paste0("https://www.elciudadano.com/chile/page/", 4:30); hist = "_h"
 # secciones <- paste0("https://www.elciudadano.com/chile/page/", 200:1000); hist = "_h"
 # secciones <- paste0("https://www.elciudadano.com/chile/page/", 1001:1800); hist = "_h_a"
 # secciones <- paste0("https://www.elciudadano.com/chile/page/", 1801:2500); hist = "_h_b"
@@ -18,7 +19,7 @@ secciones <- paste0("https://www.elciudadano.com/chile/page/", 1:3); hist = ""
 
 #loop de enlaces
 resultados_links <- map_df(secciones, \(enlace_seccion) {
-  # enlace_seccion <- secciones[4]
+  # enlace_seccion <- secciones[2]
 
   if (is.null(revisar_url(enlace_seccion))) return(NULL)
 
@@ -26,7 +27,8 @@ resultados_links <- map_df(secciones, \(enlace_seccion) {
     scrape()
 
   noticias_seccion_links <- noticias_seccion |>
-    html_elements(".col-md-9") |>
+    # html_elements(".col-md-9") |>
+    html_elements(".mb-3") |>
     html_elements("a") |>
     html_attr("href") |>
     unique()
@@ -53,22 +55,28 @@ resultados_elciudadano <- map(resultados_links$enlace, \(enlace) {
 
   noticia_titulo <- noticia |>
     #html_elements(".order-md-2") |>
-    html_elements(".mb-4") |>
-    html_text2()
+    # html_elements(".mb-4") |>
+    html_elements(".my-3") |>
+    html_text2() |> 
+    pluck(1)
 
   noticia_fecha <- noticia |>
-    html_elements(".time-now-") |>
-    html_attr("data-date") |> 
+    # html_elements(".time-now-") |>
+    # html_attr("data-date") |> 
+    html_elements("time") |>
+    html_attr("datetime") |> 
     str_extract("\\d{4}-\\d{2}-\\d{2}")
 
   noticia_bajada <- noticia |>
-    html_elements(".order-md-2") |>
-    html_elements(".the-excerpt-") |>
+    # html_elements(".order-md-2") |>
+    # html_elements(".the-excerpt-") |>
+    html_elements(".article-title-excerpt") |> 
     html_text2()
 
   #texto
   noticia_texto <- noticia |>
-    html_elements(".pt-3-") |>
+    # html_elements(".pt-3-") |>
+    html_elements(".the-content") |> 
     html_elements("p") |>
     html_text2() |>
     paste(collapse = "\n")

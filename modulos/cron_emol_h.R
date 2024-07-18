@@ -22,7 +22,7 @@ enlaces_años <- paste0("https://www.emol.com/sitemap/noticias/", 2024, "/index.
 # enlaces_años <- paste0("https://www.emol.com/sitemap/noticias/", 2022, "/index.html"); historico = "_h_2022c"
 # enlaces_años <- paste0("https://www.emol.com/sitemap/noticias/", 2021, "/index.html"); historico = "_h_2021c"
 # enlaces_años <- paste0("https://www.emol.com/sitemap/noticias/", 2020, "/index.html"); historico = "_h_2020e"
-enlaces_años <- paste0("https://www.emol.com/sitemap/noticias/", 2019, "/index.html"); historico = "_h_2019h"
+# enlaces_años <- paste0("https://www.emol.com/sitemap/noticias/", 2019, "/index.html"); historico = "_h_2019h"
 
 
 # enlaces meses ----
@@ -62,7 +62,10 @@ message(glue("Se obtuvieron {length(unlist(enlaces_meses))} categorías de meses
 # enlaces_meses_parcial <- enlaces_meses[101:125]
 # enlaces_meses_parcial <- enlaces_meses[126:150]
 # enlaces_meses_parcial <- enlaces_meses[151:175]
-enlaces_meses_parcial <- enlaces_meses[176:length(enlaces_meses)]
+# enlaces_meses_parcial <- enlaces_meses[176:length(enlaces_meses)]
+
+enlaces_meses_parcial <- enlaces_meses[length(enlaces_meses):(length(enlaces_meses)-2)] #aprox 200 ultimas noticias
+
 
 # enlaces noticias ----
 enlaces_noticias <- map(enlaces_meses_parcial, \(enlace_mes) {
