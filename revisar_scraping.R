@@ -8,21 +8,14 @@ library(purrr)
 directorios <- dir_info("resultados") |> 
   arrange(desc(modification_time))
 
-# directorios con cambios hoy
-con_cambios <- directorios |> 
-  filter(modification_time >= today())
-
 # directorios sin cambios hoy
 sin_cambios <- directorios |> 
-  filter(modification_time < today())
+  filter(modification_time < today()) |> 
+  mutate(fuente = stringr::str_extract(path, "resultados/\\w+") |> stringr::str_remove("resultados/")) |> 
+  select(fuente, size, modification_time)
 
-# datos guardados hoy
-map(directorios$path, ~{
-  # directorio <- directorios |>
-  #   slice(1) |>
-  #   pull(path) |>
-  #   dir_info()
-  
+# directorios con cambios hoy
+con_cambios <- map(directorios$path, ~{
   directorio <- dir_info(.x)
   
   directorio |> 
@@ -32,22 +25,7 @@ map(directorios$path, ~{
 }) |> 
   list_rbind()
 
+cat("\nfuentes con datos guardados hoy:\n"); print(con_cambios, n = Inf); cat("\nfuentes sin datos guardados hoy:\n"); sin_cambios
 
-# fuentes sin guardados hoy
-map(directorios$path, ~{
-  directorio <- dir_info(.x)
-  
-  datos <- directorio |> 
-    filter(modification_time >= today())
-  
-  if (nrow(datos) == 0) {
-    
-    fuente <- stringr::str_extract(.x, "resultados/\\w+") |> stringr::str_remove("resultados/")
-    tibble(fuente, "fecha" = today())
-  } else {
-    return(NULL)
-  }
-  
-}) |> 
-  list_rbind()
+
 
