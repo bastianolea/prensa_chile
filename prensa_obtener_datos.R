@@ -42,7 +42,7 @@ scraping_prensa("modulos/cron_diariofinanciero.r") #histórico solo hasta págin
 
 scraping_prensa("modulos/cron_elmostrador.r") #(requiere selenium)
 
-# scraping_prensa("modulos/cron_lacuarta.r") #histórico solo hasta página 9
+scraping_prensa("modulos/cron_lacuarta.r") #histórico solo hasta página 9
 
 scraping_prensa("modulos/cron_cooperativa.r")
 
