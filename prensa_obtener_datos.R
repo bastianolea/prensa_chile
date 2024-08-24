@@ -1,3 +1,6 @@
+# ejecuta scripts de webscraping en paralelo para obtener datos recientes de todas las fuentes
+# output: resultados/{fuente}/...
+
 library(dplyr)
 library(rvest)
 library(polite)
