@@ -1,14 +1,29 @@
 # ejecutar todos los pasos de procesamiento, post scraping (prensa_obtener_datos.R)
-# para producir 
+
+inicio <- Sys.time()
 
 # unión de scraping en una sola base de datos
-source("procesamiento/prensa_p1_cargar_datos.R")
+# cargar datos scrapeados y guardarlos en una sola base, una noticia por fila
+source("procesamiento/prensa_p1_cargar_datos.R", echo = TRUE)
 # output: datos/prensa_datos.feather
 
 # tokenización de textos en palabras
-source("procesamiento/prensa_p2_procesar_texto.R")
+# transformar datos de prensa en base tokenizada por palabras para análisis de texto
+source("procesamiento/prensa_p2_procesar_texto.R", echo = TRUE)
 # output: datos/prensa_palabras.feather
 
-# conteo de frecuencia de palabras
-source("procesamiento/prensa_p3_calcular_conteo.R")
+# conteo de frecuencia de palabras por noticia
+# source("procesamiento/prensa_p3_calcular_conteo.R", echo = TRUE)
 # output: datos/prensa_palabras_conteo.parquet
+
+# correlación entre palabras dentro de noticias, retorna base con palabras y sus pares correlacionados
+# source("analisis/prensa_calcular_correlacion.R", echo = TRUE)
+# output: datos/prensa_correlacion.parquet
+
+# procesamiento de noticias para identificar topicos mediante machine learning
+# source("analisis/prensa_calcular_topicos.R")
+
+final <- Sys.time()
+
+tiempo = final - inicio
+# 11 minutos en total

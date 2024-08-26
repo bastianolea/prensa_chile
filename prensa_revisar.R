@@ -68,6 +68,7 @@ datos_prensa |>
   pull(fuente) |> 
   unique() |> dput()
 
+
 # noticias por mes
 datos_prensa |>
   mutate(fecha = floor_date(fecha, "month")) |>
@@ -80,7 +81,7 @@ datos_prensa |>
   filter(fecha == dmy("27-02-2022"))
 
 
-# gráficos ----
+# gráfico noticias por fuentes ----
 
 # gráfico noticias por fuente y mes
 datos_prensa_grafico <- datos_prensa |>
@@ -110,7 +111,7 @@ datos_prensa_grafico |>
         legend.margin = margin(t=15), 
         panel.spacing.x = unit(4, "mm"))
 
-ggsave(glue::glue("graficos/datos_prensa_scraping_{today()}_h.png"), 
+ggsave(glue::glue("graficos/datos_prensa_scraping_{today()}_c.png"), 
        width = 11, height = 8, bg = "white")
 
 
@@ -127,10 +128,11 @@ datos_prensa_grafico |>
         axis.title = element_blank(),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.y = element_blank()) +
+  theme(panel.spacing.x = unit(0.4, "cm")) +
   labs(title = "Noticias mensuales, por fuente, 2024",
        caption = "Fuente: elaboración propia. Bastián Olea Herrera")
 
-ggsave(glue::glue("graficos/datos_prensa_fuentes_2024_{today()}_a.png"), 
+ggsave(glue::glue("graficos/datos_prensa_fuentes_2024_{today()}.png"), 
        width = 11, height = 8, bg = "white")
 
 

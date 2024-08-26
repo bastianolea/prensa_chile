@@ -19,9 +19,9 @@ scraping_prensa("modulos/cron_meganoticias.r") #hist
 
 scraping_prensa("modulos/cron_eldinamo.r") #hist
 
-scraping_prensa("modulos/cron_lanacion.r") #hist (pendiente)
+scraping_prensa("modulos/cron_lanacion.r") #hist
 
-scraping_prensa("modulos/cron_publimetro.r") #hist (pendiente)
+scraping_prensa("modulos/cron_publimetro.r") #hist
 
 scraping_prensa("modulos/cron_theclinic.r") #hist
 
@@ -53,7 +53,7 @@ scraping_prensa("modulos/cron_chvnoticias.r")
 
 scraping_prensa("modulos/cron_t13.r")
 
-scraping_prensa("modulos/cron_agricultura.r")
+scraping_prensa("modulos/cron_agricultura.r") #hist
 
 scraping_prensa("modulos/cron_biobio.r")
 
