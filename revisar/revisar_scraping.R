@@ -27,8 +27,6 @@ con_cambios <- map(directorios$path, ~{
 
 cat("\nfuentes con datos guardados hoy:\n"); print(con_cambios, n = Inf); cat("\nfuentes sin datos guardados hoy:\n"); print(sin_cambios, n = Inf)
 
-
-
 map(directorios$path, ~dir_info(.x)) |> 
   list_rbind() |> 
   mutate(fuente = stringr::str_extract(path, "resultados/\\w+") |> stringr::str_remove("resultados/")) |> 

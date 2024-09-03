@@ -78,14 +78,15 @@ intentar <- function(x, nombre = "prueba") {
 
 revisar_resultados <- function(ruta) {
   walk(list.dirs(ruta, full.names = T, recursive = F), ~{
-    Sys.sleep(0.2)
+    Sys.sleep(0.1)
     #x_carpeta <- carpetas[1]
     x_carpeta <- .x
     
     revision <- x_carpeta |> 
       list.files(full.names = T) |> 
       file.info() |> 
-      tibble::tibble()
+      tibble::tibble() |> 
+      filter(size > 10000)
     
     #mensaje
     if (max(revision$ctime) |> as.Date() == lubridate::today()) {

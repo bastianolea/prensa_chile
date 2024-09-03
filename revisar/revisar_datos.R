@@ -7,9 +7,33 @@ library(ggplot2)
 
 if (!exists("datos_prensa")) datos_prensa <- arrow::read_feather("datos/prensa_datos.feather")
 
-# revisar ----
+# revisar
+cat("total de noticias únicas:", scales::comma(nrow(datos_prensa)))
 
-#fuentes sin noticias en años
+# noticias por año ----
+datos_prensa |>
+    count(año) |>
+    arrange(desc(año))
+
+# noticias por fuente ----
+datos_prensa |>
+  count(fuente) |>
+  arrange(desc(n))
+
+# noticias por mes ----
+datos_prensa |>
+  mutate(fecha = floor_date(fecha, "month")) |>
+  count(fecha) |>
+  arrange(desc(fecha))
+
+# noticias por año y por fuente ----
+datos_prensa |>
+  count(año, fuente) |>
+  arrange(fuente, desc(año)) |> 
+  print(n=Inf)
+
+
+#fuentes sin noticias en años ----
 conteo_años <- datos_prensa |> 
   mutate(año = as.factor(año),
          fuente = as.factor(fuente)) |> 
@@ -26,12 +50,12 @@ conteo_años |>
   ggplot(aes(año, n, fill = fuente)) +
   geom_col(color = "white")
 
-# noticias sin fecha por fuente
+# noticias sin fecha por fuente ----
 datos_prensa |>
   filter(is.na(fecha)) |>
   count(fuente)
 
-# fechas minimas y maximas por fuente
+# fechas minimas y maximas por fuente ----
 datos_prensa |> 
   group_by(fuente) |> 
   summarize(min = min(fecha, na.rm = T),
@@ -42,23 +66,7 @@ max(datos_prensa$fecha, na.rm = T)
 
 datos_prensa |> filter(is.na(fecha))
 
-# noticias por año
-datos_prensa |>
-  count(año) |>
-  arrange(desc(año))
-
-# noticias por fuente
-datos_prensa |>
-  count(fuente) |>
-  arrange(desc(n))
-
-# noticias por año y por fuente
-datos_prensa |>
-  count(año, fuente) |>
-  arrange(fuente, desc(año)) |> 
-  print(n=Inf)
-
-# fuentes con mas de 5 años de noticias
+# fuentes con mas de 5 años de noticias ----
 datos_prensa |>
   count(año, fuente) |>
   arrange(fuente, desc(año)) |> 
@@ -68,18 +76,7 @@ datos_prensa |>
   pull(fuente) |> 
   unique() |> dput()
 
-
-# noticias por mes
-datos_prensa |>
-  mutate(fecha = floor_date(fecha, "month")) |>
-  count(fecha) |>
-  arrange(desc(fecha))
-
-
-datos_prensa |> 
-  filter(fuente == "latercera") |> 
-  filter(fecha == dmy("27-02-2022"))
-
+# —----
 
 # gráfico noticias por fuentes ----
 
@@ -111,11 +108,11 @@ datos_prensa_grafico |>
         legend.margin = margin(t=15), 
         panel.spacing.x = unit(4, "mm"))
 
-ggsave(glue::glue("graficos/datos_prensa_scraping_{today()}_c.png"), 
+ggsave(glue::glue("graficos/datos_prensa_scraping_{today()}_a.png"), 
        width = 11, height = 8, bg = "white")
 
 
-# revisar noticias mensuales, por fuentes y por año
+# gráfico noticias mensuales, por fuentes y por año ----
 datos_prensa_grafico |> 
   filter(año == 2022) |> 
   ggplot(aes(fecha, fill = fuente)) +
@@ -152,10 +149,3 @@ conteo_prensa_años |>
   geom_point(size = 4, alpha = .8) +
   guides(color = guide_legend(position = "bottom")) +
   theme_minimal()
-
-
-
-# —----
-tc |> tibble::as_tibble() |> 
-  mutate(titulo = stringr::str_trunc(titulo, 50)) |> 
-  select(titulo, fecha)

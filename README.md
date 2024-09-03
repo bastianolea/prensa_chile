@@ -1,11 +1,11 @@
 
 # Análisis de prensa chilena
 
-Proyecto de ciencia de datos desarrollado en R para analizar texto de noticias chilenas. Comprende módulos para realizar web scraping de sitios web de prensa para obtener el texto de sus noticias, procesos para transformar ese texto en palabras (tokens), y procesos para analizar dicho corpus de palabras usando distintas técnicas.
+Proyecto de ciencia de datos desarrollado en R para analizar texto de noticias chilenas. Comprende módulos para realizar web scraping de sitios web de prensa para obtener el texto de sus noticias, procesos para transformar ese texto en palabras (tokens), y procesos para analizar dicho corpus de palabras usando distintas técnicas estadísticas.
 
-Actualmente, el corpus de noticias obtenido supera las 500.000 noticias individuales, abarcando más de 21 fuentes periodísticas distintas.
+Actualmente, el corpus de noticias obtenido supera las 590.000 noticias individuales, las cuales suman un total de 105 millones (!) de palabras, abarcando más de 21 fuentes periodísticas distintas.
 
-![Gráfico resumen de resultados del scraping de prensa](graficos/datos_prensa_scraping_2024-08-25_c.png)
+![Gráfico resumen de resultados del scraping de prensa](graficos/datos_prensa_scraping_2024-09-02_a.png)
 
 ## Principales hallazgos
 
@@ -20,7 +20,7 @@ El script `prensa_procesar.R` es un orquestador desde el que se pueden realizar 
 ### Scraping
 En la carpeta `modulos` se encuentran decenas de scripts individuales, uno por cada medio de comunicación o fuente de prensa, cada uno de los cuales realiza scraping de las noticias de dicho medio y las guarda. **Actualización:** si requieres acceder a los módulos de web scraping, por favor contactarme directamente.
 
-Es posible realizar el scraping de uno de los medios ejecutando estos scripts individualmente, o bien, usarlos todos de forma simultánea y paralela (todos al mismo tiempo) ejecutando las funciones del script `prensa_obtener_datos.R`. Por ejemplo, para scrapear las noticias del diacio CNN Chile, se cargan las librerías del script `prensa_obtener_datos.R` y se cargan las funciones del proyecto con `source("funciones_scraping.r")`, para así poder ejecutar la función `scraping_prensa("modulos/cron_cnnchile.r")`, la cual va a ejecutar un _background job_ de RStudio, es decir, un proceso que se ejecuta de forma independiente y en el fondo (sin bloquear la consola de R). 
+Es posible realizar el scraping de uno de los medios ejecutando estos scripts individualmente, o bien, usarlos todos de forma simultánea y paralela (todos al mismo tiempo) ejecutando las funciones del script `prensa_obtener_datos.R`. Por ejemplo, para scrapear las noticias del diacio CNN Chile, se cargan las librerías del script `prensa_obtener_datos.R` y se cargan las funciones del proyecto con `source("funciones.R")`, para así poder ejecutar la función `scraping_prensa("modulos/cron_cnnchile.r")`, la cual va a ejecutar un _background job_ de RStudio, es decir, un proceso que se ejecuta de forma independiente y en el fondo (sin bloquear la consola de R). 
 
 Los resultados del scraping se guardarán en la carpeta con el nombre del medio, dentro de `resultados/`. 
 
@@ -39,7 +39,7 @@ Los scripts que en `prensa_obtener_datos.R` dicen "hist" son "históricos", es d
 
 
 ## Licencia
-Este código se rige por la licencia **GNU General Public License**, una licencia de código abierto, por lo que puedes usar el código libremente y modificarlo, pero debes compartir tus modificaciones bajo la misma licencia. Esto permite a los usuarios usar y modificar el software, y garantizar que el código seguirá siendo libre (copyleft) al imponer que subsecuentes usos o modificaciones del código deban ser compartidas de forma abierta. Por favor, citar este repositorio, y su autor, Bastián Olea Herrera.
+Este código se rige por la licencia **GNU General Public License**, una licencia de código abierto, por lo que puedes usar el código libremente y modificarlo, pero debes compartir tus modificaciones bajo la misma licencia. Esto permite a los usuarios usar y modificar el software, garantizando que el código resultante seguirá siendo libre (copyleft) al imponer que subsecuentes usos o modificaciones del código deban tamnbién ser compartidas de forma abierta. Por favor, citar este repositorio, y su autor, Bastián Olea Herrera.
 
 
 ----
