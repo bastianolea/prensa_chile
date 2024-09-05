@@ -46,14 +46,20 @@ prensa_conteo_3 <- prensa_conteo_2 |>
   mutate(semana = week(fecha))
 
 # conteo ----
-palabras_top_semana <- prensa_conteo_3 |> 
+palabras_semana <- prensa_conteo_3 |> 
   group_by(semana, palabra) |> 
   # conteo por semanas
   summarize(n = sum(n),
-            fecha = min(fecha)) 
+            fecha = min(fecha)) |> 
+  ungroup() |> 
+  # mínimo
+  filter(n > 10)
+
+# guardar
+arrow::write_parquet(palabras_semana, "apps/prensa_semanal/palabras_semana.parquet")
 
 # ajustes ----
-data <- palabras_top_semana |> 
+data <- palabras_semana |> 
   # límite de fecha
   filter(fecha >= floor_date(today() - weeks(9), "month")) |>
   # calcular frecuencia total de cada palabra
@@ -127,6 +133,8 @@ data |>
   # escalas
   scale_y_continuous(expand = expansion(c(.espaciado_y*0.7, .espaciado_y))) +
   scale_x_date(date_breaks = "weeks", date_labels = "%d de %B", expand = expansion(c(.espaciado_x, .espaciado_x))) +
+  # paletteer::scale_color_paletteer_d("rcartocolor::Antique", dynamic = FALSE) +
+  # scale_color_viridis_d(end = .8, option="magma") +
   guides(color = guide_none()) +
   theme_classic() +
   coord_cartesian(clip = "off") +
