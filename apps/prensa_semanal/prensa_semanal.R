@@ -16,9 +16,17 @@ datos_prensa
 #   filter(n > 3) |> 
 #   arrange(id, desc(n))
 
+# opciones gráfico
+.dodge = 3
+.angulo = 40
+.espaciado_y = 0.08
+.espaciado_x = 0.05
+
 # palabras irrelevantes ----
-palabras_irrelevantes = c("chile", "publicar", "año", "añosa", 
-                          "país", "persona", "año", "comunicación")
+palabras_irrelevantes = c("chile", "publicar", 
+                          "año", "añosa", "añosen",
+                          "país", "persona", "comunicación"
+)
 
 # preparar datos ----
 prensa_conteo_2 <- prensa_palabras_conteo |> 
@@ -31,71 +39,106 @@ prensa_conteo_2 <- prensa_palabras_conteo |>
               select(id, fuente, fecha, titulo),
             by = "id")
 
-# conteo ----
-palabras_top_semana <- prensa_conteo_2 |> 
+# fechas ----
+prensa_conteo_3 <- prensa_conteo_2 |> 
   # rango de fechas 
   filter(fecha >= today() - months(6)) |> 
-  mutate(semana = week(fecha)) |> 
+  mutate(semana = week(fecha))
+
+# conteo ----
+palabras_top_semana <- prensa_conteo_3 |> 
   group_by(semana, palabra) |> 
   # conteo por semanas
   summarize(n = sum(n),
-            fecha = min(fecha)) |> 
-  # dejar solo top 10 palabras por semana
-  group_by(semana) |> 
-  slice_max(n, n = 10)
+            fecha = min(fecha)) 
 
-# detalles ----
-palabras_top_semana_2 <- palabras_top_semana |> 
-  # ordenar palabras por frecuencia
-  group_by(palabra) |> 
-  mutate(total = sum(n)) |> 
-  ungroup() |> 
-  mutate(palabra = fct_reorder(palabra, total)) |> 
-  # eliminar palabras chicas en contexto
-  filter(n > mean(n)*0.7) |>
-  # dejar solo top palabras total (maximo de palabras visibles)
-  mutate(palabra_lump = fct_lump(palabra, w = total, 
-                                 n = 30, other_level = "otras")) |> 
-  filter(palabra_lump != "otras") |> 
+# ajustes ----
+data <- palabras_top_semana |> 
   # límite de fecha
   filter(fecha >= floor_date(today() - weeks(9), "month")) |>
+  # calcular frecuencia total de cada palabra
+  group_by(palabra) |> 
+  mutate(freq_total_palabra = sum(n)) |> 
+  # calcular total de palabras por semana
+  group_by(semana) |> 
+  mutate(palabras_semana = sum(n)) |> 
+  # sacar semanas chicas
+  ungroup() |> 
+  filter(palabras_semana > mean(palabras_semana)*.6) |> 
+  # eliminar palabras chicas en contexto
+  ungroup() |> 
+  filter(freq_total_palabra > mean(freq_total_palabra)*2) |>
+  # calcular porcentaje de palabra por semana
+  group_by(semana) |> 
+  mutate(p_palabra_semana = n/palabras_semana) |> 
+  # dejar solo top palabras semana por porcentaje de semana
+  filter(p_palabra_semana > 0.003) |> 
+  ungroup() |> 
+  # # dejar solo top palabras total (maximo de palabras visibles)
+  # mutate(palabra_lump = fct_lump(palabra, w = freq_total_palabra, 
+  #                                n = 25, other_level = "otras")) |> 
+  # filter(palabra_lump != "otras") |> 
   # sacar palabras que salen una sola vez
-  add_count(palabra, name = "palabra_n") |> 
-  filter(palabra_n > 1) |> 
+  # add_count(palabra, name = "palabra_n") |>
+  # filter(palabra_n > 1) |>
   # sacar semanas donde hayan pocos términos (indicio de error)
   group_by(semana) |> 
   mutate(semana_n = n()) |> 
-  filter(semana_n > 2)
+  filter(semana_n > 2) |> 
+  # dejar solo top 10 palabras por semana
+  group_by(semana) |>
+  slice_max(n, n = 10)
+  # dejar solo palabras con cierta frecuencia
+  # filter(n > 00)
+  # ungroup() |>
+  # filter(n > mean(n)*0.5)
+  
+
 
 
 # gráfico ----
-palabras_top_semana_2 |> 
+data |> 
+  # ordenar palabras por frecuencia
+  ungroup() |> 
+  mutate(palabra = fct_reorder(palabra, freq_total_palabra)) |> 
+  # etiquetas hacia la izquierda
+  mutate(inv = ifelse(semana == min(semana) | n < mean(n)*0.8, TRUE, FALSE)) |> 
+  # por porcentaje o por frecuencia
   # group_by(semana) |>
   # mutate(n = n/sum(n)) |>
   ggplot(aes(fecha, n)) +
   geom_step(aes(color = palabra),
-            linewidth = .8,
-            position = position_dodge(3),
-            direction = "mid", show.legend = F) +
+            linewidth = .9, alpha = .5,
+            direction = "mid", 
+            position = position_dodge(.dodge),
+            show.legend = F) +
   geom_point(aes(group = palabra),
              size = 3, color = "white", 
-             position = position_dodge(3)) +
+             position = position_dodge(.dodge)) +
   geom_point(aes(color = palabra),
-             size = 2, position = position_dodge(3)) +
-  shadowtext::geom_shadowtext(aes(label = paste("  ", palabra), 
-                                  color = palabra),
-                              bg.colour = "white", bg.r = 0.3, #color = "black",
-            angle = 30, size = 2.4, hjust = 0, vjust = 0.3, 
-            # nudge_x = 0.06, nudge_y = max(palabras_top_semana$n)*0.02, 
-            position = position_dodge(3),
-            check_overlap = T, show.legend = F) +
-  scale_y_continuous(expand = expansion(c(0.05, 0.1))) +
-  scale_x_date(date_breaks = "weeks", date_labels = "%d de %B", 
-               expand = expansion(c(0.02, 0.07))) +
+             size = 2, position = position_dodge(.dodge)) +
+  # texto
+  shadowtext::geom_shadowtext(
+    aes(label = ifelse(inv, paste(palabra, "  "), paste("  ", palabra)),
+        hjust = ifelse(inv, 1, 0),
+        color = palabra),
+    bg.colour = "white", bg.r = 0.3, angle = .angulo, size = 2.8, vjust = 0.3, 
+    position = position_dodge(.dodge), check_overlap = T, show.legend = F) +
+  # escalas
+  scale_y_continuous(expand = expansion(c(.espaciado_y*0.7, .espaciado_y))) +
+  scale_x_date(date_breaks = "weeks", date_labels = "%d de %B", expand = expansion(c(.espaciado_x, .espaciado_x))) +
   guides(color = guide_none()) +
   theme_classic() +
+  coord_cartesian(clip = "off") +
   theme(panel.grid.major.x = element_line(),
-        axis.text.x = element_text(hjust = 1, angle = 30)) +
-  labs(y = "frecuencia de palabra por semana",
-       x = "semanas")
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_text(hjust = 1, angle = .angulo),
+        plot.caption = element_text(color = "grey80")) +
+  labs(y = "frecuencia de palabras por semana",
+       x = "semanas", 
+       title = "Conceptos principales en prensa, por semana", 
+       caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile")
 
+# guardar
+ggsave(paste0("graficos/noticias_semana_", today(), ".jpg"), 
+       width = 6, height = 5, scale = 1.5)
