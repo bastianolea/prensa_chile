@@ -13,7 +13,7 @@ source("procesamiento/prensa_p2_procesar_texto.R", echo = TRUE)
 # output: datos/prensa_palabras.feather
 
 # conteo de frecuencia de palabras por noticia
-# source("procesamiento/prensa_p3_calcular_conteo.R", echo = TRUE)
+source("procesamiento/prensa_p3_calcular_conteo.R", echo = TRUE)
 # output: datos/prensa_palabras_conteo.parquet
 
 # correlación entre palabras dentro de noticias, retorna base con palabras y sus pares correlacionados
