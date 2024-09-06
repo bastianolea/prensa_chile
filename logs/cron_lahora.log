@@ -1,0 +1,47 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+No encoding supplied: defaulting to UTF-8.
+Se obtuvieron 6 noticias en https://lahora.cl/cronica/
+No encoding supplied: defaulting to UTF-8.
+Se obtuvieron 6 noticias en https://lahora.cl/tv/
+https://lahora.cl/cronica/2024/09/05/que-es-la-mediacion-parental-restrictiva/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/cronica/2024/09/05/se-ratifica-la-prision-preventiva-para-luis-hermosilla-y-leonarda-villalobos/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/cronica/2024/09/05/jovenes-talentos-de-los-liceos-sofofa-conquistan-el-h2-grand-prix-y-se-preparan-para-representar-al-pais-en-estados-unidos-en-2025/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/cronica/2024/09/05/atencion-doglovers-inedita-fonda-perruna-se-inaugura-en-la-pampilla-de-coquimbo-para-fiestas-patrias/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/cronica/2024/09/05/asi-espera-pichilemu-a-los-turistas-en-fiestas-patrias/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/cronica/2024/09/05/le-rompieron-el-alma-quien-era-pablo-leiva-el-estudiante-de-medicina-que-se-quito-la-vida-por-el-maltrato-en-el-internado/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/tv/2024/09/06/entrevista-los-vecinos-no-pueden-andar-persiguiendo-traficantes-edita-alarcon-y-las-preocupaciones-de-la-granja/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/tv/2024/09/05/los-amigos-de-daniel-jadue-y-el-pc-tendran-que-irse-de-lo-espejo-miguel-bruna-apunta-a-ordenar-la-casa/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/tv/2024/09/03/llegamos-en-una-situacion-precaria-pedro-carcuro-y-el-regreso-de-la-roja-a-las-clasificatorias/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/tv/2024/09/02/entrevista-l-no-se-hablara-mas-de-las-esquinas-de-la-muerte-daniela-parada-y-la-delincuencia-en-independencia/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/tv/2024/08/27/entrevista-l-aqui-y-ahora-daniel-reyes-invito-a-los-candidatos-de-la-florida-a-realizarse-el-test-de-drogas/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/tv/2024/08/25/queremos-enfrentarnos-a-rodrigo-mundaca-octavio-gonzalez-apuesta-por-la-segunda-vuelta-en-valparaiso/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+listo cron lahora 2024-09-06 00:21:13.07011

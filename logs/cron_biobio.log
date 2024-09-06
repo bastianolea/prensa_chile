@@ -1,0 +1,83 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+https://www.biobiochile.cl/lista/busca-2020/categorias/nacional (estado: 200)
+Se obtuvieron 19 noticias en https://www.biobiochile.cl/lista/busca-2020/categorias/nacional
+https://www.biobiochile.cl/lista/busca-2020/categorias/economia (estado: 200)
+Se obtuvieron 19 noticias en https://www.biobiochile.cl/lista/busca-2020/categorias/economia
+https://www.biobiochile.cl/lista/categorias/opinion (estado: 200)
+Se obtuvieron 19 noticias en https://www.biobiochile.cl/lista/categorias/opinion
+# A tibble: 57 × 2
+   enlace                                                                 origen
+   <chr>                                                                  <chr> 
+ 1 https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/… https…
+ 2 https://www.biobiochile.cl/noticias/nacional/region-metropolitana/202… https…
+ 3 https://www.biobiochile.cl/noticias/nacional/region-de-valparaiso/202… https…
+ 4 https://www.biobiochile.cl/noticias/nacional/region-metropolitana/202… https…
+ 5 https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/… https…
+ 6 https://www.biobiochile.cl/noticias/nacional/region-metropolitana/202… https…
+ 7 https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2024… https…
+ 8 https://www.biobiochile.cl/noticias/nacional/region-de-los-rios/2024/… https…
+ 9 https://www.biobiochile.cl/noticias/nacional/region-metropolitana/202… https…
+10 https://www.biobiochile.cl/noticias/nacional/chile/2024/09/05/abogado… https…
+# ℹ 47 more rows
+https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/09/06/nueva-polemica-por-gigante-china-cwe-que-busca-instalar-hidroelectrica-en-el-rio-bio-bio.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/05/don-satanas-rodrigo-topelberg-revela-detalles-de-su-encuentro-con-luis-hermosilla-en-capitan-yaber.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-de-valparaiso/2024/09/05/valparaiso-incendio-en-cerro-ramaditas-deja-una-vivienda-destruida.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/05/colegio-de-puente-alto-suspende-clases-y-celebracion-patria-tras-brutal-rina-de-alumnos-y-apoderados.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/09/05/pdi-encuentra-chalecos-antibalas-de-los-tres-carabineros-asesinados-en-canete.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/05/decretan-prision-preventiva-para-pistolero-acusado-de-matar-a-joven-en-poblacion-la-victoria.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2024/09/05/ministra-de-medio-ambiente-afirma-que-contaminacion-ha-disminuido-40-en-osorno.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-de-los-rios/2024/09/05/valdivia-ministro-de-transportes-admite-que-no-conoce-los-problemas-de-conectividad-de-morrompulli.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/05/tras-elaboracion-de-millonarios-informes-piden-indagar-al-municipio-de-las-condes-por-fraude-al-fisco.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/chile/2024/09/05/abogado-del-cde-uno-no-sabe-cuando-habla-el-hermano-de-luis-hermosilla-o-cuando-habla-el-abogado.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/09/05/encuentran-cadaver-de-una-mujer-a-un-costado-de-via-ferrea-en-coronel.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/chile/2024/09/05/preocupacion-por-frontera-maritima-y-elogios-a-tecnologias-alcaldes-del-norte-y-reunion-con-monsalve.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/05/declaran-culpable-a-fiscal-tufit-bufadel-por-abuso-sexual-en-el-centro-de-justicia.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-de-valparaiso/2024/09/05/caos-vial-en-valparaiso-obras-de-esval-en-santos-ossa-se-extenderan-al-menos-hasta-el-martes.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/09/05/division-entre-concejales-por-paro-de-funcionarios-municipales-impidio-realizacion-de-concejo.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/chile/2024/09/05/confirman-prision-preventiva-para-luis-hermosilla-y-leonarda-villalobos.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-de-la-araucania/2024/09/05/fiscalia-abre-indagatoria-por-atentado-que-impidio-evaluar-factibilidad-para-exhumar-a-pablo-marchant.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/05/organizaciones-demandan-a-la-clc-por-servicios-impagos-la-deuda-asciende-a-mas-de-9-mil-millones.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2024/09/05/suspenden-a-funcionarios-del-hpm-que-estarian-involucrados-en-violacion-de-colega-les-siguen-pagando.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/05/peru-supera-a-chile-como-el-pais-de-la-region-que-mas-tiempo-mantiene-su-inflacion-a-un-digito.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/05/fonasa-preve-nueva-fuga-masiva-de-afiliados-en-isapres-durante-el-segundo-semestre.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/05/el-delito-gano-y-nosotros-perdimos-gremio-de-comercio-lanza-critica-por-polemico-cierre-de-farmacia.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/05/wall-street-cerro-con-resultados-mixtos-tras-datos-agridulces-de-empleo-en-estados-unidos.shtml (estado: 200)

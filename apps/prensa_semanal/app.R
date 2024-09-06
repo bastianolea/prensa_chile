@@ -3,6 +3,7 @@ library(bslib)
 library(thematic)
 library(showtext)
 library(htmltools)
+library(shinyjs)
 library(arrow)
 library(dplyr)
 library(ggplot2)
@@ -11,22 +12,27 @@ library(lubridate)
 library(shadowtext)
 library(shinycssloaders)
 library(ragg)
-options(shiny.useragg = TRUE)
-showtext::showtext_opts(dpi = 180)
 
-color_fondo = "#EED0A8"
+# colores ----
+color_fondo = "#EEDABF"
 color_texto = "#866C53"
 color_detalle = "#A5876A"
 color_destacado = "#C7392B"
 
+# configuraciones ----
 thematic_shiny(
   # font = "auto", 
   font = font_spec(families = c("Lato", "Libre Baskerville")),
   # session = session,
   bg = color_fondo, fg = color_texto, accent = color_destacado)
 
+source("funciones.R")
 
-# datos ----
+options(shiny.useragg = TRUE)
+showtext::showtext_opts(dpi = 180)
+options(spinner.type = 8, spinner.color = color_detalle)
+
+# cargar datos ----
 # palabras_semana <- read_parquet("apps/prensa_semanal/palabras_semana.parquet")
 palabras_semana <- read_parquet("palabras_semana.parquet")
 
@@ -38,11 +44,12 @@ palabras_posibles <- palabras_semana |>
   pull(palabra)
 
 
+# ui ----
 ui <- page_fluid(
   title = "Prensa en Chile", 
   lang = "es",
   
-  # tema ----
+  ## tema ----
   theme = bslib::bs_theme(
     font_scale = 1.2,
     bg = color_fondo, fg = color_texto, primary = color_destacado, 
@@ -57,7 +64,9 @@ ui <- page_fluid(
     # )
   ),
   
-  # css ----
+  shinyjs::useShinyjs(),
+  
+  ## css ----
   tags$style(
     HTML("a { color: ", color_detalle, "}")
   ),
@@ -77,6 +86,7 @@ ui <- page_fluid(
                
                em(tags$a("Bastián Olea Herrera", href = "https://bastianolea.github.io/shiny_apps/",
                          style = css("color!" = color_detalle,
+                                     opacity = "60%",
                                      text_decoration = "none")),
                )
            ),
@@ -91,62 +101,94 @@ ui <- page_fluid(
   
   
   
-  ## gráfico semanas ----
+  # gráfico semanas ----
+  fluidRow(
+    column(12,
+           h3("Palabras más frecuentes por semana"),
+           
+           markdown("Gráfico que presenta las palabras más frecuentes en cada semana de la prensa escrita chilena. Una línea conecta palabras que han sido relevantes por más de una semana, para seguir su tendencia. Cada palabra tiene un color, pero puedes usar las opciones para destacar una palabra por sobre el resto."),
+    )
+  ),
   fluidRow(
     column(9,
            plotOutput("g_semanas", 
-                      width = "100%", height = "600px") |> withSpinner()
+                      width = "100%", height = "640px") |> withSpinner(),
+           
+           markdown("Éste gráfico se genera automáticamente, a partir de un proceso automatizado de obtención de textos y procesamiento de datos.
+                    A partir de todas las noticias publicadas por los medios comunicacionales escritos online, semana a semana, se transforman todas las noticias en palabras separadas, y se cuenta la repetición de cada palabra, tomando como una repetición las distintas conjugaciones de cada palabra (por ejemplo, _delincuente_ y _delincuencia_ cuentan como una sola palabra repetida 2 veces). Luego, se eliminan palabras irrelevantes (como artículos, pronombres y otras), y se genera un ranking de las palabras más frecuentes para cada semana."),
+           
     ),
     column(3,
-           ### configuración ----
-           h2("config"),
+           ## opciones ----
+           h5("Opciones del gráfico"),
            
            sliderInput("semanas",
-                       "semanas",
+                       "Rango de semanas",
                        min = 2, max = 4*5,
                        value = 9),
            
-           # sliderInput("frecuencia_total",
-           #             "frecuencia_total",
-           #             min = -4,
-           #             max = 4,
-           #             value = 2,
-           #             step = 0.5),
-           
-           sliderInput("frecuencia_min",
-                       "frecuencia_min",
-                       min = 0.001, max = 0.010,
-                       value = 0.003,
-                       step = 0.001),
-           
-           sliderInput("palabras_semana_max",
-                       "palabras_semana_max",
-                       min = 4, max = 20,
-                       value = 10,
-                       step = 1),
-           
-           selectizeInput("palabras_excluir",
-                          "palabras_excluir",
-                          choices = NULL,
-                          multiple = TRUE,
-                          options = list(create = TRUE,
-                                         placeholder = "")),
-           
-           sliderInput("angulo",
-                       "angulo",
-                       min = 0, max = 60,
-                       value = 40,
-                       step = 10),
-           
            selectizeInput("destacar_palabra",
-                          "destacar_palabra",
+                          "Destacar palabras",
                           choices = c("Ninguna", palabras_posibles),
                           multiple = FALSE,
                           options = list(search = TRUE,
                                          create = TRUE,
-                                         placeholder = "Ninguna")),
+                                         placeholder = "")),
+           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Escribir o elegir de la lista una palabra para destacarla con color en el gráfico.")
+           ),
+           
+           selectInput("texto_tamaño",
+                       "Tamaño del texto",
+                       choices = c("Normal" = 2.3, "Mediano" = 2.8, "Grande" = 3.2),
+                       selected = c("Mediano" = 2.8)
+           ),
            
            
+           div(id = "opciones_avanzadas",
+               
+               selectizeInput("palabras_excluir",
+                              "Excluir palabras",
+                              choices = NULL,
+                              multiple = TRUE,
+                              options = list(create = TRUE,
+                                             placeholder = "")),
+               div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                   em("Palabras a remover del gráfico. Separar con comas")
+               ),
+               
+               sliderInput("frecuencia_min",
+                           "Proporción mínima",
+                           min = 0.001, max = 0.010,
+                           value = 0.003, ticks = F,
+                           step = 0.001),
+               div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                   em("Proporción mínima que tiene que tener una palabra en el contexto de todas las palabras; por defecto, las palabras deben aparecer al menos en un 0,3% del total de palabras.")
+               ),
+               
+               sliderInput("palabras_semana_max",
+                           "Máximo de palabras por semana",
+                           min = 4, max = 20,
+                           value = 10,
+                           step = 1),
+               div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                   em("Cantidad máxima de palabras por cada semana; limita la cantidad de palabras por semana dejando sólo las x mayores; por defecto son 10.")
+               ),
+               
+               sliderInput("angulo",
+                           "Ángulo de etiquetas",
+                           min = 0, max = 60,
+                           value = 40,
+                           step = 10),
+               div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                   em("Ángulo del texto de las etiquetas; alterarlo puede hacer que aparezcan más etiquetas de palabras, dado que las que se sobreponen son ocultadas.")
+               )
+           ) |> shinyjs::hidden(),
+           
+           div(
+             style = css(opacity = "30%"),
+           actionButton("mostrar_opciones", "Opciones avanzadas")
+           )
            
     )
   ),
@@ -172,6 +214,14 @@ ui <- page_fluid(
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
+  
+  # interacciones ----
+  
+  observeEvent(input$mostrar_opciones, {
+    shinyjs::toggle("opciones_avanzadas")
+  })
+  
+  
   # datos ----
   ## datos conteo semanas ----
   datos_conteo_semanas <- reactive({
@@ -230,6 +280,9 @@ server <- function(input, output, session) {
       # etiquetas hacia la izquierda
       mutate(inv = ifelse(semana == min(semana) | n < mean(n)*0.8, TRUE, FALSE))
     
+    # datos |> slice(1) |> pull(fecha) |> 
+    # redactar_fecha()
+    
     # por porcentaje o por frecuencia
     # group_by(semana) |>
     # mutate(n = n/sum(n)) |>
@@ -238,7 +291,8 @@ server <- function(input, output, session) {
       # crea una variable dicotómica con la palabra destacada
       datos <- datos |> 
         mutate(destacar = ifelse(palabra == tolower(input$destacar_palabra), 
-                                 tolower(input$destacar_palabra), "otras"))
+                                 tolower(input$destacar_palabra), "otras"),
+               destacar = fct_relevel(destacar, "otras", after = 0))
     }
     
     # hace que los colores del gráfico sean por palabras, o por palabra destacada vs otras
@@ -263,11 +317,14 @@ server <- function(input, output, session) {
         aes(label = ifelse(inv, paste(palabra, "  "), paste("  ", palabra)),
             hjust = ifelse(inv, 1, 0),
             color = !!sym(variable), group = palabra),
-        bg.colour = color_fondo, bg.r = 0.3, angle = .angulo, size = 2.8, vjust = 0.3, 
+        bg.colour = color_fondo, bg.r = 0.3, angle = input$angulo, size = as.numeric(input$texto_tamaño), vjust = 0.3, 
         position = position_dodge(.dodge), check_overlap = T, show.legend = F) +
       # escalas
       scale_y_continuous(expand = expansion(c(.espaciado_y*0.7, .espaciado_y))) +
-      scale_x_date(date_breaks = "weeks", date_labels = "%d de %B", expand = expansion(c(.espaciado_x, .espaciado_x))) +
+      scale_x_date(date_breaks = "weeks", 
+                   labels = redactar_fecha,
+                   # date_labels = "%d de %B", 
+                   expand = expansion(c(.espaciado_x, .espaciado_x))) +
       guides(color = guide_none()) +
       # theme_classic() +
       coord_cartesian(clip = "off") +
@@ -276,6 +333,7 @@ server <- function(input, output, session) {
             axis.text.y = element_text(family = "Lato"),
             axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
             axis.text.x = element_text(family = "Lato", hjust = 1, angle = .angulo),
+            # panel.background = element_rect(fill = color_destacado),
             plot.caption = element_text(color = color_detalle)) +
       labs(y = "frecuencia de palabras por semana",
            x = NULL,
@@ -286,13 +344,13 @@ server <- function(input, output, session) {
     # paleta de colores si se destaca una palabra
     if (input$destacar_palabra != "Ninguna") {
       plot <- plot +
-        scale_color_manual(values = c(color_destacado, color_texto))
+        scale_color_manual(values = c(color_texto, color_destacado))
     } else {
       # browser()
       plot <- plot +
         # scale_color_brewer(palette = "Set1")
         # scale_color_manual(values = colorRampPalette(brewer.pal(Inf, "Dark2"))(length(unique(datos$palabra))))
-        scale_color_viridis_d(end = .75, option="magma")
+        scale_color_viridis_d(begin = .2, end = .7, option="magma")
     }
     
     

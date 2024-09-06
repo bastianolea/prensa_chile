@@ -1,0 +1,45 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+https://www.adnradio.cl/noticias/nacional/ (estado: 200)
+Se obtuvieron 39 noticias en https://www.adnradio.cl/noticias/nacional/
+https://www.adnradio.cl/noticias/politica/ (estado: 200)
+Se obtuvieron 39 noticias en https://www.adnradio.cl/noticias/politica/
+https://www.adnradio.cl/2024/09/05/condenan-a-oficiales-del-ejercito-a-presidio-perpetuo-por-secuestro-en-iquique-y-pisagua-durante-1973-y-1974/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/bienvenido-don-satanas-topelberg-relata-tenso-encuentro-con-hermosilla-en-capitan-yaber/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/detienen-en-terminal-de-buses-de-iquique-a-sicario-miembro-de-celula-del-tren-de-aragua/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/daniel-jadue-tras-salir-de-capitan-yaber-esperando-el-momento-para-demostrar-mi-inocencia/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/pdi-encuentra-los-chalecos-antibalas-de-los-carabineros-asesinados-en-canete/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/conflicto-de-interes-en-el-caso-convenios-esposo-de-fiscal-regional-asesoro-a-gremio-investigado/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/defensa-de-luis-hermosilla-califica-como-derrota-completa-la-ratificacion-de-la-prision-preventiva/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/no-es-una-ampliacion-alcaldesa-hassler-emite-informe-tecnico-rechazando-nueva-carcel-de-alta-seguridad-en-santiago/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/diputado-luis-cuello-propone-comision-investigadora-por-posibles-irregularidades-en-permisos-del-grupo-patio/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/foto-captada-por-chileno-da-la-vuelta-al-mundo-aparece-una-mama-puma-con-su-cachorro-en-torres-del-paine/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/mtt-inicia-nueva-regulacion-del-transporte-publico-en-el-sur-poniente-de-la-region-metropolitana/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/caso-audios-corte-de-apelaciones-mantiene-prision-preventiva-para-luis-hermosilla-y-leonarda-villalobos/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/toman-detenidos-a-dos-personas-por-el-homicidio-de-hincha-colocolino-tras-superclasico/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/como-usar-correctamente-un-condon-interno-el-paso-a-paso-para-el-uso-eficaz-del-articulo-de-salud-sexual/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/uno-en-una-celda-para-dos-y-la-otra-comparte-espacio-con-24-internas-las-diferencias-entre-las-carceles-de-hermosilla-y-villalobos/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/anestesiologos-demandan-a-clinica-las-condes-por-deuda-de-9-mil-millones-de-pesos/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/director-de-migraciones-asegura-que-desde-que-el-consulado-venezolano-se-fue-no-hemos-podido-expulsar-a-nadie/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/caso-audios-revelan-chats-de-luis-hermosilla-y-alvaro-jalaff-sobre-supuesto-financiamiento-a-campana-de-sebatian-pinera/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/detienen-a-cantante-urbano-en-coronel-tras-protagonizar-violento-portonazo-en-san-pedro-de-la-paz/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/cinco-adultos-y-dos-menores-de-edad-quienes-son-los-detenidos-en-la-violenta-pelea-registrada-en-colegio-de-puente-alto/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/fiscalia-apela-a-medida-cautelar-de-rodrigo-topelberg-por-caso-factop-solicitan-revocar-arresto-domiciliario/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/juzgado-condena-al-fiscal-tufit-bufadel-por-abuso-sexual-a-trabajadora-del-centro-de-justicia/ (estado: 200)
+https://www.adnradio.cl/2024/09/05/activan-protocolo-por-posible-caso-de-viruela-del-mono-en-tome-pruebas-son-analizadas-por-el-isp/ (estado: 200)

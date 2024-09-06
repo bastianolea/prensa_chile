@@ -1,9 +1,37 @@
-scraping_prensa <- function(ruta = "modulos/cron_radiopaulina.r") {
-  message(glue("iniciando {ruta} - {lubridate::now()}"))
+ejecutar <- function(script = "modulos/cron_elsiglo.r", 
+                     esperar = FALSE) {
   
+  ruta_log = script |> 
+    stringr::str_replace("\\.r$", ".log") |> 
+    stringr::str_replace("modulos/", "logs/")
+  
+  invisible(file.remove(ruta_log))
+  
+  comando <- paste0("nohup Rscript ", script, " >> ", ruta_log, " 2>&1")
+  
+  Sys.sleep(0.1)
+  system(comando, wait = esperar)
+}
+
+
+scraping_prensa <- function(script = "modulos/cron_radiopaulina.r") {
+  message(glue::glue("iniciando {script} - {lubridate::now()}"))
+  
+  # con source
   # glue("scraping/{f}") |> source() |> intentar(f)
-  # rstudioapi::jobRunScript(glue("modulos/{ruta}"), workingDir = "/Users/baolea/Documents/Apps Shiny/prensa")
-  rstudioapi::jobRunScript(ruta, workingDir = "/Users/baolea/R/prensa")
+  
+  # en subproceso (sesión) interactivo
+  # rstudioapi::jobRunScript(script, workingDir = "/Users/baolea/R/prensa")
+  
+  # # en subproceso (callr) no interactivo
+  # proc <- callr::r_bg(\(script) source(script), 
+  #                     supervise = TRUE,
+  #                     stderr = stringr::str_replace(script, "\\.r$", "\\.log"),
+  #                     stdout = stringr::str_replace(script, "\\.r$", "\\.log")
+  #                     )
+  
+  # ejecutar script en el fondo no interactivo
+  ejecutar(script)
 }
 
 
@@ -78,7 +106,7 @@ intentar <- function(x, nombre = "prueba") {
 
 revisar_resultados <- function(ruta) {
   walk(list.dirs(ruta, full.names = T, recursive = F), ~{
-    Sys.sleep(0.1)
+    Sys.sleep(0.05)
     #x_carpeta <- carpetas[1]
     x_carpeta <- .x
     
