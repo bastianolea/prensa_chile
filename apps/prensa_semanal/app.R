@@ -40,7 +40,9 @@ palabras_posibles <- palabras_semana |>
   group_by(palabra) |> 
   summarize(n = sum(n)) |> 
   arrange(desc(n)) |> 
-  slice(1:100) |> 
+  # filter(str_detect(palabra, "corru"))
+  # slice(1:500) |> 
+  filter(n > 1000) |> 
   pull(palabra)
 
 
@@ -187,9 +189,51 @@ ui <- page_fluid(
            
            div(
              style = css(opacity = "30%"),
-           actionButton("mostrar_opciones", "Opciones avanzadas")
+             actionButton("mostrar_opciones", "Opciones avanzadas")
            )
            
+    )
+  ),
+  
+  # gráfico palabras ----
+  fluidRow(
+    column(12,
+           br(),
+           hr(),
+           h3("Tendencia por palabras"),
+           
+           markdown("Seleccione una o varias palabras para ver su prevalencia entre el resto de palabras del total de noticias, por fecha."),
+    )
+  ),
+  
+  fluidRow(
+      column(6, style = css(max_width = "600px"),
+             selectizeInput("selector_palabras",
+                            "Seleccione palabras",
+                            choices = c("corrupción", "delincuencia", palabras_posibles),
+                            # choices = NULL,
+                            selected = c("delincuencia", "corrupción", "hermosilla", "enel"),
+                            multiple = TRUE,
+                            width = "100%",
+                            options = list(search = TRUE,
+                                           create = TRUE,
+                                           placeholder = "")),
+             div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                 em("Elegir palabras de la lista para incluirlas en el gráfico. La lista está ordenada por frecuencia de palabras.")
+             ),
+      ),
+      column(6,  style = css(max_width = "600px"),
+             sliderInput("semanas_palabras",
+                         "Rango de semanas",
+                         min = 2, max = 4*6,
+                         value = 9,
+                         width = "100%")
+      )
+    
+  ),
+  fluidRow(
+    column(12,
+           plotOutput("g_palabras", height = "640px", width = "100%") |> withSpinner()
     )
   ),
   
@@ -332,7 +376,7 @@ server <- function(input, output, session) {
             axis.ticks.x = element_blank(),
             axis.text.y = element_text(family = "Lato"),
             axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
-            axis.text.x = element_text(family = "Lato", hjust = 1, angle = .angulo),
+            axis.text.x = element_text(family = "Lato", hjust = 1, angle = input$angulo),
             # panel.background = element_rect(fill = color_destacado),
             plot.caption = element_text(color = color_detalle)) +
       labs(y = "frecuencia de palabras por semana",
@@ -340,7 +384,7 @@ server <- function(input, output, session) {
            # title = "Conceptos principales en prensa, por semana", 
            caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
       )
-    library(RColorBrewer)
+    
     # paleta de colores si se destaca una palabra
     if (input$destacar_palabra != "Ninguna") {
       plot <- plot +
@@ -356,6 +400,41 @@ server <- function(input, output, session) {
     
     return(plot)
     
+  }, res = 100)
+  
+  
+  ## gráfico palabras ----
+  
+  output$g_palabras <- renderPlot({
+    
+    data <- palabras_semana |> 
+      filter(fecha > today() - weeks(12)) |> 
+      filter(palabra %in% input$selector_palabras) |> 
+      group_by(palabra) |> 
+      mutate(freq_total_palabra = sum(n)) |> 
+      ungroup() |> 
+      mutate(palabra = fct_reorder(palabra, freq_total_palabra))
+    
+    plot <- data |> 
+      ggplot(aes(fecha, n, color = palabra)) +
+      geom_line(linewidth = .9, alpha = .7, show.legend = F) +
+      geom_point(size = 3, color = color_fondo) +
+      geom_point(size = 2) +
+      scale_color_viridis_d(begin = .2, end = .7, option = "magma") +
+      guides(color = guide_legend(reverse = T, override.aes = list(size = 4))) +
+      theme(legend.text = element_text(margin = margin(l = 2))) +
+      theme(panel.grid.major.x = element_line(),
+            axis.ticks.x = element_blank(),
+            axis.text.y = element_text(family = "Lato"),
+            axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
+            axis.text.x = element_text(family = "Lato", hjust = 1),
+            plot.caption = element_text(color = color_detalle)) +
+      labs(color = "Palabras", y = "frecuencia de palabras", x = NULL,
+           caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
+      )
+    
+    
+    return(plot)
   }, res = 100)
 }
 

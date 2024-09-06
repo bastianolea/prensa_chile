@@ -5,7 +5,7 @@ ejecutar <- function(script = "modulos/cron_elsiglo.r",
     stringr::str_replace("\\.r$", ".log") |> 
     stringr::str_replace("modulos/", "logs/")
   
-  invisible(file.remove(ruta_log))
+  invisible(suppressWarnings(file.remove(ruta_log)))
   
   comando <- paste0("nohup Rscript ", script, " >> ", ruta_log, " 2>&1")
   
