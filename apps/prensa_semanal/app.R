@@ -8,6 +8,7 @@ library(arrow)
 library(dplyr)
 library(ggplot2)
 library(forcats)
+library(stringr)
 library(lubridate)
 library(shadowtext)
 library(shinycssloaders)
@@ -20,17 +21,27 @@ color_detalle = "#A5876A"
 color_destacado = "#C7392B"
 
 # configuraciones ----
-thematic_shiny(
-  # font = "auto", 
-  font = font_spec(families = c("Lato", "Libre Baskerville")),
-  # session = session,
-  bg = color_fondo, fg = color_texto, accent = color_destacado)
+
+# register_font(name = "Lato")
 
 source("funciones.R")
 
 options(shiny.useragg = TRUE)
+
 showtext::showtext_opts(dpi = 180)
+font_add_google("Lato", "Lato")
+font_add_google("Libre Baskerville", "Libre Baskerville")
+showtext_auto()
+
 options(spinner.type = 8, spinner.color = color_detalle)
+
+thematic_shiny(
+  font = "auto",
+  # font = font_spec(families = c("Lato", "Libre Baskerville"), 
+  #                  install = TRUE),
+  # session = session,
+  bg = color_fondo, fg = color_texto, accent = color_destacado)
+
 
 # cargar datos ----
 # palabras_semana <- read_parquet("apps/prensa_semanal/palabras_semana.parquet")
@@ -55,11 +66,11 @@ ui <- page_fluid(
   theme = bslib::bs_theme(
     font_scale = 1.2,
     bg = color_fondo, fg = color_texto, primary = color_destacado, 
-    # tipografías
+    # tipografías 
     heading_font = font_google("Libre Baskerville", wght = c(400, 700),
-                               ital = c(0, 1)),
+                               ital = c(0, 1), local = TRUE),
     base_font = font_google("Lato",  wght = c(300, 400, 700, 900),
-                            ital = c(0, 1))
+                            ital = c(0, 1), local = TRUE)
     # base_font = font_link(
     #   "IBM Plex Mono",
     #   href = "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap"
@@ -106,7 +117,7 @@ ui <- page_fluid(
   # gráfico semanas ----
   fluidRow(
     column(12,
-           h3("Palabras más frecuentes por semana"),
+           h3("Palabras más frecuentes, por semana"),
            
            markdown("Gráfico que presenta las palabras más frecuentes en cada semana de la prensa escrita chilena. Una línea conecta palabras que han sido relevantes por más de una semana, para seguir su tendencia. Cada palabra tiene un color, pero puedes usar las opciones para destacar una palabra por sobre el resto."),
     )
@@ -137,7 +148,7 @@ ui <- page_fluid(
                                          create = TRUE,
                                          placeholder = "")),
            div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-               em("Escribir o elegir de la lista una palabra para destacarla con color en el gráfico.")
+               em("Escribir o elegir de la lista una palabra para destacarla con color en el gráfico. Como es un gráfico de palabras principales, puede que hayan palabras que no aparezcan dado que no fueron las principales dentro del rango de fechas.")
            ),
            
            selectInput("texto_tamaño",
@@ -200,35 +211,50 @@ ui <- page_fluid(
     column(12,
            br(),
            hr(),
-           h3("Tendencia por palabras"),
+           h3("Frecuencia de palabras, por semana"),
            
-           markdown("Seleccione una o varias palabras para ver su prevalencia entre el resto de palabras del total de noticias, por fecha."),
+           markdown("Seleccione una o varias palabras para comparar su frecuencia semanal."),
     )
   ),
   
   fluidRow(
-      column(6, style = css(max_width = "600px"),
-             selectizeInput("selector_palabras",
-                            "Seleccione palabras",
-                            choices = c("corrupción", "delincuencia", palabras_posibles),
-                            # choices = NULL,
-                            selected = c("delincuencia", "corrupción", "hermosilla", "enel"),
-                            multiple = TRUE,
-                            width = "100%",
-                            options = list(search = TRUE,
-                                           create = TRUE,
-                                           placeholder = "")),
-             div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                 em("Elegir palabras de la lista para incluirlas en el gráfico. La lista está ordenada por frecuencia de palabras.")
-             ),
-      ),
-      column(6,  style = css(max_width = "600px"),
-             sliderInput("semanas_palabras",
-                         "Rango de semanas",
-                         min = 2, max = 4*6,
-                         value = 9,
-                         width = "100%")
-      )
+    column(4, style = css(max_width = "600px"),
+           selectizeInput("selector_palabras",
+                          "Seleccione los conceptos que desea incluir",
+                          choices = c("corrupción", "delincuencia", palabras_posibles),
+                          # choices = NULL,
+                          selected = c("delincuencia", "corrupción", "hermosilla", "enel"),
+                          multiple = TRUE,
+                          width = "100%",
+                          options = list(search = TRUE,
+                                         create = TRUE,
+                                         placeholder = "")),
+           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Elegir palabras de la lista para incluirlas en el gráfico. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
+           ),
+    ),
+    column(4,  
+           style = css(max_width = "600px"),
+           selectInput("tipo_grafico",
+                       "Tipo de gráfico",
+                       choices = c("Barras", "Líneas"),
+                       selected = "Barras",
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Cambie el tipo de gráfico que se usará para visualizar los datos. Por defecto, se cambia a visualización de líneas si se seleccionan muchas palabras, y a barras si se seleccionan pocas.")
+           ),
+    ),
+    
+    column(4,  style = css(max_width = "600px"),
+           sliderInput("semanas_palabras",
+                       "Rango de semanas",
+                       min = 2, max = 4*6,
+                       value = 9,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Personalice el rango de tiempo que abarcará la visualización. Por defecto, si el rango es muy amplio, se cambia a barras.")
+           ),
+    )
     
   ),
   fluidRow(
@@ -351,18 +377,18 @@ server <- function(input, output, session) {
                 direction = "mid", 
                 position = position_dodge(.dodge),
                 show.legend = F) +
+      # texto
+      shadowtext::geom_shadowtext(
+        aes(label = ifelse(inv, paste(palabra, "  ."), paste("  ", palabra)),
+            hjust = ifelse(inv, 1, 0),
+            color = !!sym(variable), group = palabra),
+        bg.colour = color_fondo, bg.r = 0.3, angle = input$angulo, size = as.numeric(input$texto_tamaño), vjust = 0.3, 
+        position = position_dodge(.dodge), check_overlap = T, show.legend = F) +
       geom_point(aes(group = palabra),
                  size = 3, color = color_fondo, 
                  position = position_dodge(.dodge)) +
       geom_point(aes(color = !!sym(variable), group = palabra),
                  size = 2, position = position_dodge(.dodge)) +
-      # texto
-      shadowtext::geom_shadowtext(
-        aes(label = ifelse(inv, paste(palabra, "  "), paste("  ", palabra)),
-            hjust = ifelse(inv, 1, 0),
-            color = !!sym(variable), group = palabra),
-        bg.colour = color_fondo, bg.r = 0.3, angle = input$angulo, size = as.numeric(input$texto_tamaño), vjust = 0.3, 
-        position = position_dodge(.dodge), check_overlap = T, show.legend = F) +
       # escalas
       scale_y_continuous(expand = expansion(c(.espaciado_y*0.7, .espaciado_y))) +
       scale_x_date(date_breaks = "weeks", 
@@ -405,30 +431,109 @@ server <- function(input, output, session) {
   
   ## gráfico palabras ----
   
+  observeEvent(input$selector_palabras, {
+  if (length(input$selector_palabras) > 4) {
+    updateSelectInput(session, "tipo_grafico", 
+                      selected = "Líneas")
+  } else if (length(input$selector_palabras) <= 4) {
+    updateSelectInput(session, "tipo_grafico", 
+                      selected = "Barras")
+  }
+  })
+  
+  observeEvent(input$semanas_palabras, {
+    if (input$semanas_palabras > 16) {
+      updateSelectInput(session, "tipo_grafico", 
+                        selected = "Barras")
+    }
+  })
+  
   output$g_palabras <- renderPlot({
     
     data <- palabras_semana |> 
-      filter(fecha > today() - weeks(12)) |> 
+      filter(fecha > today() - weeks(input$semanas_palabras)) |> 
       filter(palabra %in% input$selector_palabras) |> 
       group_by(palabra) |> 
       mutate(freq_total_palabra = sum(n)) |> 
       ungroup() |> 
-      mutate(palabra = fct_reorder(palabra, freq_total_palabra))
+      mutate(palabra = fct_reorder(palabra, freq_total_palabra, .desc = T)) |> 
+      # otros datos
+      group_by(semana) |> 
+      mutate(n_semana = sum(n),
+             rank = dense_rank(desc(n))) |> 
+      ungroup() |> 
+      mutate(prom = mean(n)) |> 
+      mutate(chico = ifelse(n > prom*0.8, FALSE, TRUE)) |> 
+      # fechas
+      group_by(semana) |> 
+      mutate(fecha_etiqueta = redactar_fecha(min(fecha)),
+             fecha_etiqueta = fct_reorder(fecha_etiqueta, semana)) |> 
+      ungroup()
     
-    plot <- data |> 
-      ggplot(aes(fecha, n, color = palabra)) +
-      geom_line(linewidth = .9, alpha = .7, show.legend = F) +
-      geom_point(size = 3, color = color_fondo) +
-      geom_point(size = 2) +
-      scale_color_viridis_d(begin = .2, end = .7, option = "magma") +
-      guides(color = guide_legend(reverse = T, override.aes = list(size = 4))) +
+    # if (length(input$selector_palabras) > 4) {
+    if (input$tipo_grafico == "Líneas") {
+      plot <- data |> 
+        ggplot(aes(fecha_etiqueta, n, color = palabra, group = palabra)) +
+        geom_line(linewidth = 1.2, alpha = .7, show.legend = F) +
+        geom_point(size = 4, color = color_fondo) +
+        geom_point(size = 3) +
+        geom_text(data = ~group_by(.x, palabra) |> slice_max(n),
+                  aes(label = palabra,
+                      y = n + (prom*0.25)),
+                  size = 3) +
+        ggrepel::geom_text_repel(data = ~filter(.x, semana == max(semana)),
+                                 aes(label = palabra, color = palabra),
+                                 size = 3, 
+                                 hjust = 0, 
+                                 # xlim = c(0, ~pull(.x, fecha) |> max()),
+                                 nudge_x = 0.3, segment.alpha = .3,
+                                 show.legend = F, direction = "y") +
+        # scale_x_date(expand = expansion(c(0.02, 0.1))) +
+        scale_x_discrete(expand = expansion(c(0.02, 0.1))) +
+        scale_color_viridis_d(begin = .2, end = .7, option = "magma") +
+        guides(color = guide_legend(reverse = T, override.aes = list(size = 4)))
+      
+      
+    } else if (input$tipo_grafico == "Barras") {
+      # browser()
+      plot <- data |>
+        ungroup() |> 
+        # filter(rank == 1)
+        ggplot(aes(fecha_etiqueta, n, fill = palabra)) +
+        # geom_col(width = .9, color = color_fondo,
+        #          position = position_dodge2(preserve = c("single"))) +
+        geom_col(width = .7, color = color_fondo) +
+        geom_point(aes(color = palabra), alpha = 0) +
+        geom_text(aes(label = ifelse(!chico, as.character(palabra), ""),
+                      y = n - (prom*0.06),
+                  ),
+                  position = position_stack(),
+                  color = "white", angle = 90, 
+                  hjust = 1,
+                  size = 3) +
+        geom_text(data = ~filter(.x, rank == 1),
+                  aes(label = ifelse(chico, as.character(palabra), ""),
+                      y = n_semana + (prom*0.09),
+                      color = palabra),
+                  vjust = 0, show.legend = F, check_overlap = T,
+                  size = 2.8) +
+        scale_fill_viridis_d(begin = .2, direction = -1, end = .7, option = "magma", aesthetics = c("color", "fill")) +
+        scale_y_continuous(expand = expansion(c(0, 0.05))) +
+        guides(fill = guide_none(),
+               color = guide_legend(reverse = FALSE, position = "right", 
+                                    override.aes = list(alpha = 1, size = 4)))
+    }
+    
+    plot <- plot +
       theme(legend.text = element_text(margin = margin(l = 2))) +
       theme(panel.grid.major.x = element_line(),
             axis.ticks.x = element_blank(),
             axis.text.y = element_text(family = "Lato"),
             axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
             axis.text.x = element_text(family = "Lato", hjust = 1),
+            legend.title = element_text(family = "Libre Baskerville", face = "italic"),
             plot.caption = element_text(color = color_detalle)) +
+      theme(axis.text.x = element_text(family = "Lato", angle = 40)) + #, hjust = 1, angle = 40))
       labs(color = "Palabras", y = "frecuencia de palabras", x = NULL,
            caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
       )

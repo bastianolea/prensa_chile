@@ -99,3 +99,35 @@ data |>
 # guardar
 ggsave(paste0("graficos/noticias_semana_", today(), ".jpg"), 
        width = 6, height = 5, scale = 1.5)
+
+
+
+
+
+
+
+
+# —----
+
+palabras_semana <- arrow::read_parquet("apps/prensa_semanal/palabras_semana.parquet")
+
+palabra_select = c("delincuencia", "corrupción", "hermosilla", "enel")
+
+palabras_semana |> 
+  filter(fecha > today() - weeks(12)) |> 
+  filter(palabra %in% palabra_select) |> 
+  group_by(palabra) |> 
+  mutate(freq_total_palabra = sum(n)) |> 
+  ungroup() |> 
+  mutate(palabra = fct_reorder(palabra, freq_total_palabra)) |> 
+  ggplot(aes(fecha, n, color = palabra)) +
+  geom_line(linewidth = .9, alpha = .7, show.legend = F) +
+  geom_point(size = 3, color = "white") +
+  geom_point(size = 2) +
+  scale_color_viridis_d(begin = .2, end = .7, option = "magma") +
+  theme_classic() +
+  guides(color = guide_legend(reverse = T, override.aes = list(size = 4))) +
+  theme(legend.text = element_text(margin = margin(l = 2))) +
+  labs(color = "Palabras", y = "Frecuencia de palabras", x = "Semanas")
+
+

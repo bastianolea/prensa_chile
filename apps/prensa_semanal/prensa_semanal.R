@@ -49,7 +49,7 @@ palabras_semana <- prensa_conteo_3 |>
             fecha = min(fecha)) |> 
   ungroup() |> 
   # mínimo
-  filter(n > 10)
+  filter(n > 5)
 
 # guardar
 arrow::write_parquet(palabras_semana, "apps/prensa_semanal/palabras_semana.parquet")
