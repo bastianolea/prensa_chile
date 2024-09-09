@@ -5,7 +5,7 @@ account: bastianoleah
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 12623038
-bundleId: 9071528
+bundleId: 9077621
 url: https://bastianoleah.shinyapps.io/prensa_chile/
 version: 1
 asMultiple: FALSE

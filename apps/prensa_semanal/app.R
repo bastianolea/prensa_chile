@@ -55,7 +55,7 @@ palabras_posibles <- palabras_semana |>
   arrange(desc(n)) |> 
   # filter(str_detect(palabra, "corru"))
   # slice(1:500) |> 
-  filter(n > 1000) |> 
+  filter(n > 100) |> 
   pull(palabra)
 
 fuentes <- palabras_semana_fuente$fuente |> unique() |> sort()
@@ -175,7 +175,7 @@ ui <- page_fluid(
                               options = list(create = TRUE,
                                              placeholder = "")),
                div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Palabras a remover del gráfico. Separar con comas")
+                   em("Palabras a remover del gráfico. Deben separarse con comas y escribirse tal como aparecen.")
                ),
                
                sliderInput("palabras_semana_max",
@@ -434,9 +434,20 @@ server <- function(input, output, session) {
   
   # selectores ----
   
+  observe(
   updateSelectizeInput(session, 'destacar_palabra', 
-                       choices = c("Ninguna", palabras_posibles), 
+                       # choices = c("Ninguna", palabras_posibles),
+                       choices = c("Ninguna", selector_semanas_palabras()),
                        server = TRUE)
+  )
+  
+  # observe(
+  #   updateSelectizeInput(session, 'palabras_excluir', 
+  #                        # choices = c("Ninguna", palabras_posibles),
+  #                        choices = c(rev(selector_semanas_palabras())),
+  #                        server = TRUE)
+  # )
+  
   
   updateSelectizeInput(session, 'selector_palabras', 
                        choices = c("corrupción", "delincuencia", palabras_posibles),
@@ -452,8 +463,6 @@ server <- function(input, output, session) {
   # datos ----
   ## semanas ----
   datos_conteo_semanas <- reactive({
-    req(input$destacar_palabra != "")
-    
     datos1 <- palabras_semana |> 
       # límite de fecha
       filter(fecha >= today() - weeks(input$semanas)) |>
@@ -509,17 +518,23 @@ server <- function(input, output, session) {
     # group_by(semana) |>
     # mutate(n = n/sum(n)) |>
     
-    if (input$destacar_palabra != "Ninguna") {
-      # crea una variable dicotómica con la palabra destacada
-      datos2 <- datos2 |> 
-        mutate(destacar = ifelse(palabra == tolower(input$destacar_palabra), 
-                                 tolower(input$destacar_palabra), "otras"),
-               destacar = fct_relevel(destacar, "otras", after = 0))
-    }
     
+    
+    # browser()
     return(datos2)
   })
   
+  # para el selector de palabras destacadas, cosa que solo contenga palabras que aparecen en el gráfico en vez de todas
+  selector_semanas_palabras <- reactive({
+    # browser()
+    datos_conteo_semanas() |> 
+      select(palabra, freq_total_palabra) |> 
+      arrange(desc(freq_total_palabra)) |> 
+      pull(palabra) |> 
+      unique() |> 
+      as.character()
+    
+  })
   
   ## palabras ----
   
@@ -638,6 +653,8 @@ server <- function(input, output, session) {
   
   ## semanas ----
   output$g_semanas <- renderPlot({
+    req(input$destacar_palabra != "")
+    
     # opciones gráfico
     .dodge = 3
     .espaciado_y = 0.08
@@ -647,8 +664,18 @@ server <- function(input, output, session) {
     variable <- ifelse(input$destacar_palabra != "Ninguna",
                        "destacar", "palabra")
     
+    if (input$destacar_palabra != "Ninguna") {
+      # crea una variable dicotómica con la palabra destacada
+      datos3 <- datos_conteo_semanas() |> 
+        mutate(destacar = ifelse(palabra == tolower(input$destacar_palabra), 
+                                 tolower(input$destacar_palabra), "otras"),
+               destacar = fct_relevel(destacar, "otras", after = 0))
+    } else {
+      datos3 <- datos_conteo_semanas()
+    }
+    
     #gráfico 
-    plot <- datos_conteo_semanas() |> 
+    plot <- datos3 |> #datos_conteo_semanas() |> 
       ggplot(aes(fecha, n)) +
       geom_step(aes(color = !!sym(variable), group = palabra),
                 linewidth = .9, alpha = .5,
