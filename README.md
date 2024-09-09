@@ -7,6 +7,25 @@ Actualmente, el corpus de noticias obtenido supera las 590.000 noticias individu
 
 ![Gráfico resumen de resultados del scraping de prensa](graficos/datos_prensa_scraping_2024-09-02_a.png)
 
+## Aplicaciones web
+
+### Análisis de prensa chilena por semanas
+
+[Aplicación web](https://bastianoleah.shinyapps.io/prensa_chile/) desarrollada en R que muestra varios gráficos que cuantifican el contenido de las noticias de prensa escrita de Chile. Los gráficos permiten identificar qué palabras son las más usadas a través del tiempo, lo cual a su vez permite ver cómo va variando el acontecer nacional. Esta aplicación es una muestra de la utilidad del análisis de texto para resumir gran cantidad de información por medio de visualizaciones interactivas.
+
+[Accede a la aplicación en este enlace](https://bastianoleah.shinyapps.io/prensa_chile/)
+
+<a href = "https://bastianoleah.shinyapps.io/prensa_chile/">
+<img src="apps/prensa_semanal/pantallazos/analisis_prensa_chile_semanal.jpg" height="900px" />
+</a>
+
+![](apps/prensa_semanal/pantallazos/p1.png)
+![](apps/prensa_semanal/pantallazos/p2b.png)
+![](apps/prensa_semanal/pantallazos/p3.png)
+![](apps/prensa_semanal/pantallazos/p2c.png)
+![](apps/prensa_semanal/pantallazos/p4.png)
+
+
 ## Principales hallazgos
 
 ![Resultados preliminares: conceptos más frecuentes en noticias por semana](graficos/noticias_semana_2024-09-05.jpg)
