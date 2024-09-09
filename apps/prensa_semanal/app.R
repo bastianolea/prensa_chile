@@ -108,8 +108,9 @@ ui <- page_fluid(
            ),
            
            
-           markdown("Proyecto de análisis de texto de noticias chilenas. Las noticias se obtienen regularmente mediante [web scraping](https://github.com/bastianolea/prensa_chile)."),
-           markdown("Actualmente, el corpus obtenido supera las **600 mil noticias** individuales, las cuales suman un total de **105 millones de palabras**, abarcando más de 21 fuentes periodísticas distintas."),
+           markdown("Proyecto de _análisis de texto_ de noticias publicadas por medios de comunicación digitales de Chile. _En construcción._"),
+           markdown("Un sistema automatizado obtiene y procesa grandes cantidades de datos de noticias, creando una base de datos de noticias con su texto (título, cuerpo, bajada) y metadatos (fecha, fuente, dirección), a partir de la cual es posible realizar distintos análisis sobre el texto. Inicialmente, se puede analizar _sobre qué_ hablan las noticias en determinadas fechas (análisis descriptivo). Posteriormente se pueden hacer análisis más sofisticados, como agrupar temáticamente las noticias de forma automatizada, detectar si las noticias sobre cierto tema son positivas o negativas, o correlacionar qué se dice cuando se mencionan otros conceptos."),
+           markdown("Actualmente, el material obtenido supera las **600 mil noticias** individuales, las cuales suman un total de **105 millones de palabras**, abarcando más de 21 fuentes periodísticas distintas. Para más información técnica sobre este proyecto, [visite el repositorio](https://github.com/bastianolea/prensa_chile)."),
            
            hr()
     )
@@ -122,7 +123,7 @@ ui <- page_fluid(
     column(12,
            h3("Palabras más frecuentes, por semana"),
            
-           markdown("Gráfico que presenta las palabras más frecuentes en cada semana de la prensa escrita chilena. Una línea conecta palabras que han sido relevantes por más de una semana, para seguir su tendencia. Cada palabra tiene un color, pero puedes usar las opciones para destacar una palabra por sobre el resto."),
+           markdown("Gráfico que presenta las palabras más frecuentes en cada semana de la prensa escrita chilena. El eje horizontal representa el tiempo, y el vertical la frecuencia del concepto. Una línea conecta palabras que han sido relevantes por más de una semana, para seguir su tendencia. Cada palabra tiene un color, pero puedes usar las opciones para destacar una palabra por sobre el resto."),
     )
   ),
   fluidRow(
@@ -130,7 +131,7 @@ ui <- page_fluid(
            plotOutput("g_semanas", 
                       width = "100%", height = "640px") |> withSpinner(),
            
-           markdown("Éste gráfico se genera automáticamente, a partir de un proceso automatizado de obtención de textos y procesamiento de datos.
+           markdown("estos gráficos se generan automáticamente, mediante de un proceso automatizado de obtención de textos y procesamiento de datos.
                     A partir de todas las noticias publicadas por los medios comunicacionales escritos online, semana a semana, se transforman todas las noticias en palabras separadas, y se cuenta la repetición de cada palabra, tomando como una repetición las distintas conjugaciones de cada palabra (por ejemplo, _delincuente_ y _delincuencia_ cuentan como una sola palabra repetida 2 veces). Luego, se eliminan palabras irrelevantes (como artículos, pronombres y otras), y se genera un ranking de las palabras más frecuentes para cada semana."),
            
     ),
@@ -277,7 +278,7 @@ ui <- page_fluid(
            hr(),
            h3("Palabras más mencionadas en medios, semanalmente"),
            
-           markdown("Gráfico que expresa, por cada semana, las palabras más repetidas en el texto de las noticias, indicando también la proporción de las menciones de la palabra que correspondena a medios de comunicación específicos. Por ejemplo, si una barra muestra un color prevalente en ella, significa que el medio de comunicación correspondiente a ese color usó más frecuentemente el termino que los demás.")
+           markdown("Gráfico que expresa, por cada semana, las palabras más repetidas en el texto de las noticias. Las barras más largas representan palabras más frecuentes. Cada barra se forma por la proporción de las menciones de la palabra que correspondena a medios de comunicación específicos. Por ejemplo, si una barra muestra un color prevalente en ella, significa que el medio de comunicación correspondiente a ese color usó más frecuentemente el termino que los demás.")
     )
   ),
   fluidRow(
@@ -327,15 +328,12 @@ ui <- page_fluid(
   # semana fuente palabras ----
   fluidRow(
     column(12,
-           
-           # title = paste("Cantidad de noticias que mencionan:", .palabra), 
-           # subtitle = "Sólo incluyendo mayores medios de comunicación escritos",
            br(),
            hr(),
            h3("Cantidad menciones de un concepto específico"),
            h5("Concepto:", em(textOutput("texto_selector_palabras_fuente", inline = TRUE))),
            
-           markdown("Seleccione un concepto, palabra, o nombre para comparar las menciones del concepto elegido entre los distintos medios de comunicación escritos.")
+           markdown("Frecuencia total de menciones de una palabra, por semana, y separado por medios de comunicación. Seleccione un concepto, palabra, o nombre para comparar las menciones del concepto elegido entre los distintos medios de comunicación escritos. De este modo, es posible identificar si hay ciertos medios que mencionan más determinados conceptos, o medios que los evitan; o bien, la popularidad de un concepto a través del tiempo, comparada a entre distintos medios.")
     )
   ),
   fluidRow(
@@ -394,8 +392,6 @@ ui <- page_fluid(
   fluidRow(
     column(12,
            
-           
-           
            plotOutput("g_semana_fuente_palabra", height = "480px", width = "100%") |> withSpinner()
     )
   ),
@@ -405,17 +401,16 @@ ui <- page_fluid(
   
   # firma ----
   fluidRow(
-    column(12, style = css(padding = "28px"),
+    column(12, style = css(padding = "28px", font_size = "70%", font_family = "Libre Baskerville"),
            hr(),
            
-           markdown("Desarrollado por [Bastián Olea Herrera.](https://bastian.olea.biz)"),
+           markdown("Desarrollado por [Bastián Olea Herrera.](https://bastian.olea.biz) usando el lenguaje de programación R. Puedes [hacerme llegar](https://x.com/bastimapache) cualquier duda, consulta, sugerencia o comentario."),
            
            markdown("Puedes explorar mis otras [aplicaciones interactivas sobre datos sociales en mi portafolio.](https://bastianolea.github.io/shiny_apps/)"),
            
            markdown("Código de fuente de esta app y del procesamiento de los datos [disponible en GitHub.](https://github.com/bastianolea/prensa_chile)"),
            
-           div(style = "height: 40px")
-           
+           # div(style = "height: 40px")
     )
   )
 )
