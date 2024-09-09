@@ -1,4 +1,5 @@
 library(tidyverse)
+source("funciones.R")
 
 # locale -a
 Sys.setlocale("LC_TIME", "es_ES.UTF-8") # meses en español

@@ -1,13 +1,16 @@
 # ejecuta scripts de webscraping en paralelo para obtener datos recientes de todas las fuentes
 # output: resultados/{fuente}/...
 
-library(dplyr)
+library(dplyr) |> suppressPackageStartupMessages()
 library(rvest)
 library(polite)
 library(stringr)
 library(purrr)
 library(glue)
-library(lubridate)
+library(lubridate) |> suppressPackageStartupMessages()
+
+setwd("~/R/prensa")
+
 source("funciones.R")
 
 

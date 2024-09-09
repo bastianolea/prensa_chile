@@ -1,5 +1,5 @@
 
-Attaching package: ‘dplyr’
+Adjuntando el paquete: ‘dplyr’
 
 The following objects are masked from ‘package:stats’:
 
@@ -10,7 +10,7 @@ The following objects are masked from ‘package:base’:
     intersect, setdiff, setequal, union
 
 
-Attaching package: ‘lubridate’
+Adjuntando el paquete: ‘lubridate’
 
 The following objects are masked from ‘package:base’:
 
@@ -20,17 +20,19 @@ No encoding supplied: defaulting to UTF-8.
 Se obtuvieron 6 noticias en https://lahora.cl/cronica/
 No encoding supplied: defaulting to UTF-8.
 Se obtuvieron 6 noticias en https://lahora.cl/tv/
-https://lahora.cl/cronica/2024/09/06/ropa-falsa-levis-acusa-a-hites-de-falsificacion-de-productos-con-el-nombre-de-su-marca/ (estado: 200)
+https://lahora.cl/cronica/2024/09/08/reportan-serios-disturbios-en-romeria-al-cementerio-general-mas-de-20-detenidos-y-ataques-a-la-moneda/ (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://lahora.cl/cronica/2024/09/06/alcalde-de-colbun-se-disculpo-con-sandy-boquita-por-caso-de-abuso-sexual-ocurrido-hace-10-anos/ (estado: 200)
+https://lahora.cl/cronica/2024/09/08/revelan-chats-entre-luis-hermosilla-y-ministra-de-la-corte-suprema/ (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://lahora.cl/cronica/2024/09/06/promueven-la-cultura-de-la-muerte-republicanos-arremeten-contra-el-gobierno-y-la-eutanasia/ (estado: 200)
+https://lahora.cl/cronica/2024/09/08/camion-se-desbarranco-en-la-cuesta-caracoles-conductor-salto-del-vehiculo-antes-de-la-tragedia/ (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://lahora.cl/cronica/2024/09/06/que-fue-de-nicolas-lopez-condenado-por-abuso-sexual-tuvo-peculiar-reaparicion-y-esta-en-tratamiento/ (estado: 200)
+https://lahora.cl/cronica/2024/09/07/horoscopo-domingo-8-de-septiembre-predicciones-de-yolanda-sultana/ (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://lahora.cl/cronica/2024/09/06/seguiremos-avanzando-mas-de-80-mil-papitos-corazon-se-pusieron-al-dia-con-la-pension-de-alimentos/ (estado: 200)
+https://lahora.cl/cronica/2024/09/07/me-case-con-un-hombre-bueno-no-un-delincuente-titi-ahubert-saco-la-voz-por-reclusion-de-daniel-sauer/ (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://lahora.cl/cronica/2024/09/06/hay-personas-sinverguenzas-la-dura-arremetida-de-jose-antonio-kast-contra-boric-y-bachelet/ (estado: 200)
+https://lahora.cl/cronica/2024/09/07/drastico-pero-necesario-diputada-cordero-solicita-al-presidente-el-cierre-inmediato-de-la-frontera-norte-por-ola-migratoria/ (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://lahora.cl/tv/2024/09/08/entrevista-l-en-maipu-no-se-vota-a-un-mister-chile-maximo-quitral-apuesta-por-derrocar-a-tomas-vodanovic/ (estado: 200)
 No encoding supplied: defaulting to UTF-8.
 https://lahora.cl/tv/2024/09/06/entrevista-los-vecinos-no-pueden-andar-persiguiendo-traficantes-edita-alarcon-y-las-preocupaciones-de-la-granja/ (estado: 200)
 No encoding supplied: defaulting to UTF-8.
@@ -42,6 +44,4 @@ https://lahora.cl/tv/2024/09/02/entrevista-l-no-se-hablara-mas-de-las-esquinas-d
 No encoding supplied: defaulting to UTF-8.
 https://lahora.cl/tv/2024/08/27/entrevista-l-aqui-y-ahora-daniel-reyes-invito-a-los-candidatos-de-la-florida-a-realizarse-el-test-de-drogas/ (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://lahora.cl/tv/2024/08/25/queremos-enfrentarnos-a-rodrigo-mundaca-octavio-gonzalez-apuesta-por-la-segunda-vuelta-en-valparaiso/ (estado: 200)
-No encoding supplied: defaulting to UTF-8.
-listo cron lahora 2024-09-06 23:22:29.585119
+listo cron lahora 2024-09-08 20:39:26.983496

@@ -249,8 +249,71 @@ revisar_scraping <- function(data) {
 # palabras ----
 stopwords <- readr::read_lines("~/R/lira_popular/datos/stopwords_español.txt") #tidytext::get_stopwords("es") |> pull(word)
 
+# palabras irrelevantes ----
+palabras_irrelevantes = c("chile", "publicar", 
+                          "año", "años", "añosa", "añosen",
+                          "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+                          "leer", "articular", "completar", # cooperatva ("leer articulo completo")
+                          "relacionadasdetalle", "null", # emol
+                          "detallar", # meganoticias
+                          "comunidad", # puede ser relacionado a comentarios
+                          "país", "persona", "comunicación"
+)
+
 palabras_eliminar = c("right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
                       "pred", "fs", "us", "april", "flickr", "datawrapper", "data", "fried", "ftx", "medium", "exante", "server", "family", "loc", "lon", "mag", "prof", "lat", "gpt", "banner", "donación",
                       "rectangle", "container", "img", "display", "sans", "end", "weight", "content", "rem", "flex", "border", "bottom", "margin", "padding", "center", 
                       "radius", "text", "síguenos", "solid", "items", "dadada", "droidsans", "justify", "serif", "push", "function", "cmd", "div", "googletag", "ad",
-                      "protected", "email")
+                      "protected", "email",
+                      palabras_irrelevantes)
+
+
+recodificar_fuentes <- function(data) {
+  data |> 
+    mutate(fuente = case_match(fuente,
+                           "24horas" ~ "24 Horas",
+                           "adnradio" ~ "ADN Radio",
+                           "agricultura" ~ "Radio Agricultura",
+                           "biobio" ~ "Radio Bío Bío",
+                           "chvnoticias" ~ "CHV Noticias",
+                           "ciper" ~ "Ciper",
+                           "cnnchile" ~ "CNN Chile",
+                           "cooperativa" ~ "Radio Cooperativa",
+                           "diariofinanciero" ~ "Diario Financiero",
+                           "elciudadano" ~ "El Ciudadano",
+                           "eldinamo" ~ "El Dínamo",
+                           "elmostrador" ~ "El Mostrador",
+                           "elsiglo" ~ "El Siglo",
+                           "emol" ~ "Emol",
+                           "exante" ~ "Ex-Ante",
+                           "lacuarta" ~ "La Cuarta",
+                           "lahora" ~ "La Hora",
+                           "lanacion" ~ "La Nación",
+                           "latercera" ~ "La Tercera",
+                           "meganoticias" ~ "Meganoticias",
+                           "publimetro" ~ "Publimetro",
+                           "radiouchile" ~ "Radio U. de Chile",
+                           "t13" ~ "T13",
+                           "theclinic" ~ "The Clinic", 
+                           .default = fuente))
+}
+
+redactar_fecha <- function(x) { 
+  mes = month(x)
+  mes_t = recode(mes, 
+                 "1" = "enero",
+                 "2" = "febrero",
+                 "3" = "marzo",
+                 "4" = "abril",
+                 "5" = "mayo",
+                 "6" = "junio",
+                 "7" = "julio",
+                 "8" = "agosto",
+                 "9" = "septiembre",
+                 "10" = "octubre",
+                 "11" = "noviembre",
+                 "12" = "diciembre")
+  
+  fecha_etiqueta = paste(day(x), "de", mes_t)
+  return(fecha_etiqueta)
+}

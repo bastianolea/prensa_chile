@@ -1,5 +1,5 @@
 
-Attaching package: ‘dplyr’
+Adjuntando el paquete: ‘dplyr’
 
 The following objects are masked from ‘package:stats’:
 
@@ -10,16 +10,56 @@ The following objects are masked from ‘package:base’:
     intersect, setdiff, setequal, union
 
 
-Attaching package: ‘lubridate’
+Adjuntando el paquete: ‘lubridate’
 
 The following objects are masked from ‘package:base’:
 
     date, intersect, setdiff, union
 
 https://www.adnradio.cl/noticias/nacional/ (estado: 200)
-Se obtuvieron 0 noticias en https://www.adnradio.cl/noticias/nacional/
+Se obtuvieron 39 noticias en https://www.adnradio.cl/noticias/nacional/
 https://www.adnradio.cl/noticias/politica/ (estado: 200)
 Se obtuvieron 39 noticias en https://www.adnradio.cl/noticias/politica/
+https://www.adnradio.cl/2024/09/08/emiten-nuevo-aviso-por-vientos-en-chile-estas-son-las-regiones-afectadas-y-los-dias-cuando-presentara-el-fenomeno-meteorologico/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/subsecretario-monsalve-tras-revelacion-de-chats-entre-hermosilla-y-angela-vivanco-el-trafico-de-influencias-no-permite-la-igualdad-ante-la-ley/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/pronostican-lluvia-en-santiago-que-dia-volveran-las-precipitaciones-a-la-region-metropolitana/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/tras-hallazgo-de-elementos-de-servicio-ministerio-publico-no-descarta-mas-involucrados-en-asesinato-de-tres-carabineros-en-canete/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/gobierno-de-chile-lamenta-el-exilio-forzado-de-edmundo-gonzalez-y-rechaza-persecucion-que-sufrio-lider-opositor/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/el-esta-en-serios-problemas-senador-ossandon-rn-cuestiona-blindaje-a-andres-chadwick/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/con-maxima-prioridad-corte-suprema-revisara-revelaciones-de-chats-de-angela-vivanco-y-luis-hermosilla-en-pleno-de-este-lunes/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/romeria-por-conmemoracion-del-11-de-septiembre-gobierno-informa-de-23-detenidos-a-causa-de-incidentes/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/temblor-se-percibe-en-el-sur-de-chile-revisa-aca-el-epicentro-y-la-magnitud-del-sismo/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/candidatos-a-alcalde-de-recoleta-conversan-sobre-las-urgencias-de-seguridad-en-la-comuna/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/tras-revelacion-de-chats-entre-hermosilla-y-angela-vivanco-anuncian-acusacion-constitucional-contra-ministra-de-la-corte-suprema/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/domingo-am-ya-comenzo-el-horario-de-verano-cuando-es-el-proximo-cambio-de-hora-en-chile/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/romeria-en-conmemoracion-del-11-de-septiembre-incidentes-se-registran-en-el-centro-de-santiago/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/caso-audios-pudo-haber-salido-a-la-luz-mucho-antes-la-cmf-habria-sido-alertada-meses-antes-de-la-difusion/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/temblor-se-registra-en-el-norte-de-chile-revisa-aca-el-epicentro-y-la-magnitud-del-sismo/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/encuentran-a-dos-personas-fallecidas-en-el-interior-de-un-inmueble-en-san-bernardo/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/cambio-de-hora-en-chile-2024-que-hora-es-revisa-el-huso-oficial-tras-inicio-del-horario-de-verano/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/estos-son-los-dos-modelos-de-autos-que-tienen-una-alerta-de-seguridad-en-chile-con-riesgo-de-accidente-segun-alerto-el-sernac/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/cancilleria-rechaza-decision-de-venezuela-que-revoco-la-autorizacion-de-brasil-para-representar-a-la-diplomacia-argentina/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/el-conductor-salto-justo-a-tiempo-camion-cae-al-vacio-en-ruta-que-une-a-chile-con-argentina/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/anuncian-evento-de-altas-temperaturas-para-chile-cuando-comienza-y-a-que-regiones-llegara/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/con-vientos-de-hasta-100-kilometros-por-hora-que-regiones-seran-afectadas-por-un-nuevo-sistema-frontal-y-rio-atmosferico/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/metro-de-santiago-inaugura-mural-creado-por-jovenes-en-proceso-de-reinsercion-social/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/amplian-detencion-de-hombre-acusado-de-violacion-y-femicidio-de-experea-en-coronel/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/lanzan-segunda-etapa-del-proyecto-nueva-alameda-para-recuperar-espacios-publicos-y-mejorar-seguridad-en-santiago/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/ministra-vallejo-defiende-proyectos-de-cae-y-eutanasia-no-quiere-decir-que-abandonemos-los-otros-proyectos/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/condenan-a-excarabinero-por-abuso-sexual-a-menores-de-edad-en-valdivia/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/caso-audios-ministro-cordero-respalda-a-fiscalia-por-refuerzo-a-proteccion-a-datos-personales-de-celular-de-luis-hermosilla-tras-supuesta-filtracion/ (estado: 200)
+https://www.adnradio.cl/2024/09/07/hombre-muere-dentro-de-restaurante-en-concepcion-tras-emergencia-medica/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/no-puede-ser-que-en-chile-a-uno-se-la-juzgue-por-lo-que-supuestamente-dice-o-dijo-o-hizo-el-marido/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/me-tiene-enmierdada-cony-capelli-arremete-contra-manuel-de-gran-hermano-y-pide-su-salida-tras-abuso-a-yuhui/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/pena-en-los-escenarios-muere-afamado-musico-ingles-colaborador-de-david-bowie-y-paul-mccartney/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/los-tortuga-antonia-zegers-protagoniza-potente-drama-espanol-en-el-festival-de-toronto/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/famoso-youtuber-reaparece-tras-siete-meses-de-ausencia-en-redes-experimento-social-lo-hizo-bajar-115-kilos/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/pedro-almodovar-y-su-emotivo-discurso-tras-ganar-leon-de-oro-en-el-festival-de-venecia/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/confirman-a-famoso-rapero-como-show-de-medio-tiempo-del-super-bowl-2025/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/el-emotivo-mensaje-de-benjamin-vicuna-dedicado-a-su-hija-blanca-a-12-anos-de-su-fallecimiento-honrar-la-vida-es-recordar-a-nuestros-viajeros/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/con-mas-de-100-influencers-teleton-lanza-gen-t-su-nueva-comunidad-para-movilizar-a-jovenes-por-la-inclusion-en-chile/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/esta-es-la-mejor-pelicula-chilena-de-todos-los-tiempos-segun-definio-una-inteligencia-artificial/ (estado: 200)
+https://www.adnradio.cl/2024/09/08/edmundo-gonzalez-abandona-venezuela-tras-pedir-asilo-en-espana/ (estado: 200)
 https://www.adnradio.cl/2024/09/06/no-me-interesa-polemizar-con-el-caballero-ministra-vallejo-responde-a-kast-por-criticas-a-gobiernos-de-bachelet-y-boric/ (estado: 200)
 https://www.adnradio.cl/2024/09/06/tras-consejo-de-gabinete-presidente-boric-traza-objetivos-para-septiembre-e-ingresara-proyectos-de-eutanasia-y-fin-del-cae/ (estado: 200)
 https://www.adnradio.cl/2024/09/06/director-de-criteria-y-consecuencias-del-caso-hermosilla-de-cara-a-las-elecciones-2024-para-chile-vamos-es-un-tremendo-problema/ (estado: 200)
@@ -42,21 +82,4 @@ https://www.adnradio.cl/2024/09/03/soy-inocente-diputado-pulgar-niega-denuncia-p
 https://www.adnradio.cl/2024/09/03/presidente-boric-encabezara-reunion-con-parlamentarios-en-cerro-castillo-se-discutiran-temas-de-seguridad-migracion-y-situacion-carcelaria/ (estado: 200)
 https://www.adnradio.cl/2024/09/02/gobierno-de-chile-condena-orden-de-arresto-contra-edmundo-gonzalez-en-venezuela/ (estado: 200)
 https://www.adnradio.cl/2024/09/02/camara-de-diputados-aprueba-un-nuevo-acuerdo-comercial-con-la-union-europea/ (estado: 200)
-https://www.adnradio.cl/2024/09/02/siempre-consideramos-que-era-una-medida-cautelar-desproporcionada-barbara-figueroa-valoro-rebaja-de-cautelar-contra-daniel-jadue/ (estado: 200)
-https://www.adnradio.cl/2024/09/02/ministra-vallejo-y-posibles-nexos-del-gobierno-con-luis-hermosilla-en-caso-audios-estamos-sumamente-tranquilos/ (estado: 200)
-https://www.adnradio.cl/2024/09/01/presidente-de-rn-sale-en-defensa-de-chadwick-por-caso-audios-todos-tenemos-amigos-que-pueden-haber-hecho-embarradas/ (estado: 200)
-https://www.adnradio.cl/2024/08/31/tomas-de-rementeria-responde-a-dichos-de-manalich-las-palabras-miserables-no-se-borran-tan-rapido-como-una-lista-de-espera/ (estado: 200)
-https://www.adnradio.cl/2024/08/31/la-moneda-instruye-a-ministros-y-principales-asesores-a-revisar-posibles-conversaciones-con-luis-hermosilla/ (estado: 200)
-https://www.adnradio.cl/2024/08/31/ser-madre-es-una-hermosa-decisionkarol-cariola-responde-a-los-polemicos-dichos-del-exministro-jaime-manalich-sobre-su-embarazo/ (estado: 200)
-https://www.adnradio.cl/2024/08/30/exfiscal-manuel-guerra-renuncia-al-tribunal-supremo-de-amarillos-por-chile-tras-inicio-de-investigacion-en-su-contra/ (estado: 200)
-https://www.adnradio.cl/2024/09/06/sabias-que-puedes-encontrar-el-amor-con-una-pina-esta-es-la-nueva-estrategia-de-conquista-furor-en-espana/ (estado: 200)
-https://www.adnradio.cl/2024/09/06/no-se-gastan-recursos-publicos-explican-como-tvn-logra-financiar-los-grandes-sueldos-de-sus-rostros/ (estado: 200)
-https://www.adnradio.cl/2024/09/06/querida-experiodista-de-mega-muere-a-los-43-anos-sus-ultimos-dias-los-dedico-a-la-ensenanza-de-ninos-y-ninas/ (estado: 200)
-https://www.adnradio.cl/2024/09/06/iconico-actor-chileno-revela-que-intentaron-abusar-de-el-en-la-iglesia-sali-arrancando/ (estado: 200)
-https://www.adnradio.cl/2024/09/06/directoras-latinoamericanas-e-importancia-del-femcine-2024-nos-faltan-espacios-y-por-eso-es-tan-importante-este-festival/ (estado: 200)
-https://www.adnradio.cl/2024/09/06/yamila-reyna-y-su-potente-desahogo-luego-de-su-experiencia-en-la-television-chilena-me-he-desilusionado-de-gente/ (estado: 200)
-https://www.adnradio.cl/2024/09/06/la-furiosa-reaccion-de-sebastian-ramirez-ante-las-declaraciones-de-camila-power-y-yo-le-tenia-buena/ (estado: 200)
-https://www.adnradio.cl/2024/09/06/tienes-aguantar-el-dolor-en-las-manos-la-inspiradora-historia-toto-gesell-el-ultimo-buscador-de-oro-de-tierra-del-fuego/ (estado: 200)
-https://www.adnradio.cl/2024/09/06/muere-el-legendario-cantante-sergio-mendes-autor-de-la-magalenha-a-los-83-anos-de-edad/ (estado: 200)
-https://www.adnradio.cl/2024/09/06/conmocion-en-el-mundo-del-periodismo-muere-recordado-e-historico-presentador-de-noticias-de-mtv-latinoamerica/ (estado: 200)
-listo cron adnradio 2024-09-06 23:24:47.867005
+listo cron adnradio 2024-09-08 20:43:46.222154
