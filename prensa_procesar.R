@@ -16,9 +16,13 @@ source("procesamiento/prensa_p2_procesar_texto.R", echo = TRUE)
 source("procesamiento/prensa_p3_calcular_conteo.R", echo = TRUE)
 # output: datos/prensa_palabras_conteo.parquet
 
+# conteos para app de noticias semanales
+source("apps/prensa_semanal/prensa_semanal.R", echo = TRUE)
+source("apps/prensa_semanal/prensa_semanal_fuente.R", echo = TRUE)
+
 # correlación entre palabras dentro de noticias, retorna base con palabras y sus pares correlacionados
-# source("analisis/prensa_calcular_correlacion.R", echo = TRUE)
-# output: datos/prensa_correlacion.parquet
+source("analisis/prensa_calcular_correlacion.R", echo = TRUE)
+# output: datos/prensa_correlacion.parquet, datos/prensa_correlacion_fuente.parquet
 
 # procesamiento de noticias para identificar topicos mediante machine learning
 # source("analisis/prensa_calcular_topicos.R")

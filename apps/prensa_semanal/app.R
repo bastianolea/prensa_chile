@@ -29,8 +29,8 @@ source("funciones.R")
 options(shiny.useragg = TRUE)
 
 showtext::showtext_opts(dpi = 180)
-font_add_google("Lato", "Lato")
-font_add_google("Libre Baskerville", "Libre Baskerville")
+font_add_google("Lato", "Lato", db_cache = TRUE)
+font_add_google("Libre Baskerville", "Libre Baskerville",  db_cache = TRUE)
 showtext_auto()
 
 options(spinner.type = 8, spinner.color = color_detalle)
@@ -255,7 +255,7 @@ ui <- page_fluid(
            sliderInput("semanas_palabras",
                        "Rango de semanas",
                        min = 2, max = 4*6,
-                       value = 9,
+                       value = 12,
                        width = "100%"),
            div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Personalice el rango de tiempo que abarcará la visualización. Por defecto, si el rango es muy amplio, se cambia a barras.")

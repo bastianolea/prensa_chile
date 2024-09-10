@@ -25,92 +25,100 @@ Se obtuvieron 19 noticias en https://www.biobiochile.cl/lista/categorias/opinion
 # A tibble: 57 × 2
    enlace                                                                 origen
    <chr>                                                                  <chr> 
- 1 https://www.biobiochile.cl/noticias/nacional/chile/2024/09/08/confirm… https…
- 2 https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/… https…
- 3 https://www.biobiochile.cl/noticias/nacional/chile/2024/09/08/diputad… https…
- 4 https://www.biobiochile.cl/noticias/nacional/chile/2024/09/08/manouch… https…
- 5 https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/… https…
- 6 https://www.biobiochile.cl/noticias/nacional/region-de-los-rios/2024/… https…
- 7 https://www.biobiochile.cl/noticias/nacional/region-de-la-araucania/2… https…
- 8 https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/… https…
- 9 https://www.biobiochile.cl/noticias/nacional/region-metropolitana/202… https…
-10 https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2024… https…
+ 1 https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2024… https…
+ 2 https://www.biobiochile.cl/noticias/nacional/region-metropolitana/202… https…
+ 3 https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2024… https…
+ 4 https://www.biobiochile.cl/noticias/economia/negocios-y-empresas/2024… https…
+ 5 https://www.biobiochile.cl/noticias/nacional/region-metropolitana/202… https…
+ 6 https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/… https…
+ 7 https://www.biobiochile.cl/noticias/nacional/region-de-valparaiso/202… https…
+ 8 https://www.biobiochile.cl/noticias/nacional/region-de-los-rios/2024/… https…
+ 9 https://www.biobiochile.cl/noticias/nacional/chile/2024/09/09/nosotro… https…
+10 https://www.biobiochile.cl/noticias/servicios/beneficios/2024/09/09/e… https…
 # ℹ 47 more rows
-https://www.biobiochile.cl/noticias/nacional/chile/2024/09/08/confirman-un-muerto-y-36-detenidos-tras-incidentes-en-romeria-a-cementerio-general-en-santiago.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2024/09/09/decomisan-mas-de-670-kilos-de-carne-en-fiscalizaciones-previas-a-fiestas-patrias-en-osorno.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/09/08/amplian-prision-preventiva-de-adulto-mayor-tras-incidente-que-termino-con-un-muerto-en-tome.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/09/efecto-vivanco-fiscal-de-los-lagos-indagara-presunto-trafico-de-influencias-y-cohecho-en-la-suprema.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/chile/2024/09/08/diputados-udi-piden-cierre-de-frontera-norte-para-evitar-nueva-oleada-migrante-por-crisis-en-venezuela.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2024/09/09/concejales-presentan-querella-por-irregularidades-en-daem-puerto-montt-y-piden-reintegrar-a-directora.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/chile/2024/09/08/manoucheri-y-cicardini-ps-impulsaran-acusacion-constitucional-contra-jueces-por-caso-hermosilla.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/negocios-y-empresas/2024/09/09/investigacion-de-molycop-comision-antidistorsiones-descarta-existencia-de-dumping-en-acero-chino.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/09/08/condenan-a-17-anos-de-carcel-a-hombre-que-mato-a-su-padre-en-nacimiento.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/09/gobierno-anuncia-medidas-para-728-mil-pasajeros-que-viajaran-desde-santiago-por-fiestas-patrias.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-de-los-rios/2024/09/08/valdivia-seremi-de-educacion-anuncia-jornadas-de-contencion-tras-rinas-en-colegio-helvecia.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/09/09/operativo-pdi-en-hualpen-dejo-5-imputados-en-prision-e-incautacion-de-mas-de-17-millones-en-drogas.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-de-la-araucania/2024/09/08/clausuran-matadero-clandestino-en-quepe-denuncian-posibles-casos-de-maltrato-animal.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-de-valparaiso/2024/09/09/confirman-que-tercer-detenido-por-megaincendio-en-valparaiso-es-funcionario-de-senapred.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/09/08/municipio-de-santa-juana-solicitara-fin-de-concesion-tras-corte-de-luz-de-este-fin-de-semana.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-de-los-rios/2024/09/09/detienen-a-hombre-con-casi-dos-kilos-de-droga-en-cercanias-de-terminal-de-buses-de-valdivia.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/08/doble-homicidio-frustrado-ciudadanos-extranjeros-fueron-atacados-a-balazos-en-san-miguel.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/chile/2024/09/09/nosotros-aqui-no-distinguimos-chile-vamos-anuncia-ac-contra-supremos-angela-vivanco-y-sergio-munoz.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2024/09/08/reintegran-a-funcionario-de-seremi-de-salud-de-los-lagos-acusado-de-acoso-sexual-y-laboral.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/servicios/beneficios/2024/09/09/estas-son-las-becas-junaeb-que-deben-renovarse-en-el-segundo-semestre-y-quienes-deben-hacer-el-tramite.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/chile/2024/09/08/corte-suprema-expresa-preocupacion-tras-revelarse-gestiones-de-hermosilla-para-nominacion-de-vivanco.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-de-la-araucania/2024/09/09/la-araucania-este-miercoles-vence-plazo-para-solicitar-permisos-para-eventos-de-fiestas-patrias.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/chile/2024/09/08/gobierno-anuncia-querella-tras-desordenes-en-romeria-de-cementerio-general-hay-23-detenidos.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/09/decretan-prision-preventiva-para-imputado-por-asesinato-de-manifestante-tras-romeria-en-recoleta.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/09/08/justicia-dio-plazo-final-para-cumplir-fallo-y-proceder-a-desalojo-de-toma-en-arauco.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/chile/2024/09/09/de-caracter-inmediata-y-urgente-senadores-piden-apresurar-discusion-por-reforma-al-sistema-politico.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/08/romeria-al-cementerio-general-encapuchados-protagonizan-incidentes-cerca-de-la-moneda.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2024/09/09/familia-de-joven-que-se-suicido-se-querella-contra-sanador-por-estafa-extorsion-y-amenaza-de-muerte.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-de-la-araucania/2024/09/08/contraloria-acude-al-ter-para-destituir-a-alcalde-de-loncoche-que-manejo-ebrio-y-altero-documentos.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-metropolitana/2024/09/09/el-vuelco-del-bar-liguria-de-pedro-de-valdivia-tras-cierre-este-el-gran-cambio-del-restaurante.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-de-los-rios/2024/09/08/sin-oposicion-de-gremios-buscan-impulsar-ley-martin-proyecto-que-busca-regular-transporte-escolar.shtml (estado: 200)
+https://www.biobiochile.cl/biobiotv/programas/podria-ser-peor/2024/09/09/esto-no-se-trata-de-izquierda-o-derecha-aedo-y-ac-contra-ministros-vivanco-y-matus.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-de-tarapaca/2024/09/08/sismo-de-ligera-magnitud-se-percibe-en-la-zona-norte-del-pais-2.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/servicios/explicado/2024/09/09/quien-es-angela-vivanco-la-jueza-de-la-corte-suprema-suspendida-tras-conocerse-chats-con-hermosilla.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-de-valparaiso/2024/09/08/seremi-de-salud-instruye-sumario-contra-esval-por-corte-de-agua-en-cerros-de-valparaiso.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-de-valparaiso/2024/09/09/detienen-a-tercer-presunto-implicado-en-mega-incendio-que-afecto-al-gran-valparaiso.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2024/09/08/operativo-de-la-pdi-en-hualpen-allanan-21-domicilios-detienen-a-14-personas-e-incautan-droga.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/region-de-la-araucania/2024/09/09/fiscalia-confirma-que-hasta-el-momento-son-59-las-victimas-de-clinica-oncologica-de-temuco.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/07/por-que-los-argentinos-pagan-el-doble-que-los-chilenos-para-volar-a-eeuu.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/nacional/chile/2024/09/09/ley-corta-de-isapres-superintendencia-de-salud-rechaza-planes-de-pago-de-6-de-7-aseguradoras-privadas.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/region-de-los-lagos/2024/09/06/ipc-en-la-region-de-los-lagos-alza-de-carnes-y-verduras-fueron-mas-altas-que-el-promedio-nacional.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/09/no-hay-holgura-fiscal-pardow-sostiene-que-ampliar-subsidio-electrico-requiere-nuevos-ingresos.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/06/alberto-chang-desde-la-carcel-sostiene-que-no-es-un-estafador-siempre-fue-una-inversion-de-riesgos.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/negocios-y-empresas/2024/09/09/expertos-concuerdan-en-que-precio-de-venta-por-10-de-quebrada-blanca-deberia-ser-mayor-al-acordado.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/06/mewes-cpc-apunta-como-mala-senal-alza-del-ipc-de-agosto-a-las-personas-les-afectara-el-bolsillo.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/tu-bolsillo/2024/09/09/el-tramite-que-facilita-a-emprendedores-no-formalizados-vender-en-fondas-y-ferias-por-fiestas-patrias.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/06/feria-mercado-emprende-de-cenco-malls-exhibira-productos-de-pymes-locales-en-chile-peru-y-colombia.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/negocios-y-empresas/2024/09/09/la-justicia-de-eeuu-analiza-su-potencial-participacion-en-caso-por-expropiacion-de-ypf.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/negocios-y-empresas/2024/09/06/nueva-demanda-por-cortes-de-luz-saesa-es-emplazada-por-el-sernac-para-que-responda-por-danos.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/09/reportan-que-los-juegos-olimpicos-le-dieron-un-impulso-a-la-economia-francesa.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/negocios-y-empresas/2024/09/06/les-incautaron-prendas-hites-responde-acusaciones-de-levis-por-presunta-venta-de-ropa-falsificada.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/servicios/toma-nota/2024/09/09/se-acaba-el-plazo-grabado-de-patentes-es-obligatorio-que-vehiculos-deben-tenerlo-desde-esta-semana.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/servicios/toma-nota/2024/09/06/emiten-alerta-de-seguridad-en-chile-por-dos-modelos-de-vehiculos-chery-tiggo.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/09/mas-seguridad-y-seguimiento-sii-actualiza-aplicacion-para-emitir-boleta-electronica.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/negocios-y-empresas/2024/09/06/historia-repetida-y-falta-de-transparencia-las-criticas-a-acuerdo-enami-codelco-por-quebrada-blanca.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/servicios/toma-nota/2024/09/09/vehiculos-juguetes-y-mas-todas-las-alertas-de-seguridad-emitidas-por-sernac-en-los-ultimos-meses.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/06/el-desempleo-en-eeuu-rompe-racha-de-cuatro-meses-al-alza-en-medio-de-las-ansias-por-bajas-de-tipos.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/09/larroulet-y-landerretche-coinciden-que-se-debe-sanear-el-sistema-politico-para-que-chile-crezca-mas.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/servicios/toma-nota/2024/09/06/las-regiones-donde-es-mas-barato-comprar-la-canasta-dieciochera-estan-mas-baratas-que-el-ano-pasado.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/09/llegas-en-crucero-debes-pagar-grecia-pone-un-alto-a-turismo-masivo-y-les-cobrara-tarifas-en-islas.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/biobiotv/programas/expreso-bio-bio/2024/09/06/ipc-de-agosto-aumenta-en-un-03-economista-asegura-que-va-a-estar-mas-caro-este-18.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/09/el-dolar-abre-la-semana-tocando-los-950-dato-de-inflacion-en-eeuu-sera-clave-para-el-billete-verde.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/tu-bolsillo/2024/09/06/conoce-cuanto-subira-la-unidad-de-fomento-uf-tras-el-ipc-de-agosto-que-anoto-un-03-mensual.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/negocios-y-empresas/2024/09/09/ley-id-corfo-anuncia-que-simplifico-proceso-para-que-empresas-postulen-a-beneficios-tributarios.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/06/el-pib-de-la-eurozona-y-de-la-ue-crecio-un-02-en-el-segundo-trimestre.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/mercado-automotriz/2024/09/09/por-amenaza-de-despidos-trabajadores-en-huelga-esconden-las-llaves-de-200-autos-audi-de-lujo.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/06/banco-central-detallo-ipom-ante-el-senado-legisladores-preocupados-por-proyeccion-e-impacto-en-empleo.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/09/el-ipc-de-china-se-acelero-efectos-climaticos-incidieron-en-precios-de-los-alimentos.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/nacional/chile/2024/09/06/ministro-marcel-pone-urgencia-a-proyectos-de-inteligencia-economica-para-evitar-futuros-caso-audio.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/ciencia-y-tecnologia/ciencia/2024/09/09/asi-se-vivio-el-xii-summit-pais-digital-el-encuentro-de-cultura-digital-mas-importante-de-latam.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/internacional/eeuu/2024/09/06/que-proponen-en-materia-economica-kamala-harris-y-donald-trump-de-cara-a-las-elecciones-de-ee-uu.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/tu-bolsillo/2024/09/09/lo-que-dejan-de-compran-los-chilenos-en-septiembre-para-priorizar-gastos-en-comida-y-celebraciones.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/06/el-dolar-se-mueve-a-la-baja-tras-datos-de-eeuu-y-el-peso-chileno-podria-empezar-a-fortalecerse.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/negocios-y-empresas/2024/09/09/lanzo-plato-y-hostigo-a-azafata-el-caro-caos-que-genero-pasajero-ebrio-en-viaje-latam-santiago-miami.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/economia/actualidad-economica/2024/09/06/el-ipc-vario-03-en-agosto-el-pollo-y-las-verduras-entre-los-productos-que-mas-subieron-de-precio.shtml (estado: 200)
+https://www.biobiochile.cl/noticias/economia/negocios-y-empresas/2024/09/08/en-la-aventura-del-emprendedor-conoce-los-tips-y-consejos-que-te-guiaran-por-el-camino-del-exito.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/opinion/columnas-bbcl/2024/09/09/la-tokenizacion-de-la-vivienda-en-chile-otro-paso-hacia-la-precarizacion-habitacional.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/opinion/tu-voz/2024/09/09/caso-internet-archive-v-s-editoriales-donde-queda-el-derecho-de-autor.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/noticias/opinion/columnas-bbcl/2024/09/09/crisis-en-el-poder-judicial-chileno.shtml (estado: 200)
+No encoding supplied: defaulting to UTF-8.
+https://www.biobiochile.cl/biobiotv/opinion/comentarios/2024/09/07/caso-hermosilla-peligro-de-descarrilamiento.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
 https://www.biobiochile.cl/noticias/opinion/columnas-bbcl/2024/09/06/el-celular-como-testigo-de-nuestras-crisis-morales.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
@@ -142,14 +150,6 @@ https://www.biobiochile.cl/noticias/opinion/columnas-bbcl/2024/09/04/argentina-p
 No encoding supplied: defaulting to UTF-8.
 https://www.biobiochile.cl/noticias/opinion/tu-voz/2024/09/03/la-obsolescencia-del-hombre-en-la-era-de-las-redes-sociales.shtml (estado: 200)
 No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/opinion/columnas-bbcl/2024/09/03/decimas-de-los-hermanos-uno-bueno-y-otro-malo.shtml (estado: 200)
-No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/opinion/tu-voz/2024/09/03/fiestas-patrias-en-la-oficina-el-preciado-aguinaldo.shtml (estado: 200)
-No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/opinion/tu-voz/2024/09/03/ley-de-proteccion-de-datos-una-nueva-era-para-las-empresas-digitales.shtml (estado: 200)
-No encoding supplied: defaulting to UTF-8.
-https://www.biobiochile.cl/noticias/opinion/tu-voz/2024/09/03/encuesta-enusc-un-avance-para-comprender-la-complejidad-del-crimen-en-chile.shtml (estado: 200)
-No encoding supplied: defaulting to UTF-8.
 Aviso:
 In dir.create("resultados/biobio/") : 'resultados/biobio' ya existe
-listo cron biobio 2024-09-08 20:43:19.360197
+listo cron biobio 2024-09-09 21:26:28.441453
