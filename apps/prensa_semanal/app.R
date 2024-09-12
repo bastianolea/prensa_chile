@@ -687,7 +687,7 @@ server <- function(input, output, session) {
   datos_semana_fuente_3 <- reactive({
   datos_semana_fuente_2() |> 
       # agrupar fuentes chicas
-      mutate(fuente = fct_reorder(fuente, n_total_fuente, .desc = TRUE)) |>
+      mutate(fuente = fct_reorder(fuente, n_total_fuente, .desc = FALSE)) |>
       mutate(fuente = fct_lump(fuente, w = n_total_fuente, n = input$semana_fuentes_fuentes, ties.method = "first", 
                                other_level = "Otros")) |>
       group_by(fuente, semana, fecha, palabra) |>
@@ -971,7 +971,7 @@ server <- function(input, output, session) {
                       color = palabra),
                   vjust = 0, show.legend = F, check_overlap = T,
                   size = 2.8) +
-        scale_fill_viridis_d(begin = .2, direction = -1, end = .7, option = "magma", aesthetics = c("color", "fill")) +
+        scale_fill_viridis_d(begin = .2, end = .7, direction = -1, option = "magma", aesthetics = c("color", "fill")) +
         scale_y_continuous(expand = expansion(c(0, 0.05))) +
         guides(fill = guide_none(),
                color = guide_legend(reverse = FALSE, position = "right", 
@@ -1006,7 +1006,7 @@ server <- function(input, output, session) {
       geom_point(aes(color = fuente), alpha = 0) +
       tidytext::scale_y_reordered() +
       scale_x_continuous(expand = expansion(c(0, .1))) +
-      scale_fill_viridis_d(begin = .2, direction = -1, end = .7, option = "magma", aesthetics = c("color", "fill")) +
+      scale_fill_viridis_d(begin = .2, direction = 1, end = .7, option = "magma", aesthetics = c("color", "fill")) +
       facet_wrap(~fecha, 
                  scales = "free", nrow = 1)  +
       guides(fill = guide_none(),

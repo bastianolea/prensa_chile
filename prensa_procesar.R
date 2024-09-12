@@ -32,4 +32,3 @@ final <- Sys.time()
 tiempo = final - inicio
 tiempo
 # 11 minutos en total
-# 3.6 minutos ahora?
