@@ -67,13 +67,8 @@ scraping_prensa("modulos/cron_adnradio.r")
 # scraping_prensa("modulos/cron_cooperativa_h.r")
 
 
-
-
-
-
-
 #revisión ----
+Sys.sleep(60)
+
 #chequear si se guardaron los archivos
-revisar_resultados("resultados")
 source("revisar/revisar_scraping.R")
-#revisa si hay archivos nuevos el día actual

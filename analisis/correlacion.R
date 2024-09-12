@@ -1,7 +1,7 @@
 library(dplyr)
 library(arrow)
 library(ggplot2)
-
+library(stringr)
 source("funciones.R")
 
 correlacion <- arrow::read_parquet("datos/prensa_correlacion.parquet")
@@ -88,6 +88,22 @@ correlacion |>
 
 
 # graficar ----
+# 
+
+
+
+# red ----
+correlacion |>
+  filter(!is.na(correlation),
+         correlation <= .95, correlation >= .9) |>
+  graph_from_data_frame() |>
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation), show.legend = FALSE) +
+  geom_node_point(color = "lightblue", size = 5) +
+  geom_node_text(aes(label = name), repel = TRUE) +
+  theme_void()
+
+
 
 # círculo de términos correlacionados ----
 .palabra = "hermosilla"
@@ -125,7 +141,7 @@ cor_filt_max |>
 
 
 
-# círculo de términos por fuente ----
+# círculo de términos por fuente b ----
 .palabra = "hermosilla"
 .palabras_excluir = c("luis")
 .n_terminos = 6
@@ -176,16 +192,97 @@ cor_filt_max_fuente |>
   labs(x = "términos más correlacionados con x", y = NULL)
 
 
+# los siguientes son con círculos reales
+# otro 1 ----
+.palabra = "hermosilla"
+.palabras_excluir = c("luis")
+.n_terminos = 6
 
-# red ----
-correlacion |>
-  filter(!is.na(correlation),
-         correlation <= .95, correlation >= .9) |>
-  graph_from_data_frame() |>
-  ggraph(layout = "fr") +
-  geom_edge_link(aes(edge_alpha = correlation), show.legend = FALSE) +
-  geom_node_point(color = "lightblue", size = 5) +
-  geom_node_text(aes(label = name), repel = TRUE) +
-  theme_void()
+cor_filt <- correlacion |>
+  rename(palabra1 = item1, palabra2 = item2, correlacion = correlation) |> 
+  filter(palabra1 == .palabra)
 
+cor_filt_max <- cor_filt |> 
+  filter(!palabra2 %in% .palabras_excluir) |>
+  slice_max(correlacion, n = .n_terminos)
+# filter(correlacion >= .3)
+
+cor_filt_max |> 
+  mutate(tamaño = scales::rescale(correlacion, to = c(1.2, 2), 
+                                  from = range(min(correlacion), .7)),
+         tamaño = ifelse(tamaño > 2, 2, tamaño) # from = range(correlacion, na.rm = TRUE, finite = TRUE))
+  ) |> 
+  mutate(orden = dense_rank(desc(correlacion))) |> 
+  mutate(palabra2 = forcats::fct_reorder(palabra2, correlacion, .desc = TRUE)) |> 
+  ggplot(aes(x = 1, y = 1, 
+             fill = correlacion, color = correlacion)) +
+  ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = 2), alpha = .2, linewidth = .1) +
+  ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = tamaño), alpha = .9) +
+  shadowtext::geom_shadowtext(aes(label = palabra2),
+                              bg.colour = "white", bg.r = 0.3, color = "black", size = 3) +
+  geom_text(aes(label = round(correlacion, 3), y = -1.5), vjust = 1, size = 2.2, alpha = .5) +
+  guides(color = guide_none(), fill = guide_none(), size = guide_none()) +
+  theme(strip.background = element_blank(), strip.text = element_blank(),
+        axis.title.x = element_text(margin = margin(t = 8)),
+        axis.ticks = element_blank(), axis.text = element_blank(),
+        panel.grid = element_blank(), panel.background = element_blank()) +
+    coord_equal(clip = "off") +
+    scale_y_continuous(limits = c(-1.5, 3.5)) +
+    facet_grid(rows = NULL, cols = vars(orden), drop = T) +
+  labs(x = paste("términos más correlacionados con:", str_to_sentence(.palabra)), y = NULL)
+
+
+# otro 2 ----
+.palabra = "hermosilla"
+.palabras_excluir = c("luis")
+
+cor_filt_fuente <- correlacion_fuente |>
+  rename(palabra1 = item1, palabra2 = item2, correlacion = correlation) |> 
+  filter(palabra1 == .palabra)
+
+.n_terminos = 8
+.n_fuentes = 5
+
+cor_filt_max_fuente <- cor_filt_fuente |> 
+  # palabras excluidas
+  filter(!palabra2 %in% .palabras_excluir) |>
+  # maximo de términos por fuente
+  group_by(fuente) |> 
+  slice_max(correlacion, n = .n_terminos) |> 
+  # ranking de fuentes
+  group_by(fuente) |> 
+  mutate(cor_total = sum(correlacion)) |> 
+  ungroup() |> 
+  mutate(rank_fuente = dense_rank(cor_total)) |> 
+  filter(rank_fuente <= .n_fuentes)
+
+cor_filt_max_fuente |> 
+  mutate(tamaño = scales::rescale(correlacion, to = c(1.2, 2), 
+                          from = range(min(correlacion), .7)),
+         tamaño = ifelse(tamaño > 2, 2, tamaño) # from = range(correlacion, na.rm = TRUE, finite = TRUE))
+         ) |> 
+  group_by(fuente) |> 
+  mutate(orden = dense_rank(desc(correlacion))) |> 
+  recodificar_fuentes() |> 
+  mutate(palabra2 = forcats::fct_reorder(palabra2, correlacion, .desc = TRUE)) |> 
+  ggplot(aes(x = 1, y = 1, 
+             fill = correlacion, color = correlacion)) +
+  ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = 2), alpha = .2, linewidth = .1) +
+  ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = tamaño), alpha = .9) +
+  shadowtext::geom_shadowtext(aes(label = palabra2),
+                              bg.colour = "white", bg.r = 0.3, color = "black", size = 3) +
+  geom_text(aes(label = round(correlacion, 3), y = -1.5), vjust = 1, size = 2.2, alpha = .5) +
+  guides(color = guide_none(), fill = guide_none(), size = guide_none()) +
+  theme(strip.background = element_blank(), strip.text = element_text(face = "bold", vjust = 1),
+        strip.text.x = element_blank(),
+        axis.ticks = element_blank(), axis.text = element_blank(),
+        axis.title.x = element_text(margin = margin(t = 8)),
+        panel.grid = element_blank(), panel.background = element_blank()) +
+  coord_equal(clip = "off") +
+  scale_y_continuous(limits = c(-1.5, 3.5)) +
+  facet_grid(rows = vars(fuente), cols = vars(orden), drop = T,
+             # scales = "free",
+             switch = "y",
+  ) +
+  labs(x = paste("términos más correlacionados con:", str_to_sentence(.palabra)), y = NULL)
 

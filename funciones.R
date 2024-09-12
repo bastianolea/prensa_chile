@@ -124,6 +124,7 @@ revisar_resultados <- function(ruta) {
     }
   })
 }
+# revisar_resultados("resultados")
 
 
 continuar_si_hay_enlaces <- function(enla, num = 3) {
@@ -252,13 +253,13 @@ stopwords <- readr::read_lines("~/R/lira_popular/datos/stopwords_español.txt") 
 # palabras irrelevantes ----
 palabras_irrelevantes = c("chile", "publicar", 
                           "año", "años", "añosa", "añosen",
+                          "país", "persona", "comunicación", "señor",
                           "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
                           "leer", "articular", "completar", # cooperatva ("leer articulo completo")
                           "relacionadasdetalle", "null", # emol
                           "mercer", #cnnchile y otros
                           "detallar", # meganoticias
-                          "comunidad", # puede ser relacionado a comentarios
-                          "país", "persona", "comunicación"
+                          "comunidad" # puede ser relacionado a comentarios
 )
 
 palabras_eliminar = c("right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",

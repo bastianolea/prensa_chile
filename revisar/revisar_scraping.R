@@ -25,7 +25,6 @@ con_cambios <- map(directorios$path, ~{
 }) |> 
   list_rbind()
 
-cat("\nfuentes con datos guardados hoy:\n"); print(con_cambios, n = Inf); cat("\nfuentes sin datos guardados hoy:\n"); print(sin_cambios, n = Inf)
 
 map(directorios$path, ~dir_info(.x)) |> 
   list_rbind() |> 
@@ -34,6 +33,12 @@ map(directorios$path, ~dir_info(.x)) |>
   summarize(n = n(), .by = fuente) |> 
   arrange(desc(n)) |> 
   print(n=Inf)
+
+cat("\nfuentes con datos guardados hoy:\n"); print(con_cambios, n = Inf)
+
+cat("\nfuentes sin datos guardados hoy:\n"); print(sin_cambios, n = Inf)
+
+
 
 
 
