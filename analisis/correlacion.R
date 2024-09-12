@@ -234,7 +234,7 @@ cor_filt_max |>
 
 # otro 2 ----
 .palabra = "hermosilla"
-.palabras_excluir = c("luis")
+
 
 cor_filt_fuente <- correlacion_fuente |>
   rename(palabra1 = item1, palabra2 = item2, correlacion = correlation) |> 
@@ -242,6 +242,7 @@ cor_filt_fuente <- correlacion_fuente |>
 
 .n_terminos = 8
 .n_fuentes = 5
+.palabras_excluir = c("luis")
 
 cor_filt_max_fuente <- cor_filt_fuente |> 
   # palabras excluidas

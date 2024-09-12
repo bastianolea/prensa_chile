@@ -1,15 +1,15 @@
-library(shiny)
+library(shiny) |> suppressPackageStartupMessages()
+library(dplyr) |> suppressPackageStartupMessages()
 library(bslib)
 library(thematic)
 library(showtext)
 library(htmltools)
 library(shinyjs)
 library(arrow)
-library(dplyr)
 library(ggplot2)
 library(forcats)
 library(stringr)
-library(lubridate)
+library(lubridate) |> suppressPackageStartupMessages()
 library(shadowtext)
 library(shinycssloaders)
 library(ragg)
@@ -17,6 +17,7 @@ library(ragg)
 # colores ----
 color_fondo = "#EEDABF"
 color_texto = "#866C53"
+color_negro = "#694E34"
 color_detalle = "#A5876A"
 color_destacado = "#C7392B"
 
@@ -48,7 +49,11 @@ thematic_shiny(
 # palabras_semana_fuente <- read_parquet("apps/prensa_semanal/palabras_semana_fuente.parquet")
 palabras_semana <- read_parquet("palabras_semana.parquet")
 palabras_semana_fuente <- read_parquet("palabras_semana_fuente.parquet")
+correlacion <- arrow::read_parquet("prensa_correlacion.parquet")
+correlacion_fuente <- arrow::read_parquet("prensa_correlacion_fuente.parquet")
 
+
+# vectores ----
 palabras_posibles <- palabras_semana |> 
   group_by(palabra) |> 
   summarize(n = sum(n)) |> 
@@ -131,23 +136,23 @@ ui <- page_fluid(
            plotOutput("g_semanas", 
                       width = "100%", height = "640px") |> withSpinner(),
            
-           markdown("estos gráficos se generan automáticamente, mediante de un proceso automatizado de obtención de textos y procesamiento de datos.
+           markdown("Todos los gráficos se generan automáticamente, mediante de un proceso automatizado de obtención de textos y procesamiento de datos.
                     A partir de todas las noticias publicadas por los medios comunicacionales escritos online, semana a semana, se transforman todas las noticias en palabras separadas, y se cuenta la repetición de cada palabra, tomando como una repetición las distintas conjugaciones de cada palabra (por ejemplo, _delincuente_ y _delincuencia_ cuentan como una sola palabra repetida 2 veces). Luego, se eliminan palabras irrelevantes (como artículos, pronombres y otras), y se genera un ranking de las palabras más frecuentes para cada semana."),
            
     ),
     column(3,
            ## opciones ----
-           h5("Opciones del gráfico"),
+           # h5("Opciones del gráfico"),
            
            sliderInput("semanas",
                        "Rango de semanas",
                        min = 2, max = 4*5,
-                       value = 9),
+                       value = 9, width = "100%",),
            
            selectizeInput("destacar_palabra",
                           "Destacar palabras",
                           choices = NULL, #c("Ninguna", palabras_posibles),
-                          multiple = FALSE,
+                          multiple = FALSE, width = "100%",
                           options = list(search = TRUE,
                                          create = TRUE,
                                          placeholder = "")),
@@ -158,7 +163,7 @@ ui <- page_fluid(
            sliderInput("frecuencia_min",
                        "Proporción mínima",
                        min = 0.002*100, max = 0.005*100,
-                       value = 0.0036*100, ticks = F,
+                       value = 0.0036*100, ticks = F, width = "100%",
                        step = 0.0001*100),
            div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Proporción mínima que tiene que tener una palabra en el contexto de todas las palabras; por defecto, las palabras deben aparecer al menos en un 0,3% del total de palabras.")
@@ -172,7 +177,7 @@ ui <- page_fluid(
                selectizeInput("palabras_excluir",
                               "Excluir palabras",
                               choices = NULL,
-                              multiple = TRUE,
+                              multiple = TRUE,  width = "100%",
                               options = list(create = TRUE,
                                              placeholder = "")),
                div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
@@ -183,7 +188,7 @@ ui <- page_fluid(
                            "Máximo de palabras por semana",
                            min = 4, max = 20,
                            value = 10,
-                           step = 1),
+                           step = 1, width = "100%",),
                div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                    em("Cantidad máxima de palabras por cada semana; limita la cantidad de palabras por semana dejando sólo las x mayores; por defecto son 10.")
                ),
@@ -191,14 +196,14 @@ ui <- page_fluid(
                selectInput("texto_tamaño",
                            "Tamaño del texto",
                            choices = c("Normal" = 2.3, "Mediano" = 2.8, "Grande" = 3.2),
-                           selected = c("Mediano" = 2.8)
+                           selected = c("Mediano" = 2.8), width = "100%",
                ),
                
                sliderInput("angulo",
                            "Ángulo de etiquetas",
                            min = 0, max = 60,
                            value = 40,
-                           step = 10),
+                           step = 10, width = "100%",),
                div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                    em("Ángulo del texto de las etiquetas; alterarlo puede hacer que aparezcan más etiquetas de palabras, dado que las que se sobreponen son ocultadas.")
                )
@@ -270,10 +275,9 @@ ui <- page_fluid(
   ),
   
   
-  # semana fuente ----
+  # barras semana fuente ----
   fluidRow(
     column(12,
-           
            br(),
            hr(),
            h3("Palabras más mencionadas en medios, semanalmente"),
@@ -325,7 +329,7 @@ ui <- page_fluid(
   ),
   
   
-  # semana fuente palabras ----
+  # puntos fuente palabras ----
   fluidRow(
     column(12,
            br(),
@@ -357,7 +361,7 @@ ui <- page_fluid(
            sliderInput("semanas_fuentes_palabras",
                        "Rango de semanas",
                        min = 1, max = 8,
-                       value = 5,
+                       value = 4,
                        width = "100%"),
            div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Personalice el rango de tiempo que abarcará la visualización. Por defecto, si el rango es muy amplio, se cambia a barras.")
@@ -398,6 +402,106 @@ ui <- page_fluid(
   
   
   
+  # correlación ----
+  
+  ## correlación general ----
+  fluidRow(
+    column(12,
+           br(),
+           hr(),
+           h3("Correlación entre términos"),
+           
+           markdown("En este gráfico podemos elegir un concepto y obtener las palabras que son mencionadas más frecuentemente junto a ese concepto dentro de cada noticia. Por ejemplo, si una noticia habla del _presidente,_ es muy probable que también diga _Boric_ por sobre otras palabras. En este sentido, la correlación es una relación recíproca entre términos; es decir, términos que co-ocurren frecuentemente dentro de las noticias.")
+    )
+  ),
+  fluidRow(
+    column(6, #style = css(max_width = "600px"),
+           selectizeInput("cor_total_palabra",
+                          "Conceptos que desea incluir",
+                          choices = NULL, 
+                          width = "100%",
+                          options = list(search = TRUE, create = TRUE, placeholder = "")),
+           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Elija una palabra de la lista para calcular la correlación de otras palabras con ella. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
+           ),
+    ),
+    
+    column(6, #style = css(max_width = "600px"),
+           sliderInput("cor_total_palabra_n",
+                       "Cantidad de palabras",
+                       min = 3, max = 10,
+                       value = 5,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Cantidad de palabras correlacionadas a mostrar. Aumentar este valor aumenta la cantidad de círculos, mostrando conceptos menos correlacionados.")
+           )
+    )
+  ),
+  
+  fluidRow(
+    column(12,
+           plotOutput("g_cor_total", height = "260px", width = "100%") |> withSpinner()
+    )
+    
+  ),
+  
+  
+  ## correlación por fuentes ----
+  fluidRow(
+    column(12,
+           br(),
+           hr(),
+           h3("Correlación de palabras por medios de comunicación"),
+           
+           markdown("Al igua que el gráfico anterior, en éste se expresan las palabras más correlacionadas al concepto elegido, pero desagregado por medio de comunicación. De este modo es posible comparar las palabras que más co-ocurren con el término elegido a través de los distintos medios de prensa escrita, evidenciando posibles diferencias en la forma de tratar las temáticas noticiosas.")
+    )
+  ),
+  fluidRow(
+    column(4, style = css(max_width = "600px"),
+           selectizeInput("cor_fuente_palabra",
+                          "Conceptos que desea incluir",
+                          choices = NULL, 
+                          width = "100%",
+                          options = list(search = TRUE, create = TRUE, placeholder = "")),
+           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Elija una palabra de la lista para calcular la correlación de otras palabras con ella. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
+           ),
+    ),
+    
+    column(4,  
+           style = css(max_width = "600px"),
+           sliderInput("cor_fuente_palabra_n",
+                       "Cantidad de palabras",
+                       min = 3, max = 10,
+                       value = 5,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Cantidad de palabras correlacionadas a mostrar. Aumentar este valor aumenta la cantidad de círculos, mostrando conceptos menos correlacionados.")
+           )
+    ),
+    
+    column(4,  
+           style = css(max_width = "600px"),
+           sliderInput("cor_fuente_fuente_n",
+                       "Cantidad de medios",
+                       min = 2, max = 8,
+                       value = 4,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Cantidad de medios de comunicación a mostrar. Los medios se ordenan de mayor a menor de acuerdo al nivel de correlación de sus palabras.")
+           )
+    )
+  ),
+  fluidRow(
+    column(12,
+           uiOutput("ui_g_cor_fuente") |> withSpinner()
+    )
+  ),
+  
+  
+  
+  
+  
   
   # firma ----
   fluidRow(
@@ -430,10 +534,10 @@ server <- function(input, output, session) {
   # selectores ----
   
   observe(
-  updateSelectizeInput(session, 'destacar_palabra', 
-                       # choices = c("Ninguna", palabras_posibles),
-                       choices = c("Ninguna", selector_semanas_palabras()),
-                       server = TRUE)
+    updateSelectizeInput(session, 'destacar_palabra', 
+                         # choices = c("Ninguna", palabras_posibles),
+                         choices = c("Ninguna", selector_semanas_palabras()),
+                         server = TRUE)
   )
   
   # observe(
@@ -455,10 +559,21 @@ server <- function(input, output, session) {
                        server = TRUE)
   
   
+  updateSelectizeInput(session, 'cor_total_palabra', 
+                       choices = c("Hermosilla", "Macaya", "corrupción", "delincuencia", palabras_posibles),
+                       selected = "Hermosilla",
+                       server = TRUE)
+  
+  updateSelectizeInput(session, 'cor_fuente_palabra', 
+                       choices = c("Hermosilla", "Macaya", "corrupción", "delincuencia", palabras_posibles),
+                       selected = "Hermosilla",
+                       server = TRUE)
+  
+  
   # datos ----
   ## semanas ----
-  datos_conteo_semanas <- reactive({
-    datos1 <- palabras_semana |> 
+  datos_conteo_semanas_1 <- reactive({
+    palabras_semana |> 
       # límite de fecha
       filter(fecha >= today() - weeks(input$semanas)) |>
       # calcular frecuencia total de cada palabra
@@ -478,14 +593,18 @@ server <- function(input, output, session) {
       mutate(p_palabra_semana = n/palabras_semana) |> 
       # dejar solo top palabras semana por porcentaje de semana
       filter(p_palabra_semana > (input$frecuencia_min)/100) |> 
-      ungroup() |> 
-      # # dejar solo top palabras total (maximo de palabras visibles)
-      # mutate(palabra_lump = fct_lump(palabra, w = freq_total_palabra, 
-      #                                n = 25, other_level = "otras")) |> 
-      # filter(palabra_lump != "otras") |> 
-      # sacar palabras que salen una sola vez
-      # add_count(palabra, name = "palabra_n") |>
-      # filter(palabra_n > 1) |>
+      ungroup()
+  })
+  
+  datos_conteo_semanas_2 <- reactive({
+    # # dejar solo top palabras total (maximo de palabras visibles)
+    # mutate(palabra_lump = fct_lump(palabra, w = freq_total_palabra, 
+    #                                n = 25, other_level = "otras")) |> 
+    # filter(palabra_lump != "otras") |> 
+    # sacar palabras que salen una sola vez
+    # add_count(palabra, name = "palabra_n") |>
+    # filter(palabra_n > 1) |>
+    datos_conteo_semanas_1() |> 
       # sacar semanas donde hayan pocos términos (indicio de error)
       group_by(semana) |> 
       mutate(semana_n = n()) |> 
@@ -493,51 +612,39 @@ server <- function(input, output, session) {
       # dejar solo top 10 palabras por semana
       group_by(semana) |>
       slice_max(n, n = input$palabras_semana_max)
-    
-    # datos1 |> 
-    #   count(semana, fecha)
-    
-    # browser()
-    datos2 <- datos1 |> 
+  })
+  
+  datos_conteo_semanas_3 <- reactive({
+    datos_conteo_semanas_2() |> 
       filter(!palabra %in% input$palabras_excluir) |> 
       # ordenar palabras por frecuencia
       ungroup() |> 
       mutate(palabra = fct_reorder(palabra, freq_total_palabra)) |> 
       # etiquetas hacia la izquierda
       mutate(inv = ifelse(semana == min(semana) | n < mean(n)*0.8, TRUE, FALSE))
-    
-    # datos |> slice(1) |> pull(fecha) |> 
-    # redactar_fecha()
-    
-    # por porcentaje o por frecuencia
-    # group_by(semana) |>
-    # mutate(n = n/sum(n)) |>
-    
-    
-    
-    # browser()
-    return(datos2)
   })
   
   # para el selector de palabras destacadas, cosa que solo contenga palabras que aparecen en el gráfico en vez de todas
   selector_semanas_palabras <- reactive({
-    # browser()
-    datos_conteo_semanas() |> 
+    datos_conteo_semanas_3() |> 
       select(palabra, freq_total_palabra) |> 
       arrange(desc(freq_total_palabra)) |> 
       pull(palabra) |> 
       unique() |> 
       as.character()
-    
   })
   
-  ## palabras ----
   
-  datos_conteo_semanas_palabras <- reactive({
+  ## palabras ----
+  datos_conteo_semanas_palabras_1 <- reactive({
+    palabras_semana |> 
+      filter(fecha > today() - weeks(input$semanas_palabras))
+  })
+  
+  datos_conteo_semanas_palabras_2 <- reactive({
     req(input$selector_palabras != "")
     
-    palabras_semana |> 
-      filter(fecha > today() - weeks(input$semanas_palabras)) |> 
+    datos_conteo_semanas_palabras_1() |> 
       filter(palabra %in% input$selector_palabras) |> 
       group_by(palabra) |> 
       mutate(freq_total_palabra = sum(n)) |> 
@@ -558,37 +665,43 @@ server <- function(input, output, session) {
   })
   
   
-  ## semana fuente ----
+  ## barras semana fuente ----
   # top palabras por semana
-  datos_semana_fuente <- reactive({
-    .n_fuentes = input$semana_fuentes_fuentes # 5
-    .palabras_por_fuente = 60
-    .palabras_por_semana = input$semana_fuentes_palabras_n #15
+  datos_semana_fuente_1 <- reactive({
+    palabras_semana_fuente |>
+      group_by(fuente, semana) |> 
+      slice_max(n, n = 60) # palabras por fuente
+  })
+  
+  datos_semana_fuente_2 <- reactive({
     .semanas = (week(today())-(input$semanas_fuentes-1)):week(today()) #29:32
     
-    palabras_semana_fuente |>
-      # top 10 palabras 
-      group_by(fuente, semana) |> 
-      slice_max(n, n = .palabras_por_fuente) |> # palabras por fuente
+    datos_semana_fuente_1() |> 
       # calcular palabras por fuente
       group_by(fuente) |> 
       mutate(n_total_fuente = sum(n)) |> 
       filter(semana %in% .semanas) |> 
-      ungroup() |> 
+      ungroup()
+  })
+  
+  datos_semana_fuente_3 <- reactive({
+  datos_semana_fuente_2() |> 
       # agrupar fuentes chicas
-      
       mutate(fuente = fct_reorder(fuente, n_total_fuente, .desc = TRUE)) |>
-      mutate(fuente = fct_lump(fuente, w = n_total_fuente, n = .n_fuentes, ties.method = "first", 
+      mutate(fuente = fct_lump(fuente, w = n_total_fuente, n = input$semana_fuentes_fuentes, ties.method = "first", 
                                other_level = "Otros")) |>
       group_by(fuente, semana, fecha, palabra) |>
-      summarize(n = sum(n)) |> 
-      
+      summarize(n = sum(n), .groups = "drop")
+  })
+  
+  datos_semana_fuente_4 <- reactive({
+    datos_semana_fuente_3() |> 
       # maximo palabras por semana
       group_by(semana, palabra) |> 
       mutate(n_semana = sum(n)) |>
       group_by(semana) |> 
       mutate(rank2 = dense_rank(desc(n_semana))) |> 
-      filter(rank2 <= .palabras_por_semana) |> # cantidad de palabras por semana
+      filter(rank2 <= input$semana_fuentes_palabras_n) |> # cantidad de palabras por semana
       # ordenar palabras
       group_by(semana, palabra) |> 
       mutate(n_palabra_semana = sum(n)) |> 
@@ -597,24 +710,31 @@ server <- function(input, output, session) {
       ungroup()
   })
   
-  ## semana fuente palabra ----
+  ## puntos fuente palabra ----
   # palabra específica por fuente
-  datos_semana_fuente_palabra <- reactive({
+  datos_semana_fuente_palabra_1 <- reactive({
     req(input$selector_palabras_fuente != "")
     
-    .palabra = tolower(input$selector_palabras_fuente) #"hermosilla"
+    palabras_semana_fuente |>
+      filter(palabra == tolower(input$selector_palabras_fuente))
+  })
+  
+  datos_semana_fuente_palabra_2 <- reactive({
     .semanas = (week(today())-(input$semanas_fuentes_palabras-1)):week(today()) #29:32
-    .n_fuentes = input$semana_fuentes_palabras_fuentes
     
-    dato1 <- palabras_semana_fuente |>
-      # excluir palabras
-      filter(palabra == .palabra) |> 
+    datos_semana_fuente_palabra_1() |> 
       # filtrar semanas
       filter(semana %in% .semanas) |> 
       # # ranking de fuentes con mayor cantidad de palabras
       group_by(fuente) |>
       mutate(n_total_fuente = sum(n)) |>
-      ungroup() |>
+      ungroup() 
+  })
+  
+  datos_semana_fuente_palabra_3 <- reactive({
+    .n_fuentes = input$semana_fuentes_palabras_fuentes
+    
+    datos_semana_fuente_palabra_2() |>
       # agrupar fuentes chicas
       mutate(fuente = fct_lump(fuente, w = n_total_fuente,
                                n = .n_fuentes, other_level = "Otros")) |>
@@ -628,22 +748,76 @@ server <- function(input, output, session) {
       group_by(semana) |> 
       mutate(fuente2 = tidytext::reorder_within(fuente, n_palabra_fuente, semana)) |> 
       ungroup()
-    
-    # browser()
-    
+  })
+  
+  datos_semana_fuente_palabra_4 <- reactive({
     if (input$destacar_medio == "Ninguno") {
-      dato2 <- dato1 |> 
+      datos_semana_fuente_palabra_3() |> 
         mutate(destacado = "Ninguno")
+      
     } else if (input$destacar_medio != "Ninguno") {
-      dato2 <- dato1 |> 
+      datos_semana_fuente_palabra_3() |> 
         mutate(destacado = ifelse(fuente == input$destacar_medio, 
                                   "Destacado", "Otros"))
     }
-    
-    return(dato2)
   })
   
   
+  ## correlación ----
+  
+  ### correlación general ----
+  cor_total_dato_1 <- reactive({
+    req(input$cor_total_palabra != "")
+    
+    cor_filt <- correlacion |>
+      rename(palabra1 = item1, palabra2 = item2, correlacion = correlation) |> 
+      filter(palabra1 == tolower(input$cor_total_palabra))
+    
+    return(cor_filt)
+  })
+  
+  cor_total_dato_2 <- reactive({
+    req(cor_total_dato_1() |> nrow() > 1)
+    
+    .palabras_excluir = c("luis")
+    
+    cor_total_dato_1() |> 
+      filter(!palabra2 %in% .palabras_excluir) |>
+      ungroup() |> 
+      slice_max(correlacion, n = input$cor_total_palabra_n)
+  })
+  
+  
+  ### correlación fuentes ----
+  cor_fuente_dato_1 <- reactive({
+    req(input$cor_fuente_palabra != "")
+    
+    cor_filt_fuente <- correlacion_fuente |>
+      rename(palabra1 = item1, palabra2 = item2, correlacion = correlation) |> 
+      filter(palabra1 == tolower(input$cor_fuente_palabra))
+    
+    return(cor_filt_fuente)
+  })
+  
+  cor_fuente_dato_2 <- reactive({
+    .palabras_excluir = c("luis")
+    
+    cor_filt_max_fuente <- cor_fuente_dato_1() |> 
+      # palabras excluidas
+      filter(!palabra2 %in% .palabras_excluir) |>
+      # maximo de términos por fuente
+      group_by(fuente) |> 
+      slice_max(correlacion, n = input$cor_fuente_palabra_n) |> 
+      # ranking de fuentes
+      group_by(fuente) |> 
+      mutate(cor_total = sum(correlacion)) |> 
+      ungroup() |> 
+      mutate(rank_fuente = dense_rank(cor_total)) |> 
+      filter(rank_fuente <= input$cor_fuente_fuente_n)
+  })
+  
+  
+  # —----
   # gráficos ----
   
   ## semanas ----
@@ -661,12 +835,12 @@ server <- function(input, output, session) {
     
     if (input$destacar_palabra != "Ninguna") {
       # crea una variable dicotómica con la palabra destacada
-      datos3 <- datos_conteo_semanas() |> 
+      datos3 <- datos_conteo_semanas_3() |> 
         mutate(destacar = ifelse(palabra == tolower(input$destacar_palabra), 
                                  tolower(input$destacar_palabra), "otras"),
                destacar = fct_relevel(destacar, "otras", after = 0))
     } else {
-      datos3 <- datos_conteo_semanas()
+      datos3 <- datos_conteo_semanas_3()
     }
     
     #gráfico 
@@ -749,13 +923,10 @@ server <- function(input, output, session) {
   })
   
   output$g_palabras <- renderPlot({
-    
-    # datos_conteo_semanas_palabras()
-    
     # if (length(input$selector_palabras) > 4) {
     if (input$tipo_grafico == "Líneas") {
       ### líneas ----
-      plot <- datos_conteo_semanas_palabras() |> 
+      plot <- datos_conteo_semanas_palabras_2() |> 
         ggplot(aes(fecha_etiqueta, n, color = palabra, group = palabra)) +
         geom_line(linewidth = 1.2, alpha = .7, show.legend = F) +
         geom_point(size = 4, color = color_fondo) +
@@ -780,7 +951,7 @@ server <- function(input, output, session) {
     } else if (input$tipo_grafico == "Barras") {
       ### barras ----
       # browser()
-      plot <- datos_conteo_semanas_palabras() |>
+      plot <- datos_conteo_semanas_palabras_2() |>
         # filter(rank == 1)
         ggplot(aes(fecha_etiqueta, n, fill = palabra)) +
         # geom_col(width = .9, color = color_fondo,
@@ -826,10 +997,10 @@ server <- function(input, output, session) {
   }, res = 100)
   
   
-  ## semana fuente ----
+  ## barras semana fuente ----
   output$g_semana_fuente <- renderPlot({
     
-    plot <- datos_semana_fuente() |> 
+    plot <- datos_semana_fuente_4() |> 
       ggplot(aes(x = n, y = palabra, fill = fuente)) +
       geom_col(width = .7, color = color_fondo) +
       geom_point(aes(color = fuente), alpha = 0) +
@@ -865,15 +1036,14 @@ server <- function(input, output, session) {
   }, res = 100)
   
   
-  ## semana fuente palabra ----
+  ## puntos fuente palabra ----
   
   output$texto_selector_palabras_fuente <- renderText({
     str_to_sentence(input$selector_palabras_fuente)
   })
   
   output$g_semana_fuente_palabra <- renderPlot({
-    
-    plot <- datos_semana_fuente_palabra() |> 
+    plot <- datos_semana_fuente_palabra_4() |> 
       ggplot(aes(x = n, y = fuente2,
                  color = destacado)) +
       # geom_col(width = .6, fill = color_destacado) +
@@ -913,6 +1083,84 @@ server <- function(input, output, session) {
   }, res = 100)
   
   
+  
+  # correlación general ----
+  output$g_cor_total <- renderPlot({
+    
+    dato <- cor_total_dato_2() |> 
+      mutate(tamaño = scales::rescale(correlacion, to = c(1.2, 2), 
+                                      from = range(min(correlacion), .7)),
+             tamaño = ifelse(tamaño > 2, 2, tamaño) # from = range(correlacion, na.rm = TRUE, finite = TRUE))
+      ) |> 
+      mutate(orden = dense_rank(desc(correlacion))) |> 
+      mutate(palabra2 = forcats::fct_reorder(palabra2, correlacion, .desc = TRUE))
+    
+    plot <- dato |> 
+      ggplot(aes(x = 1, y = 1, 
+                 fill = correlacion, color = correlacion)) +
+      ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = 2), alpha = .2, linewidth = .1) +
+      ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = tamaño), alpha = .9) +
+      shadowtext::geom_shadowtext(aes(label = palabra2),
+                                  bg.colour = color_fondo, bg.r = 0.2, color = color_negro, size = 3.2) +
+      geom_text(aes(label = round(correlacion, 3), y = -1.5), vjust = 1, size = 2.6, alpha = .5) +
+      guides(color = guide_none(), fill = guide_none(), size = guide_none()) +
+      theme(strip.background = element_blank(), strip.text = element_blank(),
+            axis.title.x = element_text(family = "Libre Baskerville", face = "italic", margin = margin(t = 8)),
+            axis.ticks = element_blank(), axis.text = element_blank(),
+            panel.grid = element_blank(), panel.background = element_blank()) +
+      coord_equal(clip = "off") +
+      scale_y_continuous(limits = c(-1.5, 3)) +
+      facet_grid(rows = NULL, cols = vars(orden), drop = T) +
+      labs(x = paste("términos más correlacionados con:", str_to_sentence(input$cor_total_palabra)), y = NULL)
+    
+    
+    return(plot)
+  }, res = 100)
+  
+  
+  # correlación fuentes ----
+  output$g_cor_fuente <- renderPlot({
+    
+    dato <- cor_fuente_dato_2() |> 
+      mutate(tamaño = scales::rescale(correlacion, to = c(1.2, 2), 
+                                      from = range(min(correlacion), .7)),
+             tamaño = ifelse(tamaño > 2, 2, tamaño) # from = range(correlacion, na.rm = TRUE, finite = TRUE))
+      ) |> 
+      group_by(fuente) |> 
+      mutate(orden = dense_rank(desc(correlacion))) |> 
+      recodificar_fuentes() |> 
+      mutate(palabra2 = forcats::fct_reorder(palabra2, correlacion, .desc = TRUE))
+    
+    plot <- dato |> 
+      ggplot(aes(x = 1, y = 1, 
+                 fill = correlacion, color = correlacion)) +
+      ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = 2), alpha = .2, linewidth = .1) +
+      ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = tamaño), alpha = .9) +
+      shadowtext::geom_shadowtext(aes(label = palabra2),
+                                  bg.colour = color_fondo, bg.r = 0.2, color = color_negro, size = 3.2) +
+      geom_text(aes(label = round(correlacion, 3), y = -1.5), vjust = 1, size = 2.6, alpha = .5) +
+      guides(color = guide_none(), fill = guide_none(), size = guide_none()) +
+      theme(strip.background = element_blank(), strip.text = element_text(face = "bold", vjust = 1),
+            strip.text.x = element_blank(),
+            axis.ticks = element_blank(), axis.text = element_blank(),
+            axis.title.x = element_text(family = "Libre Baskerville", face = "italic", margin = margin(t = 8)),
+            panel.grid = element_blank(), panel.background = element_blank()) +
+      coord_equal(clip = "off") +
+      scale_y_continuous(limits = c(-1.5, 3)) +
+      facet_grid(rows = vars(fuente), cols = vars(orden), drop = T, switch = "y") +
+      labs(x = paste("términos más correlacionados con:", str_to_sentence(input$cor_fuente_palabra)), y = NULL)
+    
+    return(plot)
+  }, res = 100)
+  
+  output$ui_g_cor_fuente <- renderUI({
+    div(style = css(margin_bottom = "0px"),
+        plotOutput("g_cor_fuente",
+                   height = 60 + (input$cor_fuente_fuente_n*150),
+                   width = "100%") |> withSpinner()
+    )
+    # height = reactive(60 + (input$cor_fuente_fuente_n*150))
+  })
   
 }
 
