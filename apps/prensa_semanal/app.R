@@ -14,6 +14,8 @@ library(shadowtext)
 library(shinycssloaders)
 library(ragg)
 
+source("funciones.R")
+
 # colores ----
 color_fondo = "#EEDABF"
 color_texto = "#866C53"
@@ -22,18 +24,11 @@ color_detalle = "#A5876A"
 color_destacado = "#C7392B"
 
 # configuraciones ----
-
-# register_font(name = "Lato")
-
-source("funciones.R")
-
 options(shiny.useragg = TRUE)
-
 showtext::showtext_opts(dpi = 180)
 font_add_google("Lato", "Lato", db_cache = TRUE)
 font_add_google("Libre Baskerville", "Libre Baskerville",  db_cache = TRUE)
 showtext_auto()
-
 options(spinner.type = 8, spinner.color = color_detalle)
 
 thematic_shiny(

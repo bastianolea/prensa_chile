@@ -17,3 +17,34 @@ redactar_fecha <- function(x) {
   fecha_etiqueta = paste(day(x), "de", mes_t)
   return(fecha_etiqueta)
 }
+
+
+recodificar_fuentes <- function(data) {
+  data |> 
+    mutate(fuente = case_match(fuente,
+                               "24horas" ~ "24 Horas",
+                               "adnradio" ~ "ADN Radio",
+                               "agricultura" ~ "Agricultura",
+                               "biobio" ~ "Radio BíoBío",
+                               "chvnoticias" ~ "CHV Noticias",
+                               "ciper" ~ "Ciper",
+                               "cnnchile" ~ "CNN Chile",
+                               "cooperativa" ~ "Cooperativa",
+                               "diariofinanciero" ~ "D. Financiero",
+                               "elciudadano" ~ "El Ciudadano",
+                               "eldinamo" ~ "El Dínamo",
+                               "elmostrador" ~ "El Mostrador",
+                               "elsiglo" ~ "El Siglo",
+                               "emol" ~ "Emol",
+                               "exante" ~ "Ex-Ante",
+                               "lacuarta" ~ "La Cuarta",
+                               "lahora" ~ "La Hora",
+                               "lanacion" ~ "La Nación",
+                               "latercera" ~ "La Tercera",
+                               "meganoticias" ~ "Meganoticias",
+                               "publimetro" ~ "Publimetro",
+                               "radiouchile" ~ "Radio U. de Ch.",
+                               "t13" ~ "T13",
+                               "theclinic" ~ "The Clinic", 
+                               .default = fuente))
+}

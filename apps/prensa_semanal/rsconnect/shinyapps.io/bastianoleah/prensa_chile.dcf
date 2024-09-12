@@ -1,11 +1,11 @@
 name: prensa_chile
-title: prensa_semanal
+title: prensa_chile
 username: bastianoleah
 account: bastianoleah
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 12623038
-bundleId: 9079201
+bundleId: 9094218
 url: https://bastianoleah.shinyapps.io/prensa_chile/
 version: 1
 asMultiple: FALSE

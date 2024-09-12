@@ -64,6 +64,8 @@ scraping_prensa("modulos/cron_lahora.r")
 
 scraping_prensa("modulos/cron_adnradio.r") 
 
+scraping_prensa("modulos/cron_lasegunda.r") #sólo obtiene titulares, fecha y palabras clave
+
 # scraping_prensa("modulos/cron_cooperativa_h.r")
 
 
