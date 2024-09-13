@@ -52,3 +52,5 @@ palabras_semana_fuente <- future_map(prensa_palabras_conteo_3, \(parte) {
 arrow::write_parquet(palabras_semana_fuente,"apps/prensa_semanal/palabras_semana_fuente.parquet")
 
 plan(multisession)
+rm(prensa_palabras_conteo_2, prensa_palabras_conteo_3)
+invisible(gc())

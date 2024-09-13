@@ -40,3 +40,5 @@ palabras_semana <- prensa_conteo_3 |>
 # guardar ----
 arrow::write_parquet(palabras_semana, 
                      "apps/prensa_semanal/palabras_semana.parquet")
+rm(prensa_conteo_2, prensa_conteo_3)
+invisible(gc())
