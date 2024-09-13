@@ -5,7 +5,7 @@ library(thematic)
 library(showtext)
 library(htmltools)
 library(shinyjs)
-library(arrow)
+library(arrow) |> suppressPackageStartupMessages()
 library(ggplot2)
 library(forcats)
 library(stringr)
@@ -566,7 +566,7 @@ server <- function(input, output, session) {
   
   
   # datos ----
-  ## semanas ----
+  ## líneas semanas ----
   datos_conteo_semanas_1 <- reactive({
     palabras_semana |> 
       # límite de fecha
@@ -630,7 +630,7 @@ server <- function(input, output, session) {
   })
   
   
-  ## palabras ----
+  ## barras palabras ----
   datos_conteo_semanas_palabras_1 <- reactive({
     palabras_semana |> 
       filter(fecha > today() - weeks(input$semanas_palabras))
@@ -648,7 +648,8 @@ server <- function(input, output, session) {
       # otros datos
       group_by(semana) |> 
       mutate(n_semana = sum(n),
-             rank = dense_rank(desc(n))) |> 
+             # rank = dense_rank(desc(n))) |> 
+             rank = row_number(desc(n))) |> 
       ungroup() |> 
       mutate(prom = mean(n)) |> 
       mutate(chico = ifelse(n > prom*0.8, FALSE, TRUE)) |> 
@@ -690,13 +691,16 @@ server <- function(input, output, session) {
   })
   
   datos_semana_fuente_4 <- reactive({
+    # browser()
     datos_semana_fuente_3() |> 
       # maximo palabras por semana
       group_by(semana, palabra) |> 
       mutate(n_semana = sum(n)) |>
-      group_by(semana) |> 
-      mutate(rank2 = dense_rank(desc(n_semana))) |> 
-      filter(rank2 <= input$semana_fuentes_palabras_n) |> # cantidad de palabras por semana
+      group_by(semana) |>
+      mutate(rank = dense_rank(desc(n_semana))) |>
+      # mutate(rank2 = row_number(desc(n_semana))) |>
+      filter(rank <= input$semana_fuentes_palabras_n) |> # cantidad de palabras por semana
+      distinct(semana, rank, fuente, .keep_all = TRUE) |>
       # ordenar palabras
       group_by(semana, palabra) |> 
       mutate(n_palabra_semana = sum(n)) |> 
@@ -807,7 +811,7 @@ server <- function(input, output, session) {
       group_by(fuente) |> 
       mutate(cor_total = sum(correlacion)) |> 
       ungroup() |> 
-      mutate(rank_fuente = dense_rank(cor_total)) |> 
+      mutate(rank_fuente = dense_rank(cor_total)) |>
       filter(rank_fuente <= input$cor_fuente_fuente_n)
   })
   
@@ -1087,7 +1091,9 @@ server <- function(input, output, session) {
                                       from = range(min(correlacion), .7)),
              tamaño = ifelse(tamaño > 2, 2, tamaño) # from = range(correlacion, na.rm = TRUE, finite = TRUE))
       ) |> 
-      mutate(orden = dense_rank(desc(correlacion))) |> 
+      mutate(orden = dense_rank(desc(correlacion))) |>
+      # mutate(orden = row_number(desc(correlacion))) |> 
+      distinct(orden, .keep_all = TRUE) |> 
       mutate(palabra2 = forcats::fct_reorder(palabra2, correlacion, .desc = TRUE))
     
     plot <- dato |> 
@@ -1122,7 +1128,8 @@ server <- function(input, output, session) {
              tamaño = ifelse(tamaño > 2, 2, tamaño) # from = range(correlacion, na.rm = TRUE, finite = TRUE))
       ) |> 
       group_by(fuente) |> 
-      mutate(orden = dense_rank(desc(correlacion))) |> 
+      mutate(orden = dense_rank(desc(correlacion))) |>
+      distinct(fuente, orden, .keep_all = TRUE) |> 
       recodificar_fuentes() |> 
       mutate(palabra2 = forcats::fct_reorder(palabra2, correlacion, .desc = TRUE))
     

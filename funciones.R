@@ -35,6 +35,11 @@ scraping_prensa <- function(script = "modulos/cron_radiopaulina.r") {
 }
 
 
+
+beep_n <- function(x = 3) {
+  walk(1:3, ~{beep(1); Sys.sleep(0.15)}) 
+}
+
 # 
 # iniciar_selenium <- function(espera = 10, puerto = 4445L) {
 #   message("iniciando contenedor en puerto ", puerto)
