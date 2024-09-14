@@ -96,7 +96,7 @@ id_noticias_tema_homicidios <- conteo_homicidios |>
 
 
 # ver temas en datos ----
-if (!exists("datos_prensa")) datos_prensa <- arrow::read_feather("datos/prensa_datos.feather")
+if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
 
 # revisar una noticia por su id 
 datos_prensa |> filter(id == "001b295087391e8d2168252c4e923015") |> glimpse()
