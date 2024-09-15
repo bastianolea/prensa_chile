@@ -5,12 +5,16 @@ inicio <- Sys.time()
 # unión de scraping en una sola base de datos
 # cargar datos scrapeados y guardarlos en una sola base, una noticia por fila
 source("procesamiento/prensa_p1_cargar_datos.R", echo = TRUE)
-# output: datos/prensa_datos.feather
+# output: datos/prensa_datos.parquet
 
 # tokenización de textos en palabras
 # transformar datos de prensa en base tokenizada por palabras para análisis de texto
 source("procesamiento/prensa_p2_procesar_texto.R", echo = TRUE)
-# output: datos/prensa_palabras.feather
+# output: datos/prensa_palabras.parquet
+
+# tokenización por bigramas
+source("procesamiento/prensa_p2b_procesar_bigramas.R", echo = TRUE)
+# output: datos/prensa_bigramas.parquet
 
 # conteo de frecuencia de palabras por noticia
 source("procesamiento/prensa_p3_calcular_conteo.R", echo = TRUE)
