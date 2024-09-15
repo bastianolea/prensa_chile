@@ -4,7 +4,7 @@ library(bslib)
 library(thematic)
 library(showtext)
 library(htmltools)
-library(shinyjs)
+library(shinyjs) |> suppressPackageStartupMessages()
 library(arrow) |> suppressPackageStartupMessages()
 library(ggplot2)
 library(forcats)
@@ -471,7 +471,7 @@ ui <- page_fluid(
                        value = 5,
                        width = "100%"),
            div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-               em("Cantidad de palabras correlacionadas a mostrar. Aumentar este valor aumenta la cantidad de círculos, mostrando conceptos menos correlacionados.")
+               em("Cantidad de palabras correlacionadas máximas a mostrar. Aumentar este valor aumenta la cantidad de círculos, mostrando conceptos menos correlacionados.")
            )
     ),
     
@@ -480,7 +480,7 @@ ui <- page_fluid(
            sliderInput("cor_fuente_fuente_n",
                        "Cantidad de medios",
                        min = 2, max = 8,
-                       value = 4,
+                       value = 5,
                        width = "100%"),
            div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Cantidad de medios de comunicación a mostrar. Los medios se ordenan de mayor a menor de acuerdo al nivel de correlación de sus palabras.")
@@ -568,6 +568,7 @@ server <- function(input, output, session) {
   # datos ----
   ## líneas semanas ----
   datos_conteo_semanas_1 <- reactive({
+    
     palabras_semana |> 
       # límite de fecha
       filter(fecha >= today() - weeks(input$semanas)) |>
@@ -799,8 +800,10 @@ server <- function(input, output, session) {
   })
   
   cor_fuente_dato_2 <- reactive({
+    req(input$cor_fuente_palabra != "")
     .palabras_excluir = c("luis")
     
+    # browser()
     cor_filt_max_fuente <- cor_fuente_dato_1() |> 
       # palabras excluidas
       filter(!palabra2 %in% .palabras_excluir) |>
@@ -811,8 +814,10 @@ server <- function(input, output, session) {
       group_by(fuente) |> 
       mutate(cor_total = sum(correlacion)) |> 
       ungroup() |> 
-      mutate(rank_fuente = dense_rank(cor_total)) |>
+      mutate(rank_fuente = dense_rank(desc(cor_total))) |>
       filter(rank_fuente <= input$cor_fuente_fuente_n)
+    
+    return(cor_filt_max_fuente)
   })
   
   
