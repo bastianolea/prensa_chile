@@ -510,9 +510,22 @@ ui <- page_fluid(
            
            markdown("Código de fuente de esta app y del procesamiento de los datos [disponible en GitHub.](https://github.com/bastianolea/prensa_chile)"),
            
-           # div(style = "height: 40px")
+           # cafecito ----
+           div(
+             style = css(max_width = "380px", margin = "auto", padding = "28px"),
+             
+             tags$style(HTML(".cafecito:hover {opacity: 75%; transition: 0.3s; color: black !important;} .cafecito a:hover {color: black}")),
+             
+             div(class = "cafecito",
+                 style = paste("transform:scale(0.7); border: 1.2px", color_detalle, "solid; border-radius: 13px;"),
+                 tags$body(HTML('<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="bastimapache" data-color="#FFDD00" data-emoji=""  data-font="Bree" data-text="Regálame un cafecito" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>'))
+             )
+           )
     )
-  )
+  ),
+  
+  
+  
 )
 
 # —----
@@ -546,22 +559,22 @@ server <- function(input, output, session) {
   
   updateSelectizeInput(session, 'selector_palabras', 
                        choices = c("corrupción", "delincuencia", palabras_posibles),
-                       selected = c("delincuencia", "corrupción", "hermosilla", "enel"),
+                       selected = c("delincuencia", "corrupción", "hermosilla", "boric"),
                        server = TRUE)
   
   updateSelectizeInput(session, 'selector_palabras_fuente', 
-                       choices = c("Hermosilla", "Macaya", "corrupción", "delincuencia", palabras_posibles),
+                       choices = c("Hermosilla", "Cubillos", "corrupción", "delincuencia", palabras_posibles),
                        selected = "Hermosilla",
                        server = TRUE)
   
   
   updateSelectizeInput(session, 'cor_total_palabra', 
-                       choices = c("Hermosilla", "Macaya", "corrupción", "delincuencia", palabras_posibles),
+                       choices = c("Hermosilla", "Cubillos", "corrupción", "delincuencia", palabras_posibles),
                        selected = "Hermosilla",
                        server = TRUE)
   
   updateSelectizeInput(session, 'cor_fuente_palabra', 
-                       choices = c("Hermosilla", "Macaya", "corrupción", "delincuencia", palabras_posibles),
+                       choices = c("Hermosilla", "Cubillos", "corrupción", "delincuencia", palabras_posibles),
                        selected = "Hermosilla",
                        server = TRUE)
   

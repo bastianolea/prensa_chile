@@ -21,7 +21,7 @@ scraping_prensa <- function(script = "modulos/cron_radiopaulina.r") {
   # glue("scraping/{f}") |> source() |> intentar(f)
   
   # en subproceso (sesión) interactivo
-  # rstudioapi::jobRunScript(script, workingDir = "/Users/baolea/R/prensa")
+  rstudioapi::jobRunScript(script, workingDir = "/Users/baolea/R/prensa")
   
   # # en subproceso (callr) no interactivo
   # proc <- callr::r_bg(\(script) source(script), 
@@ -31,7 +31,7 @@ scraping_prensa <- function(script = "modulos/cron_radiopaulina.r") {
   #                     )
   
   # ejecutar script en el fondo no interactivo
-  ejecutar(script)
+  # ejecutar(script)
 }
 
 
