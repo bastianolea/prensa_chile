@@ -34,7 +34,7 @@ source("procesamiento/prensa_p4_calcular_correlacion.R", echo = TRUE)
 final <- Sys.time()
 
 tiempo = final - inicio
-tiempo
+cat(tiempo)
 # 13 minutos en total
 
 beep_n()

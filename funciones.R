@@ -256,20 +256,21 @@ revisar_scraping <- function(data) {
 stopwords <- readr::read_lines("~/R/lira_popular/datos/stopwords_español.txt") #tidytext::get_stopwords("es") |> pull(word)
 
 # palabras irrelevantes ----
-palabras_irrelevantes = c("chile", "publicar", 
+palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
                           "año", "años", "añosa", "añosen",
                           "país", "persona", "comunicación", "señor",
                           "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-                          "leer", "articular", "completar", # cooperatva ("leer articulo completo")
+                          "leer", "artículo", "completo", "articular", "completar", # cooperatva ("leer articulo completo")
                           "relacionadasdetalle", "null", # emol
-                          "publicación", "publicar", # elmostrador
+                          "publicación", # elmostrador
                           "mercer", #cnnchile y otros
-                          "detallar", # meganoticias
-                          "comunidad" # puede ser relacionado a comentarios
+                          "detallar" # meganoticias
 )
 
 palabras_eliminar = c("right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
                       "pred", "fs", "us", "april", "flickr", "datawrapper", "data", "fried", "ftx", "medium", "exante", "server", "family", "loc", "lon", "mag", "prof", "lat", "gpt", "banner", "donación",
+                      "style", 
+                      "aton", "emolmlt", "font", "border", "margin", #emol
                       "rectangle", "container", "img", "display", "sans", "end", "weight", "content", "rem", "flex", "border", "bottom", "margin", "padding", "center", 
                       "radius", "text", "síguenos", "solid", "items", "dadada", "droidsans", "justify", "serif", "push", "function", "cmd", "div", "googletag", "ad",
                       "protected", "email",
@@ -303,6 +304,8 @@ recodificar_fuentes <- function(data) {
                            "radiouchile" ~ "Radio U. de Ch.",
                            "t13" ~ "T13",
                            "theclinic" ~ "The Clinic", 
+                           "redgol" ~ "RedGol",
+                           "lasegunda" ~ "La Segunda",
                            .default = fuente))
 }
 

@@ -46,5 +46,7 @@ recodificar_fuentes <- function(data) {
                                "radiouchile" ~ "Radio U. de Ch.",
                                "t13" ~ "T13",
                                "theclinic" ~ "The Clinic", 
+                               "redgol" ~ "RedGol",
+                               "lasegunda" ~ "La Segunda",
                                .default = fuente))
 }
