@@ -1,6 +1,6 @@
 library(shiny) |> suppressPackageStartupMessages()
 library(dplyr) |> suppressPackageStartupMessages()
-library(bslib)
+library(bslib) |> suppressPackageStartupMessages()
 library(thematic)
 library(showtext)
 library(htmltools)
@@ -46,6 +46,7 @@ palabras_semana <- read_parquet("palabras_semana.parquet")
 palabras_semana_fuente <- read_parquet("palabras_semana_fuente.parquet")
 correlacion <- arrow::read_parquet("prensa_correlacion.parquet")
 correlacion_fuente <- arrow::read_parquet("prensa_correlacion_fuente.parquet")
+
 
 
 # vectores ----
@@ -141,8 +142,8 @@ ui <- page_fluid(
            
            sliderInput("semanas",
                        "Rango de semanas",
-                       min = 2, max = 4*5,
-                       value = 9, width = "100%",),
+                       min = 2, max = 4*3,
+                       value = 4*2, width = "100%",),
            
            selectizeInput("destacar_palabra",
                           "Destacar palabras",
@@ -254,8 +255,8 @@ ui <- page_fluid(
     column(4,  style = css(max_width = "600px"),
            sliderInput("semanas_palabras",
                        "Rango de semanas",
-                       min = 2, max = 4*6,
-                       value = 12,
+                       min = 4*1, max = 4*4,
+                       value = 4*3,
                        width = "100%"),
            div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Personalice el rango de tiempo que abarcará la visualización. Por defecto, si el rango es muy amplio, se cambia a barras.")
@@ -285,7 +286,7 @@ ui <- page_fluid(
            style = css(max_width = "600px"),
            sliderInput("semanas_fuentes",
                        "Rango de semanas",
-                       min = 1, max = 8,
+                       min = 1, max = 4*2,
                        value = 4,
                        width = "100%"),
            div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
@@ -355,7 +356,7 @@ ui <- page_fluid(
            style = css(max_width = "600px"),
            sliderInput("semanas_fuentes_palabras",
                        "Rango de semanas",
-                       min = 1, max = 8,
+                       min = 1, max = 4*2,
                        value = 4,
                        width = "100%"),
            div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
@@ -412,7 +413,7 @@ ui <- page_fluid(
   fluidRow(
     column(6, #style = css(max_width = "600px"),
            selectizeInput("cor_total_palabra",
-                          "Conceptos que desea incluir",
+                          "Concepto principal",
                           choices = NULL, 
                           width = "100%",
                           options = list(search = TRUE, create = TRUE, placeholder = "")),
@@ -454,7 +455,7 @@ ui <- page_fluid(
   fluidRow(
     column(4, style = css(max_width = "600px"),
            selectizeInput("cor_fuente_palabra",
-                          "Conceptos que desea incluir",
+                          "Concepto principal",
                           choices = NULL, 
                           width = "100%",
                           options = list(search = TRUE, create = TRUE, placeholder = "")),

@@ -13,7 +13,7 @@ source("procesamiento/prensa_p2_procesar_texto.R", echo = TRUE)
 # output: datos/prensa_palabras.parquet
 
 # tokenización por bigramas
-source("procesamiento/prensa_p2b_procesar_bigramas.R", echo = TRUE)
+# source("procesamiento/prensa_p2b_procesar_bigramas.R", echo = TRUE)
 # output: datos/prensa_bigramas.parquet
 
 # conteo de frecuencia de palabras por noticia
@@ -35,6 +35,6 @@ final <- Sys.time()
 
 tiempo = final - inicio
 tiempo
-# 11 minutos en total
+# 13 minutos en total
 
 beep_n()

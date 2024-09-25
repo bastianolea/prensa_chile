@@ -262,6 +262,7 @@ palabras_irrelevantes = c("chile", "publicar",
                           "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
                           "leer", "articular", "completar", # cooperatva ("leer articulo completo")
                           "relacionadasdetalle", "null", # emol
+                          "publicación", "publicar", # elmostrador
                           "mercer", #cnnchile y otros
                           "detallar", # meganoticias
                           "comunidad" # puede ser relacionado a comentarios
