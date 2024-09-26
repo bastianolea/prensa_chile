@@ -46,6 +46,8 @@ scraping_prensa("modulos/cron_agricultura.r") #hist
 
 scraping_prensa("modulos/cron_redgol.r") #hist
 
+scraping_prensa("modulos/cron_eldesconcierto.r") #hist
+
 scraping_prensa("modulos/cron_emol_h.r") #hist pero por meses
 
 scraping_prensa("modulos/cron_diariofinanciero.r") #histórico solo hasta página 20

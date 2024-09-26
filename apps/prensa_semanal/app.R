@@ -159,7 +159,7 @@ ui <- page_fluid(
            sliderInput("frecuencia_min",
                        "Proporción mínima",
                        min = 0.002*100, max = 0.005*100,
-                       value = 0.0036*100, ticks = F, width = "100%",
+                       value = 0.003*100, ticks = F, width = "100%",
                        step = 0.0001*100),
            div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Proporción mínima que tiene que tener una palabra en el contexto de todas las palabras; por defecto, las palabras deben aparecer al menos en un 0,3% del total de palabras.")
@@ -514,18 +514,15 @@ ui <- page_fluid(
            div(
              style = css(max_width = "380px", margin = "auto", padding = "28px"),
              
-             tags$style(HTML(".cafecito:hover {opacity: 75%; transition: 0.3s; color: black !important;} .cafecito a:hover {color: black}")),
+             tags$style(HTML(".cafecito:hover {opacity: 70%; transition: 0.3s; color: black !important;} .cafecito a:hover {color: black}")),
              
              div(class = "cafecito",
-                 style = paste("transform:scale(0.7); border: 1.2px", color_detalle, "solid; border-radius: 13px;"),
+                 style = paste("width: 100%; background-color: #FFDD04; transform:scale(0.7); border: 1.2px", color_detalle, "solid; border-radius: 13px;"),
                  tags$body(HTML('<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="bastimapache" data-color="#FFDD00" data-emoji=""  data-font="Bree" data-text="Regálame un cafecito" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>'))
              )
            )
     )
-  ),
-  
-  
-  
+  )
 )
 
 # —----
@@ -696,7 +693,7 @@ server <- function(input, output, session) {
   })
   
   datos_semana_fuente_3 <- reactive({
-  datos_semana_fuente_2() |> 
+    datos_semana_fuente_2() |> 
       # agrupar fuentes chicas
       mutate(fuente = fct_reorder(fuente, n_total_fuente, .desc = FALSE)) |>
       mutate(fuente = fct_lump(fuente, w = n_total_fuente, n = input$semana_fuentes_fuentes, ties.method = "first", 
