@@ -48,15 +48,15 @@ scraping_prensa("modulos/cron_redgol.r") #hist
 
 scraping_prensa("modulos/cron_eldesconcierto.r") #hist
 
-scraping_prensa("modulos/cron_emol_h.r") #hist pero por meses
+scraping_prensa("modulos/cron_emol.r") #hist en otro script
 
 scraping_prensa("modulos/cron_diariofinanciero.r") #histórico solo hasta página 20
 
 scraping_prensa("modulos/cron_lacuarta.r") #histórico solo hasta página 9
 
-scraping_prensa("modulos/cron_elmostrador.r") # (requiere selenium para hist)
-
 scraping_prensa("modulos/cron_cooperativa.r") #hist en otro script
+
+scraping_prensa("modulos/cron_elmostrador.r") # (requiere selenium para hist)
 
 scraping_prensa("modulos/cron_chvnoticias.r")
 
@@ -74,7 +74,7 @@ scraping_prensa("modulos/cron_lasegunda.r") #sólo obtiene titulares, fecha y pa
 
 
 #revisión ----
-Sys.sleep(60)
+Sys.sleep(30)
 
 #chequear si se guardaron los archivos
 source("revisar/revisar_scraping.R")
