@@ -5,7 +5,9 @@ Proyecto de ciencia de datos desarrollado en R para analizar texto de noticias c
 
 Actualmente, el corpus de noticias obtenido supera las 590.000 noticias individuales, las cuales suman un total de 105 millones (!) de palabras, abarcando más de 21 fuentes periodísticas distintas.
 
-![Gráfico resumen de resultados del scraping de prensa](graficos/datos_prensa_scraping_2024-09-02_a.png)
+![Gráfico resumen de resultados del scraping de prensa](graficos/datos_prensa_scraping_2024-09-27_a.png)
+
+----
 
 ## Aplicaciones web
 
@@ -24,7 +26,9 @@ Actualmente, el corpus de noticias obtenido supera las 590.000 noticias individu
 ![](apps/prensa_semanal/pantallazos/p3.png)
 ![](apps/prensa_semanal/pantallazos/p2c.png)
 ![](apps/prensa_semanal/pantallazos/p4.png)
+![](apps/prensa_semanal/pantallazos/p5b.png)
 
+----
 
 ## Principales hallazgos
 
