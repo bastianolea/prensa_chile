@@ -10,5 +10,6 @@
 resultados/
 datos/
 procesamiento/
-modulos/
+modulos/*
+!modulos/cron_ejemplo.R
 logs/
