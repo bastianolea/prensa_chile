@@ -154,16 +154,20 @@ plot <- datos_prensa_grafico_scraping_conteo_rellenado_sum |>
 
 # animación
 anim <- plot +
-  transition_states(fecha_scraping, transition_length = 3, state_length = 1, wrap = FALSE) +
+  transition_states(fecha_scraping, 
+                    transition_length = 3, state_length = 1, 
+                    wrap = FALSE) +
   enter_grow() +
   ggtitle(label = "Web scraping de medios digitales chilenos",
-          subtitle = "Cantidad total de noticias obtenidas hasta {format(as_date(closest_state), '%B de %Y')}") +
-  labs(y = "noticias", x = NULL, caption = "Fuente: elaboración propia. Bastián Olea Herrera")
-
+          subtitle = "Cantidad total de noticias obtenidas 
+          hasta {format(as_date(closest_state), '%B de %Y')}") +
+  labs(y = "noticias", x = NULL, 
+       caption = "Fuente: elaboración propia. Bastián Olea Herrera")
 
 # render
 animate(anim, 
         renderer = av_renderer("graficos/datos_prensa_scraping.mov"),
         fps = 60, end_pause = 30, duration = 16, 
         width = 1080, height = 800, units = "px", res = 90)
+
 
