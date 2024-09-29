@@ -307,6 +307,7 @@ recodificar_fuentes <- function(data) {
                            "redgol" ~ "RedGol",
                            "lasegunda" ~ "La Segunda",
                            "eldesconcierto" ~ "El Desconcierto",
+                           "quintopoder" ~ "El Quinto Poder",
                            .default = fuente))
 }
 

@@ -48,6 +48,8 @@ scraping_prensa("modulos/cron_redgol.r") #hist
 
 scraping_prensa("modulos/cron_eldesconcierto.r") #hist
 
+scraping_prensa("modulos/cron_quintopoder.r") #hist
+
 scraping_prensa("modulos/cron_emol.r") #hist en otro script
 
 scraping_prensa("modulos/cron_diariofinanciero.r") #histórico solo hasta página 20
