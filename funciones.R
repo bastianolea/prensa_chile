@@ -15,14 +15,12 @@ ejecutar <- function(script = "modulos/cron_elsiglo.r",
 
 
 scraping_prensa <- function(script = "modulos/cron_radiopaulina.r") {
-  message(glue::glue("iniciando {script} - {lubridate::now()}"))
+  message(glue::glue("iniciando {script} - {format(now(), '%d/%m/%y %H:%M:%S')}"))
   
-  # con source
-  # glue("scraping/{f}") |> source() |> intentar(f)
-  
-  # en subproceso (sesión) interactivo
+  ### en subproceso (sesión) interactivo (RStudio Background Job, compatible con cualquier sistema operativo)
   # rstudioapi::jobRunScript(script, workingDir = "/Users/baolea/R/prensa")
   
+  ###
   # # en subproceso (callr) no interactivo
   # proc <- callr::r_bg(\(script) source(script), 
   #                     supervise = TRUE,
@@ -30,7 +28,8 @@ scraping_prensa <- function(script = "modulos/cron_radiopaulina.r") {
   #                     stdout = stringr::str_replace(script, "\\.r$", "\\.log")
   #                     )
   
-  # ejecutar script en el fondo no interactivo
+  ### 
+  # ejecutar script en el fondo no interactivo (sólo en macOS, probablemente en Linux)
   ejecutar(script)
 }
 

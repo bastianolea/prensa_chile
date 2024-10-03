@@ -4,16 +4,18 @@ library(shinyjs) |> suppressPackageStartupMessages()
 
 library(dplyr) |> suppressPackageStartupMessages()
 # library(arrow) |> suppressPackageStartupMessages()
-library(readr)
+library(readr) |> suppressPackageStartupMessages()
 library(ggplot2)
 library(forcats)
 library(stringr)
 library(lubridate) |> suppressPackageStartupMessages()
 library(shadowtext)
 library(shinycssloaders)
-# library(curl)
+
 library(thematic)
 library(showtext)
+library(sysfonts)
+library(curl) |> suppressPackageStartupMessages()
 library(bslib) |> suppressPackageStartupMessages()
 library(ragg)
 
@@ -30,18 +32,15 @@ color_destacado = "#C7392B"
 
 # configuraciones ----
 options(spinner.type = 8, spinner.color = color_detalle)
-
-thematic_shiny(font = "auto",
-  bg = color_fondo, fg = color_texto, accent = color_destacado)
-
 options(shiny.useragg = TRUE)
 showtext::showtext_opts(dpi = 180)
+thematic_shiny(font = "auto", accent = color_destacado)
+.texto_ejes = 9
 
-# use_font("lato", "fonts/css/lato.css")
-# use_font("libre-baskerville", "fonts/css/libre-baskerville.css")
-# font_add_google("Lato", "Lato", db_cache = TRUE)
-# font_add_google("Libre Baskerville", "Libre Baskerville",  db_cache = TRUE)
-# showtext_auto()
+# tipografías para ragg/sysfonts
+sysfonts::font_add_google("Lato", "Lato", db_cache = TRUE)
+sysfonts::font_add_google("Libre Baskerville", "Libre Baskerville", db_cache = TRUE)
+showtext_auto()
 
 
 # cargar datos ----
@@ -59,15 +58,11 @@ correlacion_fuente <- read_rds("prensa_correlacion_fuente.rds")
 # tictoc::toc()
 
 
-
-
 # vectores ----
 palabras_posibles <- palabras_semana |> 
   group_by(palabra) |> 
   summarize(n = sum(n)) |> 
   arrange(desc(n)) |> 
-  # filter(str_detect(palabra, "corru"))
-  # slice(1:500) |> 
   filter(n > 100) |> 
   pull(palabra)
 
@@ -79,16 +74,24 @@ ui <- page_fluid(
   title = "Prensa en Chile", 
   lang = "es",
   
+  # tipografías en html
+  fresh::use_googlefont("Lato"),
+  fresh::use_googlefont("Libre Baskerville"),
+  fresh::use_googlefont("Libre Baskerville Italic"),
+  
   ## tema ----
-  tags$head(HTML('<link rel="preconnect" href="https://fonts.googleapis.com">')),
-  tags$head(HTML('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>')),
+  # tags$head(HTML('<link rel="preconnect" href="https://fonts.googleapis.com">')),
+  # tags$head(HTML('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>')),
   
   theme = bslib::bs_theme(
     font_scale = 1.2,
     bg = color_fondo, fg = color_texto, primary = color_destacado, 
     # tipografías 
-    heading_font = font_link("Libre Baskerville", "https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"),
-    base_font = font_link("Lato", "https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap")
+    base_font = "Lato",
+    heading_font = "Libre Baskerville Italic"
+    # heading_font = font_link("Libre Baskerville", "https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"),
+    # base_font = font_link("Lato", "https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap")
+    # base_font = font_link("Libre Baskerville", "https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"),
     # heading_font = font_google("Libre Baskerville", wght = "400 700", #c(400, 700),
     #                            ital = c(0, 1), 
     #                            local = FALSE),
@@ -171,7 +174,7 @@ ui <- page_fluid(
                           options = list(search = TRUE,
                                          create = TRUE,
                                          placeholder = "")),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Escribir o elegir de la lista una palabra para destacarla con color en el gráfico. Como es un gráfico de palabras principales, puede que hayan palabras que no aparezcan dado que no fueron las principales dentro del rango de fechas.")
            ),
            
@@ -180,7 +183,7 @@ ui <- page_fluid(
                        min = 0.002*100, max = 0.005*100,
                        value = 0.003*100, ticks = F, width = "100%",
                        step = 0.0001*100),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Proporción mínima que tiene que tener una palabra en el contexto de todas las palabras; por defecto, las palabras deben aparecer al menos en un 0,3% del total de palabras.")
            ),
            
@@ -188,7 +191,7 @@ ui <- page_fluid(
                        label = "Medida de frecuencia",
                        choices = c("Porcentaje", "Frecuencia")
            ),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Medida de posición vertical de las palabras. Se calculan después de eliminar palabras vacías y poco frecuentes, por lo que representan medidas meramente comparativas de la prevalencia de términos semanales.")
            ),
            
@@ -201,7 +204,7 @@ ui <- page_fluid(
                               multiple = TRUE,  width = "100%",
                               options = list(create = TRUE,
                                              placeholder = "")),
-               div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                    em("Palabras a remover del gráfico. Deben separarse con comas y escribirse tal como aparecen.")
                ),
                
@@ -210,7 +213,7 @@ ui <- page_fluid(
                            min = 4, max = 20,
                            value = 10,
                            step = 1, width = "100%",),
-               div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                    em("Cantidad máxima de palabras por cada semana; limita la cantidad de palabras por semana dejando sólo las x mayores; por defecto son 10.")
                ),
                
@@ -225,7 +228,7 @@ ui <- page_fluid(
                            min = 0, max = 60,
                            value = 40,
                            step = 10, width = "100%",),
-               div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               div(style = css(font_family = "Libre Baskervill Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                    em("Ángulo del texto de las etiquetas; alterarlo puede hacer que aparezcan más etiquetas de palabras, dado que las que se sobreponen son ocultadas.")
                )
            ) |> shinyjs::hidden(),
@@ -261,7 +264,7 @@ ui <- page_fluid(
                           options = list(search = TRUE,
                                          create = TRUE,
                                          placeholder = "")),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Elija palabras de la lista para incluirlas en el gráfico. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
            ),
     ),
@@ -272,7 +275,7 @@ ui <- page_fluid(
                        choices = c("Barras", "Líneas"),
                        selected = "Barras",
                        width = "100%"),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Cambie el tipo de gráfico que se usará para visualizar los datos. Por defecto, se cambia a visualización de líneas si se seleccionan muchas palabras, y a barras si se seleccionan pocas.")
            ),
     ),
@@ -283,7 +286,7 @@ ui <- page_fluid(
                        min = 4*1, max = 4*4,
                        value = 4*3,
                        width = "100%"),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Personalice el rango de tiempo que abarcará la visualización. Por defecto, si el rango es muy amplio, se cambia a barras.")
            ),
     )
@@ -314,7 +317,7 @@ ui <- page_fluid(
                        min = 1, max = 4*2,
                        value = 4,
                        width = "100%"),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Personalice el rango de tiempo que abarcará la visualización. Por defecto, si el rango es muy amplio, se cambia a barras.")
            )
     ),
@@ -326,7 +329,7 @@ ui <- page_fluid(
                        min = 3, max = 10,
                        value = 5,
                        width = "100%"),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Cantidad de medios comunicacionales a identificar. Se mostrarán los nombres de las n fuentes con mayor cantidad de palabras. El resto se agrupará en como ”Otros”.")
            )
     ),
@@ -338,7 +341,7 @@ ui <- page_fluid(
                        min = 5, max = 20,
                        value = 15,
                        width = "100%"),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Cantidad de palabras a mostrar por semana. Aumentar este valor aumenta la cantidad de barras, y podría permitir ver conceptos menos comunes.")
            )
     )
@@ -372,7 +375,7 @@ ui <- page_fluid(
                           width = "100%",
                           options = list(search = TRUE,
                                          create = TRUE, placeholder = "")),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Elija una palabra de la lista para usarla en el gráfico. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
            )
     ),
@@ -384,7 +387,7 @@ ui <- page_fluid(
                        min = 1, max = 4*2,
                        value = 4,
                        width = "100%"),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Personalice el rango de tiempo que abarcará la visualización. Por defecto, si el rango es muy amplio, se cambia a barras.")
            )
     ),
@@ -396,7 +399,7 @@ ui <- page_fluid(
                        min = 3, max = 15,
                        value = 10,
                        width = "100%"),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Cantidad de medios comunicacionales a identificar. Se mostrarán los nombres de las n fuentes con mayor cantidad de palabras. El resto se agrupará en ”Otros”.")
            )
     ),
@@ -409,7 +412,7 @@ ui <- page_fluid(
                           width = "100%",
                           options = list(search = TRUE,
                                          create = TRUE, placeholder = "")),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Seleccione un medio de comunicación para destacarlo en el gráfico por sobre el resto de los medios disponibles.")
            )
     )
@@ -442,7 +445,7 @@ ui <- page_fluid(
                           choices = NULL, 
                           width = "100%",
                           options = list(search = TRUE, create = TRUE, placeholder = "")),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Elija una palabra de la lista para calcular la correlación de otras palabras con ella. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
            ),
     ),
@@ -453,7 +456,7 @@ ui <- page_fluid(
                        min = 3, max = 10,
                        value = 5,
                        width = "100%"),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Cantidad de palabras correlacionadas a mostrar. Aumentar este valor aumenta la cantidad de círculos, mostrando conceptos menos correlacionados.")
            )
     )
@@ -484,7 +487,7 @@ ui <- page_fluid(
                           choices = NULL, 
                           width = "100%",
                           options = list(search = TRUE, create = TRUE, placeholder = "")),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Elija una palabra de la lista para calcular la correlación de otras palabras con ella. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
            ),
     ),
@@ -496,7 +499,7 @@ ui <- page_fluid(
                        min = 3, max = 10,
                        value = 5,
                        width = "100%"),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Cantidad de palabras correlacionadas máximas a mostrar. Aumentar este valor aumenta la cantidad de círculos, mostrando conceptos menos correlacionados.")
            )
     ),
@@ -508,7 +511,7 @@ ui <- page_fluid(
                        min = 2, max = 8,
                        value = 5,
                        width = "100%"),
-           div(style = css(font_family = "Libre Baskerville", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Cantidad de medios de comunicación a mostrar. Los medios se ordenan de mayor a menor de acuerdo al nivel de correlación de sus palabras.")
            )
     )
@@ -835,11 +838,9 @@ server <- function(input, output, session) {
   cor_fuente_dato_1 <- reactive({
     req(input$cor_fuente_palabra != "")
     
-    cor_filt_fuente <- correlacion_fuente |>
+    correlacion_fuente |>
       rename(palabra1 = item1, palabra2 = item2, correlacion = correlation) |> 
       filter(palabra1 == tolower(input$cor_fuente_palabra))
-    
-    return(cor_filt_fuente)
   })
   
   cor_fuente_dato_2 <- reactive({
@@ -855,15 +856,13 @@ server <- function(input, output, session) {
   })
   
   cor_fuente_dato_3 <- reactive({
-    cor_filt_max_fuente <- cor_fuente_dato_2() |> 
+    cor_fuente_dato_2() |> 
       # ranking de fuentes
       group_by(fuente) |> 
       mutate(cor_total = sum(correlacion)) |> 
       ungroup() |> 
       mutate(rank_fuente = dense_rank(desc(cor_total))) |>
       filter(rank_fuente <= input$cor_fuente_fuente_n)
-    
-    return(cor_filt_max_fuente)
   })
   
   
@@ -931,9 +930,9 @@ server <- function(input, output, session) {
       coord_cartesian(clip = "off") +
       theme(panel.grid.major.x = element_line(),
             axis.ticks.x = element_blank(),
-            axis.text.y = element_text(family = "Lato"),
+            axis.text.y = element_text(family = "Lato", size = .texto_ejes),
             axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
-            axis.text.x = element_text(family = "Lato", hjust = 1, angle = input$angulo),
+            axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1, angle = input$angulo),
             # panel.background = element_rect(fill = color_destacado),
             plot.caption = element_text(color = color_detalle)) +
       labs(y = "frecuencia de palabras por semana",
@@ -1042,14 +1041,14 @@ server <- function(input, output, session) {
       theme(legend.text = element_text(margin = margin(l = 2))) +
       theme(panel.grid.major.x = element_line(),
             axis.ticks.x = element_blank(),
-            axis.text.y = element_text(family = "Lato"),
+            axis.text.y = element_text(family = "Lato", size = .texto_ejes),
             axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
-            axis.text.x = element_text(family = "Lato", hjust = 1),
+            axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1),
             legend.title = element_text(family = "Libre Baskerville", face = "italic"),
             plot.caption = element_text(color = color_detalle)) +
       theme(axis.text.x = element_text(family = "Lato", angle = 40)) + #, hjust = 1, angle = 40))
-      labs(color = "Palabras", y = "frecuencia de palabras", x = NULL,
-           caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
+      labs(color = "Palabras", y = "frecuencia de palabras", x = NULL
+           # caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
       )
     
     
@@ -1083,14 +1082,13 @@ server <- function(input, output, session) {
       theme(panel.grid.major.x = element_line(),
             panel.grid.major.y = element_blank(),
             axis.ticks.y = element_blank(),
-            axis.text.y = element_text(family = "Lato"),
+            axis.text.y = element_text(family = "Lato", size = .texto_ejes),
             axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
             axis.title.x = element_text(family = "Libre Baskerville", face = "italic",
-                                        margin = margin(t=6, b=-10)),
-            axis.text.x = element_text(family = "Lato", hjust = 1),
+                                        margin = margin(t = 6, b = -10)),
+            axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1, angle = 40),
             legend.title = element_text(family = "Libre Baskerville", face = "italic"),
-            plot.caption = element_text(color = color_detalle)) +
-      theme(axis.text.x = element_text(family = "Lato", angle = 40))
+            plot.caption = element_text(color = color_detalle))
     
     return(plot)
   }, res = 100)
@@ -1130,14 +1128,13 @@ server <- function(input, output, session) {
       theme(panel.grid.major.x = element_line(),
             panel.grid.major.y = element_blank(),
             axis.ticks.y = element_blank(),
-            axis.text.y = element_text(family = "Lato"),
+            axis.text.y = element_text(family = "Lato", size = .texto_ejes),
             axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
             axis.title.x = element_text(family = "Libre Baskerville", face = "italic",
                                         margin = margin(t=6)),
-            axis.text.x = element_text(family = "Lato", hjust = 1),
+            axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1, vjust = .5, angle = 90),
             legend.title = element_text(family = "Libre Baskerville", face = "italic"),
-            plot.caption = element_text(color = color_detalle)) +
-      theme(axis.text.x = element_text(family = "Lato", angle = 90, vjust = .5))
+            plot.caption = element_text(color = color_detalle))
     
     return(plot)
   }, res = 100)

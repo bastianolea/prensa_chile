@@ -76,7 +76,7 @@ scraping_prensa("modulos/cron_lasegunda.r") #sólo obtiene titulares, fecha y pa
 
 
 #revisión ----
-Sys.sleep(30)
+# Sys.sleep(30)
 
 #chequear si se guardaron los archivos
 source("revisar/revisar_scraping.R")

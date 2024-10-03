@@ -18,10 +18,17 @@ datos_prensa_grafico <- datos_prensa |>
   mutate(fecha = floor_date(fecha, "month"),
          mes = month(fecha) |> as.integer() |> as.factor())
 
+# conteo por fuente y mes
 datos_prensa_grafico_conteo <- datos_prensa_grafico |> 
   group_by(fecha, mes, año, fuente) |> 
-  count()
+  count() |> 
+  # resumir fuentes chicas
+  ungroup() |>
+  mutate(fuente = forcats::fct_lump_prop(fuente, w = n, prop = 0.01, other_level = "otros")) |>
+  group_by(fecha, mes, año, fuente) |>
+  summarize(n = sum(n))
 
+# gráfico
 datos_prensa_grafico_conteo |> 
   ggplot(aes(mes, n, fill = fuente)) +
   geom_col(position = position_stack(), color = "white") +
@@ -41,7 +48,7 @@ datos_prensa_grafico_conteo |>
         legend.margin = margin(t=15), 
         panel.spacing.x = unit(4, "mm"))
 
-ggsave(glue::glue("graficos/datos_prensa_scraping_{today()}_a.png"), 
+ggsave(glue::glue("graficos/datos_prensa_scraping_{today()}.png"), 
        width = 11, height = 8, bg = "white")
 
 
@@ -110,8 +117,12 @@ datos_prensa_grafico_scraping <- datos_prensa |>
 # conteo inicial de noticias
 datos_prensa_grafico_scraping_conteo <- datos_prensa_grafico_scraping |> 
   group_by(fecha, mes, año, mes_scraping, fecha_scraping, fuente) |> 
-  count()
-
+  count() #|> 
+  # # resumir fuentes chicas
+  # ungroup() |>
+  # mutate(fuente = forcats::fct_lump_prop(fuente, w = n, prop = 0.01, other_level = "otros")) |>
+  # group_by(fecha, mes, año, fuente) |>
+  # summarize(n = sum(n))
 
 
 # relleno de fechas
