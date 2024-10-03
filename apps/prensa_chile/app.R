@@ -3,8 +3,8 @@ library(htmltools)
 library(shinyjs) |> suppressPackageStartupMessages()
 
 library(dplyr) |> suppressPackageStartupMessages()
-# library(arrow) |> suppressPackageStartupMessages()
-library(readr) |> suppressPackageStartupMessages()
+library(arrow) |> suppressPackageStartupMessages()
+# library(readr) |> suppressPackageStartupMessages()
 library(ggplot2)
 library(forcats)
 library(stringr)
@@ -44,18 +44,17 @@ showtext_auto()
 
 
 # cargar datos ----
-# palabras_semana <- read_parquet("palabras_semana.parquet")
-# palabras_semana_fuente <- read_parquet("palabras_semana_fuente.parquet")
-# correlacion <- arrow::read_parquet("prensa_correlacion.parquet")
-# correlacion_fuente <- arrow::read_parquet("prensa_correlacion_fuente.parquet")
-
-# tictoc::tic()
 # setwd("apps/prensa_semanal")
-palabras_semana <- read_rds("palabras_semana.rds")
-palabras_semana_fuente <- read_rds("palabras_semana_fuente.rds")
-correlacion <- read_rds("prensa_correlacion.rds")
-correlacion_fuente <- read_rds("prensa_correlacion_fuente.rds")
-# tictoc::toc()
+palabras_semana <- read_parquet("palabras_semana.parquet")
+palabras_semana_fuente <- read_parquet("palabras_semana_fuente.parquet")
+correlacion <- read_parquet("prensa_correlacion.parquet")
+correlacion_fuente <- read_parquet("prensa_correlacion_fuente.parquet")
+
+# setwd("apps/prensa_semanal")
+# palabras_semana <- read_rds("palabras_semana.rds")
+# palabras_semana_fuente <- read_rds("palabras_semana_fuente.rds")
+# correlacion <- read_rds("prensa_correlacion.rds")
+# correlacion_fuente <- read_rds("prensa_correlacion_fuente.rds")
 
 
 # vectores ----
@@ -518,7 +517,7 @@ ui <- page_fluid(
   ),
   fluidRow(
     column(12,
-           uiOutput("ui_g_cor_fuente") |> withSpinner()
+           uiOutput("ui_g_cor_fuente") |> withSpinner(proxy.height = 300)
     )
   ),
   
@@ -1222,7 +1221,7 @@ server <- function(input, output, session) {
     div(style = css(margin_bottom = "0px"),
         plotOutput("g_cor_fuente",
                    height = 60 + (input$cor_fuente_fuente_n*150),
-                   width = "100%") |> withSpinner()
+                   width = "100%") |> withSpinner(proxy.height = 300)
     )
     # height = reactive(60 + (input$cor_fuente_fuente_n*150))
   })

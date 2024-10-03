@@ -1,5 +1,7 @@
 # ejecutar todos los pasos de procesamiento, post scraping (prensa_obtener_datos.R)
 
+options(future.globals.maxSize = 1.0 * 1e9) # 1gb
+
 inicio <- Sys.time()
 
 # unión de scraping en una sola base de datos
@@ -21,8 +23,8 @@ source("procesamiento/prensa_p3_calcular_conteo.R", echo = T)
 # output: datos/prensa_palabras_conteo.parquet
 
 # conteos para app de noticias semanales
-source("apps/prensa_chile/procesamiento/prensa_semanal.R", echo = T)
-source("apps/prensa_chile/procesamiento/prensa_semanal_fuente.R", echo = T)
+source("procesamiento/prensa_semanal.R", echo = T)
+source("procesamiento/prensa_semanal_fuente.R", echo = T)
 
 # correlación entre palabras dentro de noticias, retorna base con palabras y sus pares correlacionados
 source("procesamiento/prensa_p4_calcular_correlacion.R", echo = T)
