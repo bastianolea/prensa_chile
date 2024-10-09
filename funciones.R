@@ -1,13 +1,14 @@
 ejecutar <- function(script = "modulos/cron_elsiglo.r", 
                      esperar = FALSE) {
-  
+  # browser()
   ruta_log = script |> 
     stringr::str_replace("\\.r$", ".log") |> 
     stringr::str_replace("modulos/", "logs/")
   
   invisible(suppressWarnings(file.remove(ruta_log)))
   
-  comando <- paste0("nohup Rscript ", script, " >> ", ruta_log, " 2>&1")
+  comando <- paste0("nohup /usr/local/bin/Rscript ", script, " >> ", ruta_log, " 2>&1")
+  # comando <- paste0("nohup Rscript ", script, " >> ", ruta_log, " 2>&1")
   
   Sys.sleep(0.1)
   system(comando, wait = esperar)
@@ -30,7 +31,7 @@ scraping_prensa <- function(script = "modulos/cron_radiopaulina.r") {
   
   ### 
   # ejecutar script en el fondo no interactivo (sólo en macOS, probablemente en Linux)
-  ejecutar(script)
+  ejecutar(paste0("/Users/baolea/R/prensa/", script))
 }
 
 
@@ -196,32 +197,6 @@ revisar_url <- function(url) {
 
 
 
-tramitaciones_limpiar_fechas <- function(data) {
-  data |> 
-    mutate(año = stringr::str_extract(fecha, "\\d{4}"),
-           mes = stringr::str_extract(fecha, "\\w{3}") |> tolower(),
-           dia = stringr::str_extract(fecha, "\\d{2}")) |> 
-    mutate(mes = recode(mes,
-                        "ene" = "1",
-                        "jan" = "1",
-                        "feb" = "2",
-                        "mar" = "3",
-                        "abr" = "4",
-                        "apr" = "4",
-                        "may" = "5",
-                        "jun" = "6",
-                        "jul" = "7",
-                        "ago" = "8",
-                        "aug" = "8",
-                        "sep" = "9",
-                        "oct" = "10",
-                        "nov" = "11",
-                        "dic" = "12",
-                        "dec" = "12")) |>
-    mutate(fecha_o = fecha,
-           fecha = lubridate::ymd(paste(año, mes, dia)))
-}
-
 
 
 limpiar_texto <- function(x) {
@@ -252,7 +227,7 @@ revisar_scraping <- function(data) {
 
 
 # palabras ----
-stopwords <- readr::read_lines("~/R/lira_popular/datos/stopwords_español.txt") #tidytext::get_stopwords("es") |> pull(word)
+stopwords <- readr::read_lines("datos/stopwords_español.txt") #tidytext::get_stopwords("es") |> pull(word)
 
 # palabras irrelevantes ----
 palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
