@@ -9,12 +9,14 @@ library(purrr)
 library(glue)
 library(lubridate) |> suppressPackageStartupMessages()
 
-setwd("~/R/prensa")
+setwd("/Users/baolea/R/prensa")
+Sys.setlocale("LC_CTYPE", "en_US.UTF-8") #para ajustar locale al ejecutar desde Rscript
 
 source("funciones.R")
 
 
 # realizar scraping ----
+notificacion("Scraping de prensa", "Iniciando scripts…")
 
 scraping_prensa("modulos/cron_latercera.r") #hist
 
@@ -68,7 +70,7 @@ scraping_prensa("modulos/cron_biobio.r")
 
 scraping_prensa("modulos/cron_lahora.r")
 
-scraping_prensa("modulos/cron_adnradio.r") 
+scraping_prensa("modulos/cron_adnradio.r")
 
 scraping_prensa("modulos/cron_lasegunda.r") #sólo obtiene titulares, fecha y palabras clave
 
@@ -80,3 +82,5 @@ scraping_prensa("modulos/cron_lasegunda.r") #sólo obtiene titulares, fecha y pa
 
 #chequear si se guardaron los archivos
 source("revisar/revisar_scraping.R")
+
+notificacion("Scraping de prensa", "Datos de noticias descargados")

@@ -329,3 +329,13 @@ redactar_fecha <- function(x) {
   fecha_etiqueta = paste(day(x), "de", mes_t)
   return(fecha_etiqueta)
 }
+
+# sólo funciona en macOS
+notificacion <- function(titulo = "Título", texto = "texto") {
+  # system("osascript -e 'display notification \"Datos de noticias descargados\" with title \"Scraping de prensa\"'")
+  system(
+    paste0("osascript -e 'display notification \"", texto, "\" with title \"", titulo, "\"'")
+  )
+}
+
+# notificacion("Scraping de prensa", "Datos de noticias descargados")
