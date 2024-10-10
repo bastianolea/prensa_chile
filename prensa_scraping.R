@@ -75,13 +75,13 @@ scraping_prensa("modulos/cron_adnradio.r")
 
 scraping_prensa("modulos/cron_lasegunda.r") #sólo obtiene titulares, fecha y palabras clave
 
-# scraping_prensa("modulos/cron_cooperativa_h.r")
+# scraping_prensa("modulos/cron_cooperativa_h.r") #este es sólo histórico
 
 
-#revisión ----
+# revisión ----
 # Sys.sleep(30)
 
-#chequear si se guardaron los archivos
+# chequear si se guardaron los archivos
 source("revisar/revisar_scraping.R")
 
 notificacion("Scraping de prensa", "Datos de noticias descargados")
