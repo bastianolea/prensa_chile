@@ -1,5 +1,5 @@
 ejecutar <- function(script = "modulos/cron_elsiglo.r", 
-                     esperar = FALSE) {
+                     esperar = TRUE) {
   # browser()
   ruta_log = script |> 
     stringr::str_replace("\\.r$", ".log") |> 
@@ -7,7 +7,7 @@ ejecutar <- function(script = "modulos/cron_elsiglo.r",
   
   invisible(suppressWarnings(file.remove(ruta_log)))
   
-  comando <- paste0("nohup /usr/local/bin/Rscript ", script, " >> ", ruta_log, " 2>&1")
+  comando <- paste0("/usr/local/bin/Rscript ", script, " >> ", ruta_log, " 2>&1")
   # comando <- paste0("nohup Rscript ", script, " >> ", ruta_log, " 2>&1")
   
   Sys.sleep(0.1)
@@ -19,7 +19,7 @@ scraping_prensa <- function(script = "modulos/cron_radiopaulina.r") {
   message(glue::glue("iniciando {script} - {format(now(), '%d/%m/%y %H:%M:%S')}"))
   
   ### en subproceso (sesión) interactivo (RStudio Background Job, compatible con cualquier sistema operativo)
-  # rstudioapi::jobRunScript(script, workingDir = "/Users/baolea/R/prensa")
+  rstudioapi::jobRunScript(script)
   
   ###
   # # en subproceso (callr) no interactivo
@@ -31,7 +31,7 @@ scraping_prensa <- function(script = "modulos/cron_radiopaulina.r") {
   
   ### 
   # ejecutar script en el fondo no interactivo (sólo en macOS, probablemente en Linux)
-  ejecutar(paste0("/Users/baolea/R/prensa/", script))
+  # ejecutar(paste0("/Users/baolea/R/prensa/", script))
 }
 
 
@@ -227,7 +227,7 @@ revisar_scraping <- function(data) {
 
 
 # palabras ----
-stopwords <- readr::read_lines("datos/stopwords_español.txt") #tidytext::get_stopwords("es") |> pull(word)
+stopwords <- readr::read_lines("datos/stopwords_es.txt") #tidytext::get_stopwords("es") |> pull(word)
 
 # palabras irrelevantes ----
 palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
@@ -308,9 +308,11 @@ redactar_fecha <- function(x) {
 # sólo funciona en macOS
 notificacion <- function(titulo = "Título", texto = "texto") {
   # system("osascript -e 'display notification \"Datos de noticias descargados\" with title \"Scraping de prensa\"'")
+  message(titulo, ": ", texto)
+  
   system(
     paste0("osascript -e 'display notification \"", texto, "\" with title \"", titulo, "\"'")
-  )
+  ) |> try()
 }
 
 # notificacion("Scraping de prensa", "Datos de noticias descargados")
