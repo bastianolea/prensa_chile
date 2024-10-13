@@ -19,7 +19,7 @@ scraping_prensa <- function(script = "modulos/cron_radiopaulina.r") {
   message(glue::glue("iniciando {script} - {format(now(), '%d/%m/%y %H:%M:%S')}"))
   
   ### en subproceso (sesión) interactivo (RStudio Background Job, compatible con cualquier sistema operativo)
-  rstudioapi::jobRunScript(script)
+  rstudioapi::jobRunScript(script, workingDir = getwd())
   
   ###
   # # en subproceso (callr) no interactivo

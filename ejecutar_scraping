@@ -1,2 +1,2 @@
 #!/bin/sh
-Rscript /Users/baolea/R/prensa/prensa_scraping.R
+Rscript /Users/baolea/R/prensa/otros/ejecutar_scraping.R
