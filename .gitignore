@@ -7,8 +7,9 @@
 .httr-oauth
 .DS_Store
 .quarto
-resultados/
-datos/
+datos/*
+!datos/stopwords_es.txt
+resultados/*
 modulos/*
 !modulos/cron_ejemplo.R
 logs/*
