@@ -103,7 +103,7 @@ data |>
 
 
 # guardar
-ggsave(paste0("graficos/noticias_semana_", today(), ".jpg"), 
+ggsave(paste0("graficos/resultados/noticias_semana_", today(), ".jpg"), 
        width = 6, height = 5, scale = 1.5)
 
 

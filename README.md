@@ -5,7 +5,7 @@ Proyecto de ciencia de datos desarrollado en R para analizar texto de noticias c
 
 Actualmente, el corpus de noticias obtenido supera las 590.000 noticias individuales, las cuales suman un total de 105 millones (!) de palabras, abarcando más de 33 fuentes periodísticas distintas.
 
-![Gráfico resumen de resultados del scraping de prensa](graficos/datos_prensa_scraping_2024-09-29.png)
+![Gráfico resumen de resultados del scraping de prensa](graficos/resultados/datos_prensa_scraping_2024-09-29.png)
 
 ----
 
@@ -18,23 +18,23 @@ Actualmente, el corpus de noticias obtenido supera las 590.000 noticias individu
 [Accede a la aplicación en este enlace](https://bastianoleah.shinyapps.io/prensa_chile/)
 
 <a href = "https://bastianoleah.shinyapps.io/prensa_chile/">
-<img src="apps/prensa_semanal/pantallazos/analisis_prensa_chile_semanal.jpg" height="900px" />
+<img src="apps/prensa_chile/pantallazos/analisis_prensa_chile_semanal.jpg" height="900px" />
 </a>
 
-![](apps/prensa_semanal/pantallazos/p1.png)
-![](apps/prensa_semanal/pantallazos/p2b.png)
-![](apps/prensa_semanal/pantallazos/p3.png)
-![](apps/prensa_semanal/pantallazos/p2c.png)
-![](apps/prensa_semanal/pantallazos/p4.png)
-![](apps/prensa_semanal/pantallazos/p5b.png)
+![](apps/prensa_chile/pantallazos/p1.png)
+![](apps/prensa_chile/pantallazos/p2b.png)
+![](apps/prensa_chile/pantallazos/p3.png)
+![](apps/prensa_chile/pantallazos/p2c.png)
+![](apps/prensa_chile/pantallazos/p4.png)
+![](apps/prensa_chile/pantallazos/p5b.png)
 
 ----
 
 ## Principales hallazgos
 
-![Resultados preliminares: conceptos más frecuentes en noticias por semana](graficos/noticias_semana_2024-09-30.jpg)
+![Resultados preliminares: conceptos más frecuentes en noticias por semana](graficos/resultados/noticias_semana_2024-09-30.jpg)
 
-![Resultados preliminares: noticias sobre delincuencia versus estadísticas de delitos reportados](graficos/prensa_delincuencia_vs_reporte3b.jpg)
+![Resultados preliminares: noticias sobre delincuencia versus estadísticas de delitos reportados](graficos/resultados/prensa_delincuencia_vs_reporte3b.jpg)
 
 _próximamente..._
 

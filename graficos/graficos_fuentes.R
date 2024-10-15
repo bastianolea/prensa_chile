@@ -48,7 +48,7 @@ datos_prensa_grafico_conteo |>
         legend.margin = margin(t=15), 
         panel.spacing.x = unit(4, "mm"))
 
-ggsave(glue::glue("graficos/datos_prensa_scraping_{today()}.png"), 
+ggsave(glue::glue("graficos/resultados/datos_prensa_scraping_{today()}.png"), 
        width = 11, height = 8, bg = "white")
 
 
@@ -69,7 +69,7 @@ datos_prensa_grafico |>
   labs(title = "Noticias mensuales, por fuente, 2024",
        caption = "Fuente: elaboración propia. Bastián Olea Herrera")
 
-ggsave(glue::glue("graficos/datos_prensa_fuentes_2024_{today()}.png"), 
+ggsave(glue::glue("graficos/resultados/datos_prensa_fuentes_2024_{today()}.png"), 
        width = 11, height = 8, bg = "white")
 
 
@@ -177,7 +177,7 @@ anim <- plot +
 
 # render
 animate(anim, 
-        renderer = av_renderer("graficos/datos_prensa_scraping.mov"),
+        renderer = av_renderer("graficos/resultados/datos_prensa_scraping.mov"),
         fps = 60, end_pause = 30, duration = 16, 
         width = 1080, height = 800, units = "px", res = 90)
 
