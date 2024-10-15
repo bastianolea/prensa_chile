@@ -9,7 +9,6 @@
 .quarto
 resultados/
 datos/
-procesamiento/
 modulos/*
 !modulos/cron_ejemplo.R
 logs/*
