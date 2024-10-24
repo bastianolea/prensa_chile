@@ -1,11 +1,14 @@
 # este script ejecuta paralelamente el scraping usando furrr, preferible si se quiere automatizar y agendar el proceso usando cron o launchd
+
+setwd("~/R/prensa/")
+source("funciones.R")
+
 Sys.setenv(LANG = "en_US.UTF-8")
 Sys.setlocale("LC_ALL", "en_US.UTF-8")
 
 library(furrr)
 plan(multisession, workers = 7)
-setwd("/Users/baolea/R/prensa/")
-source("funciones.R")
+
 
 # cat("prueba")
 # R.version.string
@@ -48,6 +51,11 @@ modulos <- c(
 modulos <- paste0("/Users/baolea/R/prensa/", modulos)
 
 # ejecutar paralelamente
-future_walk(modulos, source)
+future_walk(modulos, ~source(.x, local = TRUE))
 
 notificacion("Scraping de prensa", "Datos de noticias descargados")
+
+plan(multisession)
+
+source("revisar/revisar_scraping.R")
+
