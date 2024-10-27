@@ -316,3 +316,8 @@ notificacion <- function(titulo = "Título", texto = "texto") {
 }
 
 # notificacion("Scraping de prensa", "Datos de noticias descargados")
+
+
+rng <- function() {
+  sample(1111:9999, 1)
+}

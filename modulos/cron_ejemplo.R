@@ -105,6 +105,6 @@ resultados_elsiglo <- map(enlaces_elsiglo, \(enlace) {
 dir.create("resultados/elsiglo/", showWarnings = F)
 
 readr::write_rds(resultados_elsiglo, 
-                 glue("resultados/elsiglo/elsiglo_cron_{today()}.rds"))
+                 glue("resultados/elsiglo/elsiglo_cron_{rng()}_{today()}.rds"))
 
 message(glue("listo cron elsiglo {now()}"))
