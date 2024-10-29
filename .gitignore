@@ -8,6 +8,7 @@
 .DS_Store
 .quarto
 datos/*
+!datos/prensa_datos_muestra.csv
 !datos/stopwords_es.txt
 resultados/*
 modulos/*
