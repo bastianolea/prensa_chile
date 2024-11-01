@@ -113,8 +113,9 @@ plan(multisession)
 rm(prensa_palabras,
    prensa_palabras_pre,
    prensa_palabras_split,
-   prensa_palabras_raiz,
-   prensa_palabras_conteo)
+   prensa_palabras_raiz
+   # prensa_palabras_conteo
+   )
 invisible(gc())
 
 tictoc::toc()

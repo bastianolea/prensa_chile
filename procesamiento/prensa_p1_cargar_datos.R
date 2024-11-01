@@ -266,18 +266,18 @@ tictoc::toc()
 
 # datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
 
-# guardar una muestra de los datos
-datos_muestra_0 <- datos_prensa |> 
-  filter(año >= 2023) |> 
-  slice_sample(n = 1000) 
-
-datos_muestra <- datos_muestra_0 |> 
-  filter(!is.na(fecha),
-         !is.na(titulo),
-         nchar(titulo) > 50,
-         nchar(cuerpo) > 500,
-         nchar(cuerpo) < 4000) |> 
-  select(titulo, cuerpo, fecha)
-
-# guardar
-readr::write_csv2(datos_muestra, "datos/prensa_datos_muestra.csv")
+# # guardar una muestra de los datos
+# datos_muestra_0 <- datos_prensa |> 
+#   filter(año >= 2023) |> 
+#   slice_sample(n = 1000) 
+# 
+# datos_muestra <- datos_muestra_0 |> 
+#   filter(!is.na(fecha),
+#          !is.na(titulo),
+#          nchar(titulo) > 50,
+#          nchar(cuerpo) > 500,
+#          nchar(cuerpo) < 4000) |> 
+#   select(titulo, cuerpo, fecha)
+# 
+# # guardar
+# readr::write_csv2(datos_muestra, "datos/prensa_datos_muestra.csv")

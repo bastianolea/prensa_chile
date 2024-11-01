@@ -305,6 +305,22 @@ redactar_fecha <- function(x) {
   return(fecha_etiqueta)
 }
 
+mes_a_numero <- function(x) {
+  recode(x, 
+          "enero" = "1",
+          "febrero" = "2",
+          "marzo" = "3",
+          "abril" = "4",
+          "mayo" = "5",
+          "junio" = "6",
+          "julio" = "7",
+          "agosto" = "8",
+          "septiembre" = "9",
+            "octubre" = "10",
+            "noviembre" = "11",
+            "diciembre" = "12")
+}
+
 # sólo funciona en macOS
 notificacion <- function(titulo = "Título", texto = "texto") {
   # system("osascript -e 'display notification \"Datos de noticias descargados\" with title \"Scraping de prensa\"'")
@@ -320,4 +336,9 @@ notificacion <- function(titulo = "Título", texto = "texto") {
 
 rng <- function() {
   sample(1111:9999, 1)
+}
+
+
+ruta_resultado <- function(fuente = "latercera", hist = "", formato = "rds") {
+  glue::glue("resultados/{fuente}/{fuente}_cron_{rng()}_{lubridate::today()}{hist}.{formato}")
 }

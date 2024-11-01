@@ -64,8 +64,9 @@ message(paste("total de palabras:",
 arrow::write_parquet(prensa_palabras, "datos/prensa_palabras.parquet")
 
 plan(multisession)
-rm(datos_prensa_split,
-   prensa_palabras)
+rm(datos_prensa_split
+   # prensa_palabras
+   )
 invisible(gc())
 
 beepr::beep()
