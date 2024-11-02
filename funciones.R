@@ -342,3 +342,21 @@ rng <- function() {
 ruta_resultado <- function(fuente = "latercera", hist = "", formato = "rds") {
   glue::glue("resultados/{fuente}/{fuente}_cron_{rng()}_{lubridate::today()}{hist}.{formato}")
 }
+
+
+modulos_n <- function() {
+  fs::dir_ls("resultados") |> length()
+}
+
+sin_cambios_hoy <- function() {
+  directorios <- fs::dir_info("resultados") |> 
+    arrange(desc(modification_time))
+  
+  # directorios sin cambios hoy
+  sin_cambios <- directorios |> 
+    filter(modification_time < lubridate::today()) |> 
+    mutate(fuente = stringr::str_extract(path, "resultados/\\w+") |> stringr::str_remove("resultados/")) |> 
+    select(fuente, size, modification_time)
+  
+  return(sin_cambios)
+}

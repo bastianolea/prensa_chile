@@ -7,7 +7,8 @@ Sys.setenv(LANG = "en_US.UTF-8")
 Sys.setlocale("LC_ALL", "en_US.UTF-8")
 
 library(furrr)
-plan(multisession, workers = 7)
+library(glue)
+plan(multisession, workers = 8)
 
 
 # cat("prueba")
@@ -18,6 +19,10 @@ plan(multisession, workers = 7)
 notificacion("Scraping de prensa", "Iniciando scripts…")
 
 modulos <- c(
+  "modulos/cron_diariofinanciero.r",
+  "modulos/cron_eldesconcierto.r",
+  "modulos/cron_emol.r",
+  "modulos/cron_lacuarta.r",
   "modulos/cron_latercera.r",
   "modulos/cron_meganoticias.r",
   "modulos/cron_eldinamo.r",
@@ -33,11 +38,7 @@ modulos <- c(
   "modulos/cron_ciper.r",
   "modulos/cron_agricultura.r",
   "modulos/cron_redgol.r",
-  "modulos/cron_eldesconcierto.r",
   "modulos/cron_quintopoder.r",
-  "modulos/cron_emol.r",
-  "modulos/cron_diariofinanciero.r",
-  "modulos/cron_lacuarta.r",
   "modulos/cron_cooperativa.r",
   "modulos/cron_elmostrador.r",
   "modulos/cron_chvnoticias.r",
@@ -51,7 +52,15 @@ modulos <- c(
 modulos <- paste0("/Users/baolea/R/prensa/", modulos)
 
 # ejecutar paralelamente
-future_walk(modulos, ~source(.x, local = TRUE))
+future_walk(modulos, ~{
+  source(.x, local = TRUE, echo = FALSE)
+  
+  notificacion("Scraping de prensa", 
+               glue("{.x} terminado.
+                    Listos {nrow(sin_cambios_hoy())} de {modulos_n()}."))
+  
+  print(paste(nrow(sin_cambios_hoy()), "de", modulos_n()))
+  })
 
 notificacion("Scraping de prensa", "Datos de noticias descargados")
 

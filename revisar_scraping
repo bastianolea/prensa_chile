@@ -1,0 +1,2 @@
+#!/bin/sh
+Rscript /Users/baolea/R/prensa/otros/revisar_scraping.R
