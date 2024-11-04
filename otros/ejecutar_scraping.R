@@ -57,7 +57,7 @@ future_walk(modulos, ~{
   
   notificacion("Scraping de prensa", 
                glue("{.x} terminado.
-                    Listos {nrow(sin_cambios_hoy())} de {modulos_n()}."))
+                    Listos {modulos_n() - nrow(sin_cambios_hoy())} de {modulos_n()}."))
   
   print(paste(nrow(sin_cambios_hoy()), "de", modulos_n()))
   })
