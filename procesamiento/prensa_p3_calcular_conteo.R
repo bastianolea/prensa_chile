@@ -90,6 +90,7 @@ prensa_palabras_raiz <- prensa_palabras_split |>
                                            "sujetos" ~ "sujeto",
                                            c("municipal", "municipio") ~ "municipalidad",
                                            "alcaldesa" ~ "alcalde",
+                                           "presidenta" ~ "presidente",
                                            c("pública", "públicas", "públicos") ~ "público",
                                            .default = palabra))
   )

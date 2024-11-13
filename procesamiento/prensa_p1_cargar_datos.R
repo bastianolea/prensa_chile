@@ -191,8 +191,8 @@ modulos_limpios_fechas <- future_map(modulos_limpios, \(modulo) {
     mutate(fecha_original = fecha, 
            fecha = fecha2,
            año = year(fecha)) |> 
-    select(-fecha_scraping)
-    # mutate(fecha_scraping = as_date(fecha_scraping))
+    # select(-fecha_scraping)
+    mutate(fecha_scraping = as_date(fecha_scraping))
   
   return(resultado_3)
 })

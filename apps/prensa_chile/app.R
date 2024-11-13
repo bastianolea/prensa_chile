@@ -3,6 +3,7 @@ library(htmltools)
 library(shinyjs) |> suppressPackageStartupMessages()
 
 library(dplyr) |> suppressPackageStartupMessages()
+# library(arrow) |> suppressPackageStartupMessages()
 library(arrow) |> suppressPackageStartupMessages()
 # library(readr) |> suppressPackageStartupMessages()
 library(ggplot2)
@@ -587,8 +588,9 @@ server <- function(input, output, session) {
                        server = TRUE)
   
   updateSelectizeInput(session, 'selector_palabras_fuente', 
-                       choices = c("Hermosilla", "Cubillos", "corrupción", "delincuencia", palabras_posibles),
-                       selected = "Hermosilla",
+                       # choices = c("Hermosilla", "Cubillos", "corrupción", "delincuencia", palabras_posibles),
+                       choices = c(palabras_posibles),
+                       # selected = "Hermosilla",
                        server = TRUE)
   
   

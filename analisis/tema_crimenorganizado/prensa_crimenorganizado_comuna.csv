@@ -1,0 +1,208 @@
+comuna;cut_comuna;region;cut_region;n
+Santiago;13101;Metropolitana de Santiago;13;570
+Metropolitana de Santiago;NA;Metropolitana de Santiago;NA;515
+Arica;15101;Arica y Parinacota;15;340
+La Araucanía;NA;La Araucanía;NA;283
+Maipú;13119;Metropolitana de Santiago;13;211
+San Felipe;5701;Valparaíso;5;182
+Tarapacá;NA;Tarapacá;NA;152
+Calle Larga;5302;Valparaíso;5;149
+Biobío;NA;Biobío;NA;145
+Puente Alto;13201;Metropolitana de Santiago;13;129
+Florida;8104;Biobío;8;122
+Valparaíso;5101;Valparaíso;5;104
+La Pintana;13112;Metropolitana de Santiago;13;100
+Antofagasta;2101;Antofagasta;2;94
+Estación Central;13106;Metropolitana de Santiago;13;93
+Constitución;7102;Maule;7;91
+Iquique;1101;Tarapacá;1;85
+Padre Las Casas;9112;La Araucanía;9;83
+Arauco;8202;Biobío;8;82
+Recoleta;13127;Metropolitana de Santiago;13;82
+Independencia;13108;Metropolitana de Santiago;13;77
+Providencia;13123;Metropolitana de Santiago;13;75
+San Carlos;16301;Ñuble;16;73
+San Bernardo;13401;Metropolitana de Santiago;13;72
+San Miguel;13130;Metropolitana de Santiago;13;71
+Lampa;13302;Metropolitana de Santiago;13;69
+Quilicura;13125;Metropolitana de Santiago;13;67
+Cerro Navia;13103;Metropolitana de Santiago;13;66
+San Pedro de Atacama;2203;Antofagasta;2;62
+San Antonio;5601;Valparaíso;5;61
+Alto Hospicio;1107;Tarapacá;1;56
+Los Ríos;NA;Los Ríos;NA;54
+San Nicolás;16305;Ñuble;16;54
+Quinta de Tilcoco;6114;Libertador Gral. Bernardo O'Higgins;6;52
+San Pablo;10307;Los Lagos;10;52
+Puerto Montt;10101;Los Lagos;10;51
+Calama;2201;Antofagasta;2;48
+Coquimbo;4102;Coquimbo;4;48
+Concepción;8101;Biobío;8;47
+Cerrillos;13102;Metropolitana de Santiago;13;44
+San Javier;7406;Maule;7;43
+Cañete;8203;Biobío;8;42
+Lo Espejo;13116;Metropolitana de Santiago;13;42
+Las Condes;13114;Metropolitana de Santiago;13;40
+María Elena;2302;Antofagasta;2;40
+El Bosque;13105;Metropolitana de Santiago;13;39
+Retiro;7405;Maule;7;39
+Colina;13301;Metropolitana de Santiago;13;38
+Pudahuel;13124;Metropolitana de Santiago;13;38
+Victoria;9211;La Araucanía;9;38
+San Ramón;13131;Metropolitana de Santiago;13;37
+Renca;13128;Metropolitana de Santiago;13;35
+Colchane;1403;Tarapacá;1;34
+Coronel;8102;Biobío;8;34
+Huechuraba;13107;Metropolitana de Santiago;13;34
+Viña del Mar;5109;Valparaíso;5;33
+Temuco;9101;La Araucanía;9;32
+La Granja;13111;Metropolitana de Santiago;13;31
+San Joaquín;13129;Metropolitana de Santiago;13;31
+Diego de Almagro;3202;Atacama;3;30
+La Cisterna;13109;Metropolitana de Santiago;13;30
+Ñuñoa;13120;Metropolitana de Santiago;13;30
+Los Lagos;14104;Los Ríos;14;29
+Peñalolén;13122;Metropolitana de Santiago;13;29
+Santa María;5706;Valparaíso;5;29
+Vitacura;13132;Metropolitana de Santiago;13;29
+Villa Alemana;5804;Valparaíso;5;26
+Lo Prado;13117;Metropolitana de Santiago;13;25
+La Reina;13113;Metropolitana de Santiago;13;24
+Yungay;16109;Ñuble;16;23
+La Serena;4101;Coquimbo;4;22
+San Fernando;6301;Libertador Gral. Bernardo O'Higgins;6;22
+Los Andes;5301;Valparaíso;5;21
+Melipilla;13501;Metropolitana de Santiago;13;21
+Rancagua;6101;Libertador Gral. Bernardo O'Higgins;6;20
+Castro;10201;Los Lagos;10;19
+Ercilla;9204;La Araucanía;9;19
+La Unión;14201;Los Ríos;14;18
+Los Vilos;4203;Coquimbo;4;18
+Maule;7105;Maule;7;18
+Molina;7304;Maule;7;18
+Quilpué;5801;Valparaíso;5;18
+Ñuble;NA;Ñuble;NA;18
+Atacama;NA;Atacama;NA;17
+Talagante;13601;Metropolitana de Santiago;13;17
+Punta Arenas;12101;Magallanes y de la Antártica Chilena;12;16
+Tierra Amarilla;3103;Atacama;3;16
+El Carmen;16104;Ñuble;16;15
+Hualpén;8112;Biobío;8;15
+Macul;13118;Metropolitana de Santiago;13;15
+Valdivia;14101;Los Ríos;14;15
+Lautaro;9108;La Araucanía;9;14
+Ovalle;4301;Coquimbo;4;14
+Talca;7101;Maule;7;14
+Calera;5502;Valparaíso;5;12
+Conchalí;13104;Metropolitana de Santiago;13;12
+Curacaví;13503;Metropolitana de Santiago;13;12
+Chillán;16101;Ñuble;16;11
+Magallanes y de la Antártica Chilena;NA;Magallanes y de la Antártica Chilena;NA;11
+Rinconada;5303;Valparaíso;5;11
+Aysén del General Carlos Ibáñez del Campo;NA;Aysén del General Carlos Ibáñez del Campo;NA;10
+Buin;13402;Metropolitana de Santiago;13;10
+Lo Barnechea;13115;Metropolitana de Santiago;13;10
+San Vicente;6117;Libertador Gral. Bernardo O'Higgins;6;10
+Zapallar;5405;Valparaíso;5;10
+Paine;13404;Metropolitana de Santiago;13;9
+Angol;9201;La Araucanía;9;8
+Lumaco;9207;La Araucanía;9;8
+Navidad;6205;Libertador Gral. Bernardo O'Higgins;6;8
+San Ignacio;16108;Ñuble;16;8
+Talcahuano;8110;Biobío;8;8
+Tirúa;8207;Biobío;8;8
+Bulnes;16102;Ñuble;16;7
+Carahue;9102;La Araucanía;9;7
+Collipulli;9202;La Araucanía;9;7
+Copiapó;3101;Atacama;3;7
+Isla de Maipo;13603;Metropolitana de Santiago;13;7
+Torres del Paine;12402;Magallanes y de la Antártica Chilena;12;7
+Contulmo;8204;Biobío;8;6
+Lota;8106;Biobío;8;6
+Casablanca;5102;Valparaíso;5;5
+Máfil;14105;Los Ríos;14;5
+Pozo Almonte;1401;Tarapacá;1;5
+Tiltil;13303;Metropolitana de Santiago;13;5
+Canela;4202;Coquimbo;4;4
+Cartagena;5603;Valparaíso;5;4
+La Estrella;6202;Libertador Gral. Bernardo O'Higgins;6;4
+San Esteban;5304;Valparaíso;5;4
+Santo Domingo;5606;Valparaíso;5;4
+Taltal;2104;Antofagasta;2;4
+Vallenar;3301;Atacama;3;4
+Curacautín;9203;La Araucanía;9;3
+Curicó;7301;Maule;7;3
+Freire;9105;La Araucanía;9;3
+La Cruz;5504;Valparaíso;5;3
+Laguna Blanca;12102;Magallanes y de la Antártica Chilena;12;3
+Limache;5802;Valparaíso;5;3
+Los Angeles;8301;Biobío;8;3
+Malloa;6109;Libertador Gral. Bernardo O'Higgins;6;3
+Monte Patria;4303;Coquimbo;4;3
+Mostazal;6110;Libertador Gral. Bernardo O'Higgins;6;3
+Quillota;5501;Valparaíso;5;3
+Rengo;6115;Libertador Gral. Bernardo O'Higgins;6;3
+San Gregorio;12104;Magallanes y de la Antártica Chilena;12;3
+San Rafael;7110;Maule;7;3
+Sierra Gorda;2103;Antofagasta;2;3
+Vicuña;4106;Coquimbo;4;3
+Algarrobo;5602;Valparaíso;5;2
+Chiguayante;8103;Biobío;8;2
+Cunco;9103;La Araucanía;9;2
+Curanilahue;8205;Biobío;8;2
+El Quisco;5604;Valparaíso;5;2
+Graneros;6106;Libertador Gral. Bernardo O'Higgins;6;2
+Lebu;8201;Biobío;8;2
+Libertador Gral. Bernardo O'Higgins;NA;Libertador Gral. Bernardo O'Higgins;NA;2
+Llanquihue;10107;Los Lagos;10;2
+Longaví;7403;Maule;7;2
+Parral;7404;Maule;7;2
+Pedro Aguirre Cerda;13121;Metropolitana de Santiago;13;2
+Penco;8107;Biobío;8;2
+Perquenco;9113;La Araucanía;9;2
+Peñaflor;13605;Metropolitana de Santiago;13;2
+Pinto;16106;Ñuble;16;2
+Pirque;13202;Metropolitana de Santiago;13;2
+Porvenir;12301;Magallanes y de la Antártica Chilena;12;2
+Puchuncaví;5105;Valparaíso;5;2
+Purranque;10303;Los Lagos;10;2
+Purén;9208;La Araucanía;9;2
+Río Hurtado;4305;Coquimbo;4;2
+Saavedra;9116;La Araucanía;9;2
+Teodoro Schmidt;9117;La Araucanía;9;2
+Traiguén;9210;La Araucanía;9;2
+Villarrica;9120;La Araucanía;9;2
+Yumbel;8313;Biobío;8;2
+Cabildo;5402;Valparaíso;5;1
+Cabrero;8303;Biobío;8;1
+Calbuco;10102;Los Lagos;10;1
+Camiña;1402;Tarapacá;1;1
+Chaitén;10401;Los Lagos;10;1
+Chonchi;10203;Los Lagos;10;1
+Coinco;6103;Libertador Gral. Bernardo O'Higgins;6;1
+Colbún;7402;Maule;7;1
+Corral;14102;Los Ríos;14;1
+Curaco de Vélez;10204;Los Lagos;10;1
+Curarrehue;9104;La Araucanía;9;1
+Futrono;14202;Los Ríos;14;1
+Hualqui;8105;Biobío;8;1
+La Ligua;5401;Valparaíso;5;1
+Loncoche;9109;La Araucanía;9;1
+Los Muermos;10106;Los Lagos;10;1
+Mulchén;8305;Biobío;8;1
+Negrete;8307;Biobío;8;1
+Nogales;5506;Valparaíso;5;1
+Pelarco;7106;Maule;7;1
+Petorca;5404;Valparaíso;5;1
+Pica;1405;Tarapacá;1;1
+Pichilemu;6201;Libertador Gral. Bernardo O'Higgins;6;1
+Pitrufquén;9114;La Araucanía;9;1
+Putre;15201;Arica y Parinacota;15;1
+Quilleco;8309;Biobío;8;1
+Renaico;9209;La Araucanía;9;1
+Requínoa;6116;Libertador Gral. Bernardo O'Higgins;6;1
+Río Negro;10305;Los Lagos;10;1
+Salamanca;4204;Coquimbo;4;1
+San Clemente;7109;Maule;7;1
+Tocopilla;2301;Antofagasta;2;1
+Vilcún;9119;La Araucanía;9;1

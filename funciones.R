@@ -231,6 +231,7 @@ stopwords <- readr::read_lines("datos/stopwords_es.txt") #tidytext::get_stopword
 
 # palabras irrelevantes ----
 palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
+                          "región",
                           "año", "años", "añosa", "añosen",
                           "país", "persona", "comunicación", "señor",
                           "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
@@ -241,14 +242,14 @@ palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
                           "detallar" # meganoticias
 )
 
-palabras_eliminar = c("right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
+palabras_eliminar = c(palabras_irrelevantes,
+                      "right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
                       "pred", "fs", "us", "april", "flickr", "datawrapper", "data", "fried", "ftx", "medium", "exante", "server", "family", "loc", "lon", "mag", "prof", "lat", "gpt", "banner", "donación",
                       "style", 
                       "aton", "emolmlt", "font", "border", "margin", #emol
                       "rectangle", "container", "img", "display", "sans", "end", "weight", "content", "rem", "flex", "border", "bottom", "margin", "padding", "center", 
                       "radius", "text", "síguenos", "solid", "items", "dadada", "droidsans", "justify", "serif", "push", "function", "cmd", "div", "googletag", "ad",
-                      "protected", "email",
-                      palabras_irrelevantes)
+                      "protected", "email")
 
 
 recodificar_fuentes <- function(data) {

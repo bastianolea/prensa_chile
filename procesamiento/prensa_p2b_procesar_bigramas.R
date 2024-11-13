@@ -7,6 +7,8 @@ source("funciones.R")
 plan(multisession, workers = 7)
 # options(future.globals.maxSize = 2048*1024^2)
 
+# 6 minutos aprox
+
 # cargar datos ----
 if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
 
@@ -58,11 +60,11 @@ arrow::write_parquet(prensa_bigramas_palabras, "datos/prensa_bigramas.parquet")
 
 rm(prensa_bigramas_palabras); invisible(gc())
 
-
-# 
+plan(multisession)
+ 
 # # conteo de bigramas con la palabra caso ----
 
-if (!exists("prensa_bigramas_palabras")) prensa_bigramas_palabras <- arrow::read_parquet("datos/prensa_bigramas.parquet")
+# if (!exists("prensa_bigramas_palabras")) prensa_bigramas_palabras <- arrow::read_parquet("datos/prensa_bigramas.parquet")
 # conteo_casos <- future_map(prensa_bigramas_palabras, \(parte) {
 #   
 #   parte_orden <- parte |> 
