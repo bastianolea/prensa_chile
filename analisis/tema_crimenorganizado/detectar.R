@@ -75,7 +75,7 @@ organizaciones <- c("Tren de Aragua",
 organizaciones_2 <- tibble(organizaciones) |> 
   mutate(palabras = corpus::text_tokens(organizaciones, 
                                         corpus::text_filter(drop = stopwords::stopwords("es"))
-                                        )) |> 
+  )) |> 
   # tidyr::nest(data = palabras) |> 
   rowwise() |> 
   mutate(organizacion_limpio = unlist(palabras) |> paste(collapse = " "))
@@ -101,7 +101,7 @@ purrr::keep(test_vector, \(x) nchar(x) > 4)
 
 positive_vector
 
- 
+
 lista_comunas_1_palabra <- lista_comunas_match |> filter(!is.na(comunas_1p)) |> pull(comunas_1p)
 lista_comunas_2_palabras <- lista_comunas_match |> filter(!is.na(comunas_2p)) |> pull(comunas_2p)
 
@@ -196,7 +196,7 @@ prensa_bigramas_10 <- prensa_bigramas_9 |>
 
 prensa_bigramas_11 <- prensa_bigramas_10 |> 
   count(comuna, cut_comuna, region, cut_region, sort = TRUE)
-  
+
 
 readr::write_csv2(prensa_bigramas_11,
                   "analisis/tema_crimenorganizado/prensa_crimenorganizado_comuna.csv")
@@ -266,7 +266,7 @@ prensa_bigramas_11 |>
 
 
 # gráficos por bandas ----
-if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
+
 
 prensa_bigramas_bandas_2 <- prensa_bigramas_7 |> 
   filter(ubicacion & noticia_confirmar_ubicacion) |> 
@@ -285,11 +285,13 @@ prensa_bigramas_bandas_4 <- prensa_bigramas_bandas_3 |>
             by = join_by(id),
             multiple = "first")
 
+if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
+
 datos_prensa_2 <- datos_prensa |> 
-  select(id, fecha)
+  select(id, titulo, fuente, url, fecha)
 
 rm(datos_prensa)
-         
+
 prensa_bigramas_bandas_5 <- prensa_bigramas_bandas_4 |> 
   left_join(datos_prensa_2, 
             join_by(id), 
@@ -320,5 +322,31 @@ prensa_bigramas_bandas_6 |>
        x = "Fecha",
        y = "Menciones de organizaciones criminales en noticias",
        color = "Organizaciones criminales")
+
+
+# gráfico por regiones y bandas ----
+
+prensa_bigramas_bandas_6 |>           
+  filter(year(fecha) >= 2020,
+         fecha <= today() - months(1)) |> 
+  ungroup() |> 
+  count(region, cut_region, bandas_nombre) |> 
+  filter(!is.na(region)) |> 
+  mutate(bandas_nombre = fct_reorder(bandas_nombre, n, .desc = T)) |> 
+  group_by(region) |> 
+  mutate(sum = sum(n)) |> 
+  ungroup() |> 
+  mutate(region = fct_reorder(region, sum, .desc = F)) |> 
+  ggplot(aes(x = n, y = region, fill = bandas_nombre)) +
+  geom_col(color = "white", linewidth = .1) +
+  scale_x_continuous(expand = expansion(c(0, 0))) +
+  theme_minimal() +
+  guides(fill = guide_legend(position = "bottom", nrow = 3)) +
+  labs(title = "Conteo de menciones de organizaciones criminales\nen noticias sobre crimen organizado",
+       x = "Menciones de organizaciones criminales en noticias",
+       y = "Regiones",
+       fill = "Organizaciones criminales")
+
+
 
 
