@@ -189,7 +189,8 @@ ui <- page_fluid(
            
            selectInput("palabras_semanas_tipo",
                        label = "Medida de frecuencia",
-                       choices = c("Porcentaje", "Frecuencia")
+                       choices = c("Porcentaje", "Frecuencia"),
+                       selected = "Frecuencia"
            ),
            div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                em("Medida de posición vertical de las palabras. Se calculan después de eliminar palabras vacías y poco frecuentes, por lo que representan medidas meramente comparativas de la prevalencia de términos semanales.")
@@ -584,7 +585,7 @@ server <- function(input, output, session) {
   
   updateSelectizeInput(session, 'selector_palabras', 
                        choices = c("corrupción", "delincuencia", palabras_posibles),
-                       selected = c("delincuencia", "corrupción", "hermosilla", "boric"),
+                       selected = c("delincuencia", "corrupción", "hermosilla", "monsalve"),
                        server = TRUE)
   
   updateSelectizeInput(session, 'selector_palabras_fuente', 
@@ -595,12 +596,12 @@ server <- function(input, output, session) {
   
   
   updateSelectizeInput(session, 'cor_total_palabra', 
-                       choices = c("Hermosilla", "Cubillos", "corrupción", "delincuencia", palabras_posibles),
+                       choices = c("Hermosilla", "Monsalve", "corrupción", "delincuencia", palabras_posibles),
                        selected = "Hermosilla",
                        server = TRUE)
   
   updateSelectizeInput(session, 'cor_fuente_palabra', 
-                       choices = c("Hermosilla", "Cubillos", "corrupción", "delincuencia", palabras_posibles),
+                       choices = c("Hermosilla", "Monsalve", "corrupción", "delincuencia", palabras_posibles),
                        selected = "Hermosilla",
                        server = TRUE)
   
