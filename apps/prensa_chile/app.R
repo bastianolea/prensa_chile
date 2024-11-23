@@ -3,7 +3,6 @@ library(htmltools)
 library(shinyjs) |> suppressPackageStartupMessages()
 
 library(dplyr) |> suppressPackageStartupMessages()
-# library(arrow) |> suppressPackageStartupMessages()
 library(arrow) |> suppressPackageStartupMessages()
 # library(readr) |> suppressPackageStartupMessages()
 library(ggplot2)
@@ -39,8 +38,26 @@ thematic_shiny(font = "auto", accent = color_destacado)
 .texto_ejes = 9
 
 # tipografías para ragg/sysfonts
-sysfonts::font_add_google("Lato", "Lato", db_cache = TRUE)
-sysfonts::font_add_google("Libre Baskerville", "Libre Baskerville", db_cache = TRUE)
+# sysfonts::font_add_google("Lato", "Lato", db_cache = TRUE)
+# sysfonts::font_add_google("Libre Baskerville", "Libre Baskerville", db_cache = TRUE)
+
+# cargar tipografía local (descargada con gfonts)
+# gfonts::setup_font(id = "lato", output_dir = "www/") # instalar tipografía localmente
+# gfonts::setup_font(id = "libre-baskerville", output_dir = "www/")
+
+sysfonts::font_add("Lato",
+                   regular = "www/fonts/lato-v24-latin-regular.ttf",
+                   bold = "www/fonts/lato-v24-latin-900.ttf",
+                   italic = "www/fonts/lato-v24-latin-italic.ttf",
+                   bolditalic = "www/fonts/lato-v24-latin-900italic.ttf",
+)
+sysfonts::font_add("Libre Baskerville",
+                   regular = "www/fonts/libre-baskerville-v14-latin-regular.ttf",
+                   bold = "www/fonts/libre-baskerville-v14-latin-700.ttf",
+                   italic = "www/fonts/libre-baskerville-v14-latin-italic.ttf",
+                   bolditalic = "www/fonts/libre-baskerville-v14-latin-italic.ttf",
+)
+
 showtext_auto()
 
 
@@ -75,9 +92,22 @@ ui <- page_fluid(
   lang = "es",
   
   # tipografías en html
-  fresh::use_googlefont("Lato"),
-  fresh::use_googlefont("Libre Baskerville"),
-  fresh::use_googlefont("Libre Baskerville Italic"),
+  # gfonts::use_font("lato", "www/css/lato.css"),
+  # gfonts::use_font("libre-baskerville", "www/css/libre-baskerville.css"),
+  # fresh::use_googlefont("Lato"),
+  # fresh::use_googlefont("Libre Baskerville"),
+  # fresh::use_googlefont("Libre Baskerville Italic"),
+  
+  tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "css/libre-baskerville.css")),
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "css/libre-baskerville.css"),
+    tags$style("* {font-family:'Libre Baskerville' !important;}")
+  ),
+  tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "css/lato.css")),
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "css/lato.css"),
+    tags$style("p, label, item {font-family:'Lato' !important;}")
+  ),
   
   ## tema ----
   # tags$head(HTML('<link rel="preconnect" href="https://fonts.googleapis.com">')),
@@ -87,20 +117,8 @@ ui <- page_fluid(
     font_scale = 1.2,
     bg = color_fondo, fg = color_texto, primary = color_destacado, 
     # tipografías 
-    base_font = "Lato",
-    heading_font = "Libre Baskerville Italic"
-    # heading_font = font_link("Libre Baskerville", "https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"),
-    # base_font = font_link("Lato", "https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap")
-    # base_font = font_link("Libre Baskerville", "https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"),
-    # heading_font = font_google("Libre Baskerville", wght = "400 700", #c(400, 700),
-    #                            ital = c(0, 1), 
-    #                            local = FALSE),
-    # base_font = font_google("Lato",  
-    #                         # wght = "300 400 700 900", #
-    #                         wght = c(300, 400, 700, 900),
-    #                         ital = c(0, 1), 
-    #                         # cache = sass_file_cache(dir = "cache"))
-    #                         local = FALSE)
+    # base_font = "Lato",
+    # # heading_font = "Libre Baskerville"
   ),
   
   shinyjs::useShinyjs(),
@@ -919,6 +937,7 @@ server <- function(input, output, session) {
         aes(label = ifelse(inv, paste(palabra, "  "), paste("  ", palabra)),
             hjust = ifelse(inv, 1, 0),
             color = !!sym(variable), group = palabra),
+        family = "Lato",
         bg.colour = color_fondo, bg.r = 0.3, angle = input$angulo, size = as.numeric(input$texto_tamaño), vjust = 0.3, 
         position = position_dodge(.dodge), check_overlap = T, show.legend = F) +
       # escalas
@@ -995,10 +1014,10 @@ server <- function(input, output, session) {
         geom_text(data = ~group_by(.x, palabra) |> slice_max(n),
                   aes(label = palabra,
                       y = n + (prom*0.25)),
-                  size = 3) +
+                  family = "Lato", size = 3) +
         ggrepel::geom_text_repel(data = ~filter(.x, semana == max(semana)),
                                  aes(label = palabra, color = palabra),
-                                 size = 3, 
+                                 size = 3, family = "Lato",
                                  hjust = 0, 
                                  # xlim = c(0, ~pull(.x, fecha) |> max()),
                                  nudge_x = 0.3, segment.alpha = .3,
@@ -1024,12 +1043,14 @@ server <- function(input, output, session) {
         ),
         position = position_stack(),
         color = "white", angle = 90, 
+        family = "Lato",
         hjust = 1,
         size = 3) +
         geom_text(data = ~filter(.x, rank == 1),
                   aes(label = ifelse(chico, as.character(palabra), ""),
                       y = n_semana + (prom*0.09),
                       color = palabra),
+                  family = "Lato",
                   vjust = 0, show.legend = F, check_overlap = T,
                   size = 2.8) +
         scale_fill_viridis_d(begin = .2, end = .7, direction = -1, option = "magma", aesthetics = c("color", "fill")) +
@@ -1047,6 +1068,7 @@ server <- function(input, output, session) {
             axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
             axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1),
             legend.title = element_text(family = "Libre Baskerville", face = "italic"),
+            legend.text =  element_text(family = "Lato"),
             plot.caption = element_text(color = color_detalle)) +
       theme(axis.text.x = element_text(family = "Lato", angle = 40)) + #, hjust = 1, angle = 40))
       labs(color = "Palabras", y = "frecuencia de palabras", x = NULL
@@ -1076,8 +1098,9 @@ server <- function(input, output, session) {
                                   reverse = TRUE,
                                   override.aes = list(alpha = 1, size = 4))) +
       labs(y = "palabras más mencionadas por semana", x = "frecuencia de mención, por fuente",
-           fill = "fuentes\nescritas",
-           caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile")
+           fill = "fuentes\nescritas"
+           # caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
+           )
     
     plot <- plot +
       theme(legend.text = element_text(margin = margin(l = 2))) +
@@ -1089,8 +1112,10 @@ server <- function(input, output, session) {
             axis.title.x = element_text(family = "Libre Baskerville", face = "italic",
                                         margin = margin(t = 6, b = -10)),
             axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1, angle = 40),
-            legend.title = element_text(family = "Libre Baskerville", face = "italic"),
-            plot.caption = element_text(color = color_detalle))
+            legend.title = element_blank(), #element_text(family = "Libre Baskerville", face = "italic"),
+            legend.text =  element_text(family = "Lato"), 
+            plot.caption = element_text(color = color_detalle)) +
+      theme(strip.text = element_text(family = "Lato"))
     
     return(plot)
   }, res = 100)
@@ -1136,7 +1161,8 @@ server <- function(input, output, session) {
                                         margin = margin(t=6)),
             axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1, vjust = .5, angle = 90),
             legend.title = element_text(family = "Libre Baskerville", face = "italic"),
-            plot.caption = element_text(color = color_detalle))
+            plot.caption = element_text(color = color_detalle)) +
+      theme(strip.text = element_text(family = "Lato"))
     
     return(plot)
   }, res = 100)
@@ -1162,6 +1188,7 @@ server <- function(input, output, session) {
       ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = 2), alpha = .2, linewidth = .1) +
       ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = tamaño), alpha = .9) +
       shadowtext::geom_shadowtext(aes(label = palabra2),
+                                  family = "Lato",
                                   bg.colour = color_fondo, bg.r = 0.2, color = color_negro, size = 3.2) +
       geom_text(aes(label = round(correlacion, 3), y = -1.5), vjust = 1, size = 2.6, alpha = .5) +
       guides(color = guide_none(), fill = guide_none(), size = guide_none()) +
@@ -1201,6 +1228,7 @@ server <- function(input, output, session) {
       ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = 2), alpha = .2, linewidth = .1) +
       ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = tamaño), alpha = .9) +
       shadowtext::geom_shadowtext(aes(label = palabra2),
+                                  family = "Lato",
                                   bg.colour = color_fondo, bg.r = 0.2, color = color_negro, size = 3.2) +
       geom_text(aes(label = round(correlacion, 3), y = -1.5), vjust = 1, size = 2.6, alpha = .5) +
       guides(color = guide_none(), fill = guide_none(), size = guide_none()) +
