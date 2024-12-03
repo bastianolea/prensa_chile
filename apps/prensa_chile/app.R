@@ -141,15 +141,22 @@ ui <- page_fluid(
                h1("Análisis de prensa en Chile",
                   style = css(font_style = "italic")),
                
-               em(tags$a("Bastián Olea Herrera", href = "https://bastianolea.github.io/shiny_apps/",
-                         style = css("color!" = color_detalle,
-                                     opacity = "60%",
-                                     text_decoration = "none")),
+               div(style = css("color!" = color_detalle,
+                               opacity = "60%",
+                               font_size = "80%",
+                               text_decoration = "none"),
+                   
+               em(tags$a("Bastián Olea Herrera", href = "https://bastianolea.github.io/shiny_apps/"),
+               ),
+               br(),
+               
+               em("Última actualización de datos:", textOutput("ultimos_datos_fecha", inline = TRUE)
+               )
                )
            ),
            
            
-           markdown("Proyecto de _análisis de texto_ de noticias publicadas por medios de comunicación digitales de Chile. _En construcción._"),
+           markdown("Proyecto de _análisis de texto_ de noticias publicadas por medios de comunicación digitales de Chile. Se actualiza semanalmente."),
            markdown("Un sistema automatizado obtiene y procesa grandes cantidades de datos de noticias, creando una base de datos de noticias con su texto (título, cuerpo, bajada) y metadatos (fecha, fuente, dirección), a partir de la cual es posible realizar distintos análisis sobre el texto. Inicialmente, se puede analizar _sobre qué_ hablan las noticias en determinadas fechas (análisis descriptivo). Posteriormente se pueden hacer análisis más sofisticados, como agrupar temáticamente las noticias de forma automatizada, detectar si las noticias sobre cierto tema son positivas o negativas, o correlacionar qué se dice cuando se mencionan otros conceptos."),
            markdown("Actualmente, el material obtenido supera las **600 mil noticias** individuales, las cuales suman un total de **105 millones de palabras**, abarcando más de 21 fuentes periodísticas distintas. Para más información técnica sobre este proyecto, [visite el repositorio](https://github.com/bastianolea/prensa_chile)."),
            
@@ -559,12 +566,12 @@ ui <- page_fluid(
            
            # cafecito ----
            div(
-             style = css(max_width = "380px", margin = "auto", padding = "28px"),
+             style = css(max_width = "400px", margin = "auto", padding = "28px"),
              
              tags$style(HTML(".cafecito:hover {opacity: 70%; transition: 0.3s; color: black !important;} .cafecito a:hover {color: black}")),
              
              div(class = "cafecito",
-                 style = paste("width: 100%; background-color: #FFDD04; transform:scale(0.7); border: 1.2px", color_detalle, "solid; border-radius: 13px;"),
+                 style = paste("width: 100%; background-color: #FFDD04; transform:scale(0.6); border: 1.2px", color_detalle, "solid; border-radius: 13px;"),
                  tags$body(HTML('<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="bastimapache" data-color="#FFDD00" data-emoji=""  data-font="Bree" data-text="Regálame un cafecito" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>'))
              )
            )
@@ -626,6 +633,12 @@ server <- function(input, output, session) {
   
   # —----
   
+  
+  output$ultimos_datos_fecha <- renderText({
+    
+    format(file.info("palabras_semana.parquet")$mtime,
+           "%d/%m%/%y")
+  })
   
   # cálculos ----
   # todos los bloques reactivos se intentan particionar de forma lógica según lo que los usuarios puedan seleccionar,

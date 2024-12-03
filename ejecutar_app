@@ -1,5 +1,0 @@
-nohup R -e 'shiny::runApp("~/R/prensa/apps/prensa_chile/", port = 4064)'
-
-R -e 'browseURL("http://127.0.0.1:4064")'
-
-# chmod +x ~/R/prensa/ejecutar_app
