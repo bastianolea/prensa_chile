@@ -3,7 +3,7 @@
 
 Proyecto de ciencia de datos desarrollado en R para analizar texto de noticias chilenas. Comprende módulos para realizar web scraping de sitios web de prensa para obtener el texto de sus noticias, procesos para transformar ese texto en palabras (tokens), y procesos para analizar dicho corpus de palabras usando distintas técnicas estadísticas.
 
-Actualmente, el corpus de noticias obtenido supera las 590.000 noticias individuales, las cuales suman un total de 105 millones (!) de palabras, abarcando más de 33 fuentes periodísticas distintas.
+Actualmente, el corpus de noticias obtenido supera las 600.000 noticias individuales, las cuales suman un total de 105 millones (!) de palabras, abarcando más de 33 fuentes periodísticas distintas.
 
 ![Gráfico resumen de resultados del scraping de prensa](graficos/resultados/datos_prensa_scraping_2024-09-29.png)
 
@@ -29,6 +29,10 @@ Actualmente, el corpus de noticias obtenido supera las 590.000 noticias individu
 ![](apps/prensa_chile/pantallazos/p5b.png)
 
 ----
+
+## Datos
+Los datos obtenidos mediante este repositorio van sumando más de 600 mil noticias. Los datos, por su peso, no están disponibles de forma pública. Sin embargo, puedes acceder a una muestra de 3.000 noticias del año 2024, seleccionadas al azar, en la carpeta `datos` de este repositorio. Esta seleccion de datos contiene texto de titulares, cuerpo de noticia, fuente y fecha.
+
 
 ## Principales hallazgos
 
