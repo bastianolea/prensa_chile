@@ -120,4 +120,4 @@ rm(prensa_palabras,
 invisible(gc())
 
 tictoc::toc()
-beep()
+# beep()

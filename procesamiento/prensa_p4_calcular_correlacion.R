@@ -4,7 +4,6 @@
 library(dplyr)
 library(purrr)
 library(widyr)
-library(beepr)
 
 # cargar ----
 if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")

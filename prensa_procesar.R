@@ -2,7 +2,7 @@
 
 fecha_limite = "01-12-2024" # para prensa semanal
   
-options(future.globals.maxSize = 1.0 * 1e9) # 1gb
+options(future.globals.maxSize = 1.0 * 2e9) # 1gb
 
 inicio <- Sys.time()
 
@@ -41,4 +41,4 @@ tiempo = final - inicio
 print(round(tiempo, 1))
 # 15 minutos en total
 
-beep_n()
+beep()
