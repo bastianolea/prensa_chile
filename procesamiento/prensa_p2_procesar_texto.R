@@ -63,6 +63,14 @@ message(paste("total de palabras:",
 ## guardar ----
 arrow::write_parquet(prensa_palabras, "datos/prensa_palabras.parquet")
 
+# guardar cantidad de palabras
+n_palabras <- prensa_palabras |> 
+  nrow() |> 
+  signif(digits = 3)
+
+n_palabras |> write("datos/prensa_n_noticias.txt")
+n_palabras |> write("apps/prensa_chile/prensa_n_palabras.txt")
+
 plan(multisession)
 rm(datos_prensa_split
    # prensa_palabras

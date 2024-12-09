@@ -1,6 +1,6 @@
 # ejecutar todos los pasos de procesamiento, post scraping (prensa_obtener_datos.R)
 
-fecha_limite = "01-12-2024" # para prensa semanal
+fecha_limite = "08-12-2024" # para prensa semanal
   
 options(future.globals.maxSize = 1.0 * 2e9) # 1gb
 

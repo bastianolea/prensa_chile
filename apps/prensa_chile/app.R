@@ -1,22 +1,21 @@
 library(shiny) |> suppressPackageStartupMessages()
-library(htmltools)
-library(shinyjs) |> suppressPackageStartupMessages()
 
 library(dplyr) |> suppressPackageStartupMessages()
 library(arrow) |> suppressPackageStartupMessages()
-# library(readr) |> suppressPackageStartupMessages()
+
 library(ggplot2)
 library(forcats)
 library(stringr)
 library(lubridate) |> suppressPackageStartupMessages()
 library(shadowtext)
-library(shinycssloaders)
 
+library(bslib) |> suppressPackageStartupMessages()
+library(htmltools)
+library(shinyjs) |> suppressPackageStartupMessages()
 library(thematic)
+library(shinycssloaders)
 library(showtext)
 library(sysfonts)
-library(curl) |> suppressPackageStartupMessages()
-library(bslib) |> suppressPackageStartupMessages()
 library(ragg)
 
 source("funciones.R")
@@ -67,6 +66,10 @@ palabras_semana <- read_parquet("palabras_semana.parquet")
 palabras_semana_fuente <- read_parquet("palabras_semana_fuente.parquet")
 correlacion <- read_parquet("prensa_correlacion.parquet")
 correlacion_fuente <- read_parquet("prensa_correlacion_fuente.parquet")
+
+n_noticias <- readLines("prensa_n_noticias.txt") |> as.numeric() |> format(big.mark = ".", decimal.mark = ",")
+n_palabras <- readLines("prensa_n_palabras.txt") |> as.numeric()
+
 
 # setwd("apps/prensa_semanal")
 # palabras_semana <- read_rds("palabras_semana.rds")
@@ -146,20 +149,21 @@ ui <- page_fluid(
                                font_size = "80%",
                                text_decoration = "none"),
                    
-               em(tags$a("Bastián Olea Herrera", href = "https://bastianolea.github.io/shiny_apps/"),
-               ),
-               br(),
-               
-               em("Última actualización de datos:", textOutput("ultimos_datos_fecha", inline = TRUE)
-               )
+                   em(tags$a("Bastián Olea Herrera", href = "https://bastianolea.github.io/shiny_apps/"),
+                   ),
+                   br(),
+                   
+                   em("Última actualización de datos:", textOutput("ultimos_datos_fecha", inline = TRUE)
+                   )
                )
            ),
            
            
-           markdown("Proyecto de _análisis de texto_ de noticias publicadas por medios de comunicación digitales de Chile. Se actualiza semanalmente."),
-           markdown("Un sistema automatizado obtiene y procesa grandes cantidades de datos de noticias, creando una base de datos de noticias con su texto (título, cuerpo, bajada) y metadatos (fecha, fuente, dirección), a partir de la cual es posible realizar distintos análisis sobre el texto. Inicialmente, se puede analizar _sobre qué_ hablan las noticias en determinadas fechas (análisis descriptivo). Posteriormente se pueden hacer análisis más sofisticados, como agrupar temáticamente las noticias de forma automatizada, detectar si las noticias sobre cierto tema son positivas o negativas, o correlacionar qué se dice cuando se mencionan otros conceptos."),
-           markdown("Actualmente, el material obtenido supera las **600 mil noticias** individuales, las cuales suman un total de **105 millones de palabras**, abarcando más de 21 fuentes periodísticas distintas. Para más información técnica sobre este proyecto, [visite el repositorio](https://github.com/bastianolea/prensa_chile)."),
-           
+           markdown(
+             paste0("Proyecto de _análisis de texto_ de noticias publicadas por medios de comunicación digitales de Chile. Actualmente, el material obtenido supera las **", n_noticias, " noticias** individuales, 
+                    las cuales suman un total de **", n_palabras/1000000, " millones de palabras**, abarcando más de 20 fuentes periodísticas distintas.")),
+           markdown("Un sistema automatizado obtiene y procesa grandes cantidades de datos de noticias diariamente, creando una base de datos de noticias con su texto (título, cuerpo, bajada) y metadatos (fecha, fuente, dirección web). A partir de esta información es posible realizar distintos análisis sobre el texto. Este visualizador permite describir _sobre qué_ hablan las noticias en determinadas fechas, en intervalos de semanas, y fuentes periodísticas."),
+           markdown("Para más información técnica sobre este proyecto, [visite el repositorio](https://github.com/bastianolea/prensa_chile)."),
            hr()
     )
   ),
@@ -1113,7 +1117,7 @@ server <- function(input, output, session) {
       labs(y = "palabras más mencionadas por semana", x = "frecuencia de mención, por fuente",
            fill = "fuentes\nescritas"
            # caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
-           )
+      )
     
     plot <- plot +
       theme(legend.text = element_text(margin = margin(l = 2))) +
