@@ -21,11 +21,14 @@ prensa_palabras_conteo_2 <- prensa_palabras_conteo |>
               select(id, fuente, fecha),
             by = "id") 
 
+rm(prensa_palabras_conteo,
+   datos_prensa)
+
 
 # fechas ----
 prensa_palabras_conteo_3 <- prensa_palabras_conteo_2 |> 
   # rango de fechas 
-  filter(fecha >= today() - months(6)) |> 
+  filter(fecha >= today() - months(4)) |> 
   filter(fecha <= dmy(fecha_limite)) |> # fecha límite, para no incluir días de la semana siguiente
   mutate(semana = week(fecha),
          fecha = floor_date(fecha, unit = "week", week_start = 1)) |> 
@@ -48,23 +51,23 @@ palabras_semana_fuente <- future_map(prensa_palabras_conteo_3, \(parte) {
   mutate(fecha = redactar_fecha(fecha),
          fecha = fct_reorder(fecha, semana))
 
-
+# top palabras por semana
 palabras_semana_fuente_2 <- palabras_semana_fuente |> 
-  # top palabras por semana
   group_by(fuente, semana) |> 
-  slice_max(n, n = 60) |> # palabras por fuente
+  slice_max(n, n = 2000) |> # palabras por fuente
   # calcular palabras por fuente
   group_by(fuente) |> 
   mutate(n_total_fuente = sum(n)) |> 
   ungroup()
 
+# palabras_semana_fuente_2 |> 
+#   filter(palabra == "migración")
 
 # guardar ----
 arrow::write_parquet(palabras_semana_fuente_2,"apps/prensa_chile/palabras_semana_fuente.parquet")
 # palabras_semana_fuente <- arrow::read_parquet("apps/prensa_chile/palabras_semana_fuente.parquet")
 
 plan(multisession)
-rm(prensa_palabras_conteo,
-   prensa_palabras_conteo_2, prensa_palabras_conteo_3,
+rm(prensa_palabras_conteo_2, prensa_palabras_conteo_3,
    palabras_semana_fuente, palabras_semana_fuente_2)
 invisible(gc())

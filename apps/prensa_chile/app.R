@@ -40,7 +40,7 @@ thematic_shiny(font = "auto", accent = color_destacado)
 # sysfonts::font_add_google("Lato", "Lato", db_cache = TRUE)
 # sysfonts::font_add_google("Libre Baskerville", "Libre Baskerville", db_cache = TRUE)
 
-# cargar tipografía local (descargada con gfonts)
+# descargar tipografía local (descargada con gfonts)
 # gfonts::setup_font(id = "lato", output_dir = "www/") # instalar tipografía localmente
 # gfonts::setup_font(id = "libre-baskerville", output_dir = "www/")
 
@@ -1164,8 +1164,9 @@ server <- function(input, output, session) {
       facet_wrap(~fecha, 
                  scales = "free", nrow = 1)  +
       # theme_minimal() +
-      labs(y = "fuentes ordenadas por menciones", x = "frecuencia de mención, por semanas",
-           caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile")
+      labs(y = "fuentes ordenadas por menciones", x = "frecuencia de mención, por semanas"
+           # caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
+           )
     
     plot <- plot +
       theme(legend.text = element_text(margin = margin(l = 2))) +

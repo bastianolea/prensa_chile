@@ -81,7 +81,9 @@ prensa_palabras_raiz <- prensa_palabras_split |>
                # agrupar manualmente palabras (conjugaciones, palabras no lematizadas) para que coincidan en una sola
                mutate(palabra = case_match(palabra,
                                            c("venezolano", "venezolana") ~ "venezuela",
-                                           c("delincuente", "delictual") ~ "delincuencia",
+                                           c("inmigrantes", "inmigrante", "migrantes", "migrante", "migrar", "inmigrar", "migración", "inmigración", "migratorio", "migratoria", "emigrar") ~ "migración",
+                                           c("delincuencia", "delincuente", "delincuencial", "delinquir", "delictual") ~ "delincuencia",
+                                           c("seguridad", "inseguridad", "inseguro") ~ "seguridad",
                                            "abogada" ~ "abogado",
                                            "policial" ~ "policía",
                                            "antisociales" ~ "antisocial",
@@ -90,7 +92,7 @@ prensa_palabras_raiz <- prensa_palabras_split |>
                                            "sujetos" ~ "sujeto",
                                            c("municipal", "municipio") ~ "municipalidad",
                                            "alcaldesa" ~ "alcalde",
-                                           "presidenta" ~ "presidente",
+                                           c("presidenta", "presidencial") ~ "presidente",
                                            c("pública", "públicas", "públicos") ~ "público",
                                            .default = palabra))
   )

@@ -18,11 +18,13 @@ prensa_conteo_2 <- prensa_palabras_conteo |>
               select(id, fecha),
             by = "id")
 
+rm(prensa_palabras_conteo,
+   datos_prensa)
 
 # fechas ----
 prensa_conteo_3 <- prensa_conteo_2 |> 
   # rango de fechas 
-  filter(fecha >= today() - months(6)) |> 
+  filter(fecha >= today() - months(4)) |> 
   filter(fecha <= dmy(fecha_limite)) |> # fecha límite, para no incluir días de la semana siguiente
   mutate(fecha = floor_date(fecha, unit = "week", week_start = 1),
          semana = week(fecha))
@@ -32,7 +34,7 @@ palabras_semana <- prensa_conteo_3 |>
   group_by(semana, fecha, palabra) |> 
   # conteo por semanas
   summarize(n = sum(n),
-            fecha = min(fecha)) |> 
+            fecha = min(fecha), .groups = "drop") |> 
   # mínimo
   filter(n > 2)
 
@@ -49,7 +51,7 @@ palabras_semana_2 <- palabras_semana |>
   mutate(palabras_semana = sum(n)) |> 
   # sacar semanas chicas
   ungroup() |> 
-  filter(palabras_semana > mean(palabras_semana)*.6) |> 
+  filter(palabras_semana > mean(palabras_semana)*.4) |> 
   # eliminar palabras chicas en contexto
   # ungroup() |> 
   # filter(freq_total_palabra > mean(freq_total_palabra)*input$frecuencia_total) |>
@@ -66,6 +68,5 @@ arrow::write_parquet(palabras_semana_2,
 rm(palabras_semana,
    palabras_semana_2,
    prensa_conteo_2,
-   prensa_palabras_conteo,
    prensa_conteo_3)
 invisible(gc())
