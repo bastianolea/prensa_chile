@@ -149,7 +149,7 @@ ui <- page_fluid(
                                font_size = "80%",
                                text_decoration = "none"),
                    
-                   em(tags$a("Bastián Olea Herrera", href = "https://bastianolea.github.io/shiny_apps/"),
+                   em(tags$a("Bastián Olea Herrera", href = "https://bastianolea.rbind.io"),
                    ),
                    br(),
                    
@@ -562,7 +562,7 @@ ui <- page_fluid(
     column(12, style = css(padding = "28px", font_size = "70%", font_family = "Libre Baskerville"),
            hr(),
            
-           markdown("Desarrollado por [Bastián Olea Herrera.](https://bastian.olea.biz) usando el lenguaje de programación R. Puedes [hacerme llegar](https://x.com/bastimapache) cualquier duda, consulta, sugerencia o comentario."),
+           markdown("Desarrollado por [Bastián Olea Herrera.](https://bastianolea.rbind.io) usando el lenguaje de programación R. Puedes [hacerme llegar](https://bastianolea.rbind.io/contact/) cualquier duda, consulta, sugerencia o comentario."),
            
            markdown("Puedes explorar mis otras [aplicaciones interactivas sobre datos sociales en mi portafolio.](https://bastianolea.github.io/shiny_apps/)"),
            
@@ -641,7 +641,7 @@ server <- function(input, output, session) {
   output$ultimos_datos_fecha <- renderText({
     
     format(file.info("palabras_semana.parquet")$mtime,
-           "%d/%m%/%y")
+           "%d/%m/%Y")
   })
   
   # cálculos ----
