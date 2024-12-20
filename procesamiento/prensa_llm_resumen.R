@@ -1,11 +1,11 @@
 library(dplyr)
 library(purrr)
 library(furrr)
-library(tictoc)
 library(stringr)
 library(mall)
 library(lubridate)
 library(arrow)
+library(beepr)
 
 source("funciones.R")
 
@@ -19,18 +19,24 @@ llm_use("ollama", "llama3.1:8b",
 # cargar datos ----
 if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.parquet")
 
-# cargar resultados anteiores
+# cargar resultados anteriores
 anterior <- read_parquet("datos/prensa_llm_resumen.parquet")
 
-
 # extraer muestra
+muestra = 500
+
 datos_muestra <- datos_prensa |> 
-  filter(año >= 2023) |> 
+  filter(año >= 2024) |> 
   filter(!id %in% anterior$id) |> 
-  slice_sample(n = 500)
+  slice_sample(n = muestra)
+
+# estimar tiempo
+message(paste("tiempo aproximado de procesamiento:", round((muestra * 8)/60/60, 1), "horas"))
+
 
 # separar en piezas ----
-# el dataframe se separa en una lista de igual cantidad de filas para facilitar su procesamiento multiprocesador
+# se separa en una lista de igual cantidad de filas para facilitar su procesamiento multiprocesador
+
 filas <- nrow(datos_muestra)
 grupos <- filas %/% 100 #un grupo cada 10000 observaciones
 
@@ -66,11 +72,11 @@ resumenes <- map(datos_limpios_split,
                    message(paste("procesando", dato$id))
                    
                    # obtener sentimiento
-                   resumen <- dato$texto |> llm_vec_summarize(max_words = 40, additional_prompt = "en español")
+                   resumen <- dato$texto |> llm_vec_summarize(max_words = 30, additional_prompt = "en español")
                    
                    # reintentar 1 vez
                    if (is.na(resumen)) {
-                     resumen <- dato$texto |> llm_vec_summarize(max_words = 40, additional_prompt = "en español")
+                     resumen <- dato$texto |> llm_vec_summarize(max_words = 30, additional_prompt = "en español")
                    }
                    final <- now()
                    
@@ -84,14 +90,18 @@ resumenes <- map(datos_limpios_split,
                    )
                    
                    return(resultado)
-                 })
+                 }); beep()
 
 # tiempo total
 resumenes |> 
   list_rbind() |> 
-  summarize(tiempo_total = sum(tiempo))
+  summarize(tiempo_total = sum(tiempo),
+            tiempo_prom = mean(tiempo))
 
-resumenes |> list_rbind()
+resumenes |> 
+  list_rbind() |> 
+  slice_sample(n = 10) |> 
+  pull(resumen)
 
 
 # guardar avance ----

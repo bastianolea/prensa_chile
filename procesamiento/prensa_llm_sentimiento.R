@@ -1,7 +1,6 @@
 library(dplyr)
 library(purrr)
 library(furrr)
-library(tictoc)
 library(stringr)
 library(mall)
 library(lubridate)
@@ -20,18 +19,25 @@ llm_use("ollama", "llama3.1:8b",
 # cargar datos ----
 if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.parquet")
 
-# cargar resultados anteiores
+# cargar resultados anteriores
 anterior <- read_parquet("datos/prensa_llm_sentimiento.parquet")
 
+
 # extraer muestra
+muestra = 500 # definir cantidad de noticias a procesar
+
 datos_muestra <- datos_prensa |> 
-  filter(año >= 2023) |> 
+  filter(año >= 2024) |> 
   filter(!id %in% anterior$id) |> 
-  slice_sample(n = 500)
+  slice_sample(n = muestra)
+
+# estimar tiempo
+message(paste("tiempo aproximado de procesamiento:", round((muestra * 5)/60/60, 1), "horas"))
 
 
 # separar en piezas ----
-# el dataframe se separa en una lista de igual cantidad de filas para facilitar su procesamiento multiprocesador
+# se separa en una lista de igual cantidad de filas para facilitar su procesamiento multiprocesador
+
 filas <- nrow(datos_muestra)
 grupos <- filas %/% 100 #un grupo cada 10000 observaciones
 
@@ -60,6 +66,7 @@ datos_limpios_split <- datos_limpios |>
 
 
 # loop ----
+
 # obtener sentimientos de todos los textos
 sentimientos <- map(datos_limpios_split, 
                     \(dato) {

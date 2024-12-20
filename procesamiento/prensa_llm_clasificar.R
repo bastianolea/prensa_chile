@@ -1,11 +1,11 @@
 library(dplyr)
 library(purrr)
 library(furrr)
-library(tictoc)
 library(stringr)
 library(mall)
 library(lubridate)
 library(arrow)
+library(beepr)
 
 source("funciones.R")
 
@@ -19,14 +19,20 @@ llm_use("ollama", "llama3.1:8b",
 # cargar datos ----
 if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
 
-# cargar resultados anteiores
+# cargar resultados anteriores
 anterior <- read_parquet("datos/prensa_llm_clasificar.parquet")
 
 # extraer muestra
+muestra = 500
+
 datos_muestra <- datos_prensa |> 
-  filter(año >= 2023) |> 
+  filter(año >= 2024) |> 
   filter(!id %in% anterior$id) |> 
-  slice_sample(n = 500)
+  slice_sample(n = muestra)
+
+# estimar tiempo
+message(paste("tiempo aproximado de procesamiento:", round((muestra * 5)/60/60, 1), "horas"))
+
 
 # separar en piezas ----
 # el dataframe se separa en una lista de igual cantidad de filas para facilitar su procesamiento multiprocesador
@@ -56,10 +62,9 @@ datos_limpios_split <- datos_limpios |>
   group_by(id) |>
   group_split()
 
-categorias = c("política", "deporte", "economía",
-               "cultura", "farándula",
-               "policial", "ciencias", 
-               "internacional")
+categorias = c("política", "economía", "policial",
+               "cultura", "farándula", "deporte", "ciencias", "tecnología"
+               )
 
 
 # loop ----
@@ -88,16 +93,17 @@ clasificacion <- map(datos_limpios_split,
                        )
                        
                        return(resultado)
-                     })
+                     }); beep()
 
 # tiempo total
 clasificacion |> 
   list_rbind() |> 
-  summarize(tiempo_total = sum(tiempo))
+  summarize(tiempo_total = sum(tiempo),
+            tiempo_prom = mean(tiempo))
 
-# clasificacion |> list_rbind() |> 
-#   left_join(datos_prensa_prueba_3 |> list_rbind()) |> 
-#   select(titulo, clasificacion)
+clasificacion |> list_rbind() |>
+  left_join(datos_limpios |> list_rbind()) |>
+  select(titulo, clasificacion)
 
 
 # guardar avance ----
