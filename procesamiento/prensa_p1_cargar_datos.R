@@ -5,7 +5,6 @@
 # finalmente, se cargan las partes preprocesadas y se escriben como una sola base.
 # input: archivos rds individuales de la carpeta resultados
 # output: prensa_datos.feather
-# tiempo estimado: 34 minutos aprox (ahora menos de 2 minutos!)
 
 tictoc::tic()
 
@@ -78,20 +77,20 @@ modulos_cargados <- future_map(archivos_modulos, \(archivo_modulo) {
 # separar fuentes con muchos datos en partes mas pequeñas para luego procesarlas
 modulos_cargados <- map(modulos_cargados, \(modulo) {
   # modulo <- modulos_cargados[[2]]
-  
+
   filas <- nrow(modulo)
   grupos <- filas %/% 10000 #un grupo cada 10000 observaciones
-  
+
   if (filas >= 10000) {
-    modulo <- modulo |> 
-      mutate(grupos = (row_number()-1) %/% (n()/grupos)) |> 
-      group_by(grupos) |> 
+    modulo <- modulo |>
+      mutate(grupos = (row_number()-1) %/% (n()/grupos)) |>
+      group_by(grupos) |>
       group_split()
   } else {
-    modulo <- modulo |> 
+    modulo <- modulo |>
       mutate(grupos = 0)
   }
-  
+
   return(modulo)
 }) |> list_flatten()
 
@@ -213,8 +212,8 @@ modulos_limpios_fechas <- future_map(modulos_limpios, \(modulo) {
 # segunda forma de hacerlo, directamente desde memoria
 datos_prensa <- modulos_limpios_fechas |> 
   list_rbind() |>
-  arrange(desc(fecha)) |>
-  distinct(url, .keep_all = TRUE)
+  arrange(desc(fecha)) #|>
+  # distinct(url, .keep_all = TRUE)
 
 # revisar ----
 # noticias por fuente
@@ -242,6 +241,8 @@ datos_prensa <- modulos_limpios_fechas |>
 
 # guardar ----
 arrow::write_parquet(datos_prensa, "datos/prensa_datos.parquet")
+
+
 
 # guardar cantidad de noticias
 n_noticias <- datos_prensa |> 

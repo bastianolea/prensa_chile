@@ -201,10 +201,11 @@ revisar_url <- function(url) {
 
 limpiar_texto <- function(x) {
   x |> 
-    tolower() |> 
-    str_replace_all("[[:punct:]]", " ") |> 
-    str_replace_all("[0-9]", " ") |> 
-    str_replace_all("\\||\\<|\\>|@|-|—|\\{|\\}|\\[|\\]|\\=|“", " ") |> 
+    textclean::strip() |> 
+    # tolower() |> 
+    # str_replace_all("[[:punct:]]", " ") |> 
+    # str_replace_all("[0-9]", " ") |> 
+    # str_replace_all("\\||\\<|\\>|@|-|—|\\{|\\}|\\[|\\]|\\=|“", " ") |> 
     str_trim() |> 
     str_squish()
 }

@@ -7,7 +7,7 @@ options(future.globals.maxSize = 1.0 * 3e9)
 inicio <- Sys.time()
 
 # unión de scraping en una sola base de datos
-# cargar datos scrapeados y guardarlos en una sola base, una noticia por fila
+# cargar datos scrapeados, los limpia y los guarda en una sola base, una noticia por fila
 source("procesamiento/prensa_p1_cargar_datos.R", echo = T)
 # output: datos/prensa_datos.parquet
 
@@ -29,11 +29,20 @@ source("procesamiento/prensa_semanal.R", echo = T)
 source("procesamiento/prensa_semanal_fuente.R", echo = T)
 
 # correlación entre palabras dentro de noticias, retorna base con palabras y sus pares correlacionados
-source("procesamiento/prensa_p4_calcular_correlacion.R", echo = T)
+source("procesamiento/prensa_correlacion.R", echo = T)
 # output: datos/prensa_correlacion.parquet, datos/prensa_correlacion_fuente.parquet
 
 # procesamiento de noticias para identificar topicos mediante machine learning
 # source("analisis/prensa_calcular_topicos.R")
+
+# # sentimiento de noticias usando modelos de lenguaje
+# source("procesamiento/prensa_llm_sentimiento.R", echo = T)
+# 
+# # resumen de noticias usando modelos de lenguaje
+# source("procesamiento/prensa_llm_resumen.R", echo = T)
+# 
+# # tópico de noticias usando modelos de lenguaje
+# source("procesamiento/prensa_llm_clasificar.R", echo = T)
 
 final <- Sys.time()
 
