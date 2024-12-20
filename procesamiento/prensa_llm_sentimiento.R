@@ -24,7 +24,7 @@ anterior <- read_parquet("datos/prensa_llm_sentimiento.parquet")
 
 
 # extraer muestra
-muestra = 500 # definir cantidad de noticias a procesar
+muestra = 2000 # definir cantidad de noticias a procesar
 
 datos_muestra <- datos_prensa |> 
   filter(año >= 2024) |> 

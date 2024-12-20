@@ -23,7 +23,7 @@ if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_d
 anterior <- read_parquet("datos/prensa_llm_clasificar.parquet")
 
 # extraer muestra
-muestra = 500
+muestra = 2000
 
 datos_muestra <- datos_prensa |> 
   filter(año >= 2024) |> 
