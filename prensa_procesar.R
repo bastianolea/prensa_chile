@@ -35,14 +35,14 @@ source("procesamiento/prensa_correlacion.R", echo = T)
 # procesamiento de noticias para identificar topicos mediante machine learning
 # source("analisis/prensa_calcular_topicos.R")
 
-# # sentimiento de noticias usando modelos de lenguaje
-# source("procesamiento/prensa_llm_sentimiento.R", echo = T)
-# 
-# # resumen de noticias usando modelos de lenguaje
-# source("procesamiento/prensa_llm_resumen.R", echo = T)
-# 
-# # tópico de noticias usando modelos de lenguaje
-# source("procesamiento/prensa_llm_clasificar.R", echo = T)
+# sentimiento de noticias usando modelos de lenguaje
+source("procesamiento/prensa_llm_sentimiento.R", echo = T)
+
+# resumen de noticias usando modelos de lenguaje
+source("procesamiento/prensa_llm_resumen.R", echo = T)
+
+# tópico de noticias usando modelos de lenguaje
+source("procesamiento/prensa_llm_clasificar.R", echo = T)
 
 final <- Sys.time()
 

@@ -23,7 +23,7 @@ if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.pa
 anterior <- read_parquet("datos/prensa_llm_resumen.parquet")
 
 # extraer muestra
-muestra = 1000 # definir cantidad de noticias a procesar
+muestra = 1200 # definir cantidad de noticias a procesar
 
 datos_muestra <- datos_prensa |> 
   filter(año >= 2024) |> 
