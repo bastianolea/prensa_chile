@@ -23,10 +23,11 @@ if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.pa
 anterior <- read_parquet("datos/prensa_llm_resumen.parquet")
 
 # extraer muestra
-muestra = 1200 # definir cantidad de noticias a procesar
+muestra = 100 # definir cantidad de noticias a procesar
 
 datos_muestra <- datos_prensa |> 
   filter(año >= 2024) |> 
+  filter(fecha > (today() - weeks(2))) |> 
   filter(!id %in% anterior$id) |> 
   slice_sample(n = muestra)
 
@@ -86,6 +87,7 @@ resumenes <- map(datos_limpios_split,
                    resultado <- tibble(id = dato$id,
                                        resumen,
                                        tiempo = final - inicio,
+                                       tiempo_1 = inicio, tiempo_2 = final,
                                        n_palabras = dato$n_palabras
                    )
                    

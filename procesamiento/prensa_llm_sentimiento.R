@@ -22,12 +22,12 @@ if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.pa
 # cargar resultados anteriores
 anterior <- read_parquet("datos/prensa_llm_sentimiento.parquet")
 
-
 # extraer muestra
-muestra = 2000 # definir cantidad de noticias a procesar
+muestra = 100 # definir cantidad de noticias a procesar
 
 datos_muestra <- datos_prensa |> 
   filter(año >= 2024) |> 
+  filter(fecha > (today() - weeks(2))) |> 
   filter(!id %in% anterior$id) |> 
   slice_sample(n = muestra)
 
@@ -61,6 +61,7 @@ datos_limpios <- future_map(datos_muestra_split,
 # separar por id
 datos_limpios_split <- datos_limpios |> 
   list_rbind() |> 
+  distinct(id, .keep_all = TRUE) |> 
   group_by(id) |>
   group_split()
 
@@ -72,7 +73,7 @@ sentimientos <- map(datos_limpios_split,
                     \(dato) {
                       inicio <- now()
                       message(paste("procesando", dato$id))
-                      
+                    
                       # obtener sentimiento
                       sentimiento <- dato$texto |> llm_vec_sentiment(options = c("positivo", "neutral", "negativo"))
                       
@@ -88,6 +89,7 @@ sentimientos <- map(datos_limpios_split,
                       resultado <- tibble(id = dato$id,
                                           sentimiento,
                                           tiempo = final - inicio,
+                                          tiempo_1 = inicio, tiempo_2 = final,
                                           n_palabras = dato$n_palabras
                       )
                       

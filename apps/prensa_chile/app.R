@@ -194,7 +194,7 @@ ui <- page_fluid(
            sliderInput("semanas",
                        "Rango de semanas",
                        min = 2, max = 4*3,
-                       value = 4*2, width = "100%",),
+                       value = 9, width = "100%",),
            
            selectizeInput("destacar_palabra",
                           "Destacar palabras",

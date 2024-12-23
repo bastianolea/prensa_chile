@@ -23,10 +23,11 @@ if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_d
 anterior <- read_parquet("datos/prensa_llm_clasificar.parquet")
 
 # extraer muestra
-muestra = 2000
+muestra = 100
 
 datos_muestra <- datos_prensa |> 
   filter(año >= 2024) |> 
+  filter(fecha > (today() - weeks(2))) |> 
   filter(!id %in% anterior$id) |> 
   slice_sample(n = muestra)
 
@@ -59,6 +60,7 @@ datos_limpios <- future_map(datos_muestra_split,
 # separar por id
 datos_limpios_split <- datos_limpios |> 
   list_rbind() |> 
+  distinct(id, .keep_all = TRUE) |> 
   group_by(id) |>
   group_split()
 
@@ -89,6 +91,7 @@ clasificacion <- map(datos_limpios_split,
                        resultado <- tibble(id = dato$id,
                                            clasificacion,
                                            tiempo = final - inicio,
+                                           tiempo_1 = inicio, tiempo_2 = final,
                                            n_palabras = dato$n_palabras
                        )
                        
@@ -101,9 +104,9 @@ clasificacion |>
   summarize(tiempo_total = sum(tiempo),
             tiempo_prom = mean(tiempo))
 
-clasificacion |> list_rbind() |>
-  left_join(datos_limpios |> list_rbind()) |>
-  select(titulo, clasificacion)
+# clasificacion |> list_rbind() |>
+#   left_join(datos_limpios |> list_rbind()) |>
+#   select(titulo, clasificacion)
 
 
 # guardar avance ----

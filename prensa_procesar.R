@@ -1,6 +1,6 @@
 # ejecutar todos los pasos de procesamiento, post scraping (prensa_obtener_datos.R)
 
-fecha_limite = "08-12-2024" # domingo que termina la semana, para prensa semanal
+fecha_limite = "22-12-2024" # domingo que termina la semana, para prensa semanal
   
 options(future.globals.maxSize = 1.0 * 3e9)
 
@@ -32,22 +32,22 @@ source("procesamiento/prensa_semanal_fuente.R", echo = T)
 source("procesamiento/prensa_correlacion.R", echo = T)
 # output: datos/prensa_correlacion.parquet, datos/prensa_correlacion_fuente.parquet
 
-# procesamiento de noticias para identificar topicos mediante machine learning
-# source("analisis/prensa_calcular_topicos.R")
-
 # sentimiento de noticias usando modelos de lenguaje
 source("procesamiento/prensa_llm_sentimiento.R", echo = T)
+# output: prensa_llm_sentimiento.parquet
 
 # resumen de noticias usando modelos de lenguaje
 source("procesamiento/prensa_llm_resumen.R", echo = T)
+# output: prensa_llm_resumen.parquet
 
 # tópico de noticias usando modelos de lenguaje
 source("procesamiento/prensa_llm_clasificar.R", echo = T)
+# output: prensa_llm_clasificar.parquet
 
 final <- Sys.time()
 
 tiempo = final - inicio
 print(round(tiempo, 1))
-# 15 minutos en total
+# 15 minutos en total, 1 hora si se suman procesos LLM
 
 beep()

@@ -2,12 +2,12 @@ library(dplyr)
 library(arrow)
 library(ggplot2)
 
-# # cargar bases unificadas
-# sentimiento <- read_parquet("datos/prensa_llm_sentimiento.parquet")
-# clasificacion <- read_parquet("datos/prensa_llm_clasificar.parquet")
-# resumen <- read_parquet("datos/prensa_llm_resumen.parquet")
+# cargar bases unificadas
+sentimiento <- read_parquet("datos/prensa_llm_sentimiento.parquet")
+clasificacion <- read_parquet("datos/prensa_llm_clasificar.parquet")
+resumen <- read_parquet("datos/prensa_llm_resumen.parquet")
 
-# cargar sólo ultimo procesamiento
+# # cargar sólo ultimo procesamiento
 sentimiento <- fs::dir_info("datos/prensa_llm/sentimiento/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
 clasificacion <- fs::dir_info("datos/prensa_llm/clasificar/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
 resumen <- fs::dir_info("datos/prensa_llm/resumen/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
@@ -17,14 +17,18 @@ datos <- bind_rows(sentimiento |> mutate(tipo = "sentimiento", orden = row_numbe
                    clasificacion |> mutate(tipo = "clasificacion", orden = row_number()),
                    resumen |> mutate(tipo = "resumen", orden = row_number()))
 
+# tiempo promedio
+datos |> 
+  summarize(mean(tiempo), 
+            n(), 
+            .by = tipo)
+
 # tema
 theme_set(theme_linedraw() +
           theme(panel.background = element_rect(fill = "transparent", colour = NA),  
                 plot.background = element_rect(fill = "transparent", colour = NA)))
 
-# tiempo promedio
-datos |> 
-  summarize(mean(tiempo), .by = tipo)
+
 
 # por palabras y tiempo de ejecución
 datos |> 
@@ -63,3 +67,5 @@ datos |>
   labs(subtitle = "por tiempo de ejecución y orden de ejecución")
 
 # ggsave(filename = "plot_c.png", width = 4, height = 2.5, scale = 1.8)
+
+
