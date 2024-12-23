@@ -48,14 +48,14 @@ datos_muestra_split <- datos_muestra |>
 
 # limpiar ----
 datos_limpios <- future_map(datos_muestra_split, 
-                                    \(datos) {
-                                      datos |> 
-                                        select(id, titulo, bajada, cuerpo) |> 
-                                        mutate(texto = paste(bajada, cuerpo),
-                                               texto = textclean::strip(texto, digit.remove = FALSE, char.keep = c(".", ",")),
-                                               texto = str_trunc(texto, 5000, side = "center")) |> 
-                                        mutate(n_palabras = str_count(texto, "\\w+"))
-                                    })
+                            \(datos) {
+                              datos |> 
+                                select(id, titulo, bajada, cuerpo) |> 
+                                mutate(texto = paste(bajada, cuerpo),
+                                       texto = textclean::strip(texto, digit.remove = FALSE, char.keep = c(".", ",")),
+                                       texto = str_trunc(texto, 5000, side = "center")) |> 
+                                mutate(n_palabras = str_count(texto, "\\w+"))
+                            })
 
 # separar por id
 datos_limpios_split <- datos_limpios |> 
@@ -66,7 +66,7 @@ datos_limpios_split <- datos_limpios |>
 
 categorias = c("política", "economía", "policial",
                "cultura", "farándula", "deporte", "ciencias", "tecnología"
-               )
+)
 
 
 # loop ----
@@ -76,26 +76,32 @@ clasificacion <- map(datos_limpios_split,
                        inicio <- now()
                        message(paste("procesando", dato$id))
                        
-                       # clasificar
-                       clasificacion <- dato$texto |> llm_vec_classify(labels = categorias)
-                       
-                       # reintentar 1 vez
-                       if (is.na(clasificacion)) {
+                       tryCatch({
+                         # clasificar
                          clasificacion <- dato$texto |> llm_vec_classify(labels = categorias)
-                       }
-                       final <- now()
-                       
-                       if (is.na(clasificacion)) return(NULL)
-                       
-                       # resultado
-                       resultado <- tibble(id = dato$id,
-                                           clasificacion,
-                                           tiempo = final - inicio,
-                                           tiempo_1 = inicio, tiempo_2 = final,
-                                           n_palabras = dato$n_palabras
-                       )
-                       
-                       return(resultado)
+                         
+                         # reintentar 1 vez
+                         if (is.na(clasificacion)) {
+                           clasificacion <- dato$texto |> llm_vec_classify(labels = categorias)
+                         }
+                         final <- now()
+                         
+                         if (is.na(clasificacion)) return(NULL)
+                         
+                         # resultado
+                         resultado <- tibble(id = dato$id,
+                                             clasificacion,
+                                             tiempo = final - inicio,
+                                             tiempo_1 = inicio, tiempo_2 = final,
+                                             n_palabras = dato$n_palabras
+                         )
+                         
+                         return(resultado)
+                       },
+                       error = function(e) {
+                         cli::cli_alert_danger("error:", e)
+                         return(NULL)
+                       })
                      }); beep()
 
 # tiempo total

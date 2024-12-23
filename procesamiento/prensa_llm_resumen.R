@@ -49,14 +49,14 @@ datos_muestra_split <- datos_muestra |>
 
 # limpiar ----
 datos_limpios <- future_map(datos_muestra_split, 
-                                    \(datos) {
-                                      datos |> 
-                                        select(id, bajada, cuerpo) |> 
-                                        mutate(texto = paste(bajada, cuerpo),
-                                               texto = textclean::strip(texto, digit.remove = FALSE, char.keep = c(".", ",")),
-                                               texto = str_trunc(texto, 5000, side = "center")) |> 
-                                        mutate(n_palabras = str_count(texto, "\\w+"))
-                                    })
+                            \(datos) {
+                              datos |> 
+                                select(id, bajada, cuerpo) |> 
+                                mutate(texto = paste(bajada, cuerpo),
+                                       texto = textclean::strip(texto, digit.remove = FALSE, char.keep = c(".", ",")),
+                                       texto = str_trunc(texto, 5000, side = "center")) |> 
+                                mutate(n_palabras = str_count(texto, "\\w+"))
+                            })
 
 # separar por id
 datos_limpios_split <- datos_limpios |> 
@@ -72,26 +72,32 @@ resumenes <- map(datos_limpios_split,
                    inicio <- now()
                    message(paste("procesando", dato$id))
                    
-                   # obtener sentimiento
-                   resumen <- dato$texto |> llm_vec_summarize(max_words = 30, additional_prompt = "en español")
-                   
-                   # reintentar 1 vez
-                   if (is.na(resumen)) {
+                   tryCatch({
+                     # obtener sentimiento
                      resumen <- dato$texto |> llm_vec_summarize(max_words = 30, additional_prompt = "en español")
-                   }
-                   final <- now()
-                   
-                   if (is.na(resumen)) return(NULL)
-                   
-                   # resultado
-                   resultado <- tibble(id = dato$id,
-                                       resumen,
-                                       tiempo = final - inicio,
-                                       tiempo_1 = inicio, tiempo_2 = final,
-                                       n_palabras = dato$n_palabras
-                   )
-                   
-                   return(resultado)
+                     
+                     # reintentar 1 vez
+                     if (is.na(resumen)) {
+                       resumen <- dato$texto |> llm_vec_summarize(max_words = 30, additional_prompt = "en español")
+                     }
+                     final <- now()
+                     
+                     if (is.na(resumen)) return(NULL)
+                     
+                     # resultado
+                     resultado <- tibble(id = dato$id,
+                                         resumen,
+                                         tiempo = final - inicio,
+                                         tiempo_1 = inicio, tiempo_2 = final,
+                                         n_palabras = dato$n_palabras
+                     )
+                     
+                     return(resultado)
+                   },
+                   error = function(e) {
+                     cli::cli_alert_danger("error:", e)
+                     return(NULL)
+                   })
                  }); beep()
 
 # tiempo total
@@ -114,7 +120,7 @@ resumenes |>
 
 # unir resultados ----
 resultados <- map(dir("datos/prensa_llm/resumen/", full.names = T),
-    read_parquet) |> 
+                  read_parquet) |> 
   list_rbind()
 
 # guardar resultados unidos
