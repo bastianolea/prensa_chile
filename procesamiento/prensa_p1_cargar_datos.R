@@ -108,7 +108,9 @@ modulos_limpios <- future_map(modulos_cargados, \(modulo) {
     # limpiar fuentes
     mutate(fuente = str_remove(fuente, "_pais")) |> 
     # noticias con título
-    filter(nchar(titulo) > 20)
+    filter(nchar(titulo) > 20) |> 
+    # noticias con cuerpo
+    filter(nchar(cuerpo) > 100)
   
   if (nrow(datos_2) == 0) return(NULL)
   
@@ -128,7 +130,7 @@ modulos_limpios <- future_map(modulos_cargados, \(modulo) {
   # finalizar
   datos_prensa <- datos_4 |> 
     select(fuente, fecha, titulo, bajada, cuerpo, cuerpo_limpio, fecha_scraping, url) |> 
-    # crear ids unicos por noticia
+    # crear ids únicos por noticia
     rowwise() |>
     mutate(id = rlang::hash(url)) |> 
     ungroup()

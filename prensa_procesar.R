@@ -37,7 +37,7 @@ source("procesamiento/prensa_llm_sentimiento.R", echo = T)
 # output: prensa_llm_sentimiento.parquet
 
 # resumen de noticias usando modelos de lenguaje
-source("procesamiento/prensa_llm_resumen.R", echo = T)
+# source("procesamiento/prensa_llm_resumen.R", echo = T)
 # output: prensa_llm_resumen.parquet
 
 # tópico de noticias usando modelos de lenguaje
