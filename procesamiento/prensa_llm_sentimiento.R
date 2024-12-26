@@ -23,16 +23,21 @@ if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.pa
 anterior <- read_parquet("datos/prensa_llm_sentimiento.parquet")
 
 # extraer muestra
-muestra = 3000 # definir cantidad de noticias a procesar
+muestra = 20000 # definir cantidad de noticias a procesar
 
 # estimar tiempo
 message(paste("tiempo aproximado de procesamiento:", round((muestra * 4.9)/60/60, 1), "horas"))
 
+# datos_muestra <- datos_prensa |> 
+#   filter(año >= 2024) |> 
+#   filter(fecha > (today() - weeks(6))) |> 
+#   filter(!id %in% anterior$id) |> 
+#   slice_sample(n = muestra)
+
 datos_muestra <- datos_prensa |> 
   filter(año >= 2024) |> 
-  filter(fecha > (today() - weeks(2))) |> 
   filter(!id %in% anterior$id) |> 
-  slice_sample(n = muestra)
+  slice(1:muestra)
 
 
 # separar en piezas ----
@@ -54,7 +59,7 @@ datos_limpios <- future_map(datos_muestra_split,
                                 select(id, bajada, cuerpo) |> 
                                 mutate(texto = paste(bajada, cuerpo),
                                        texto = textclean::strip(texto, digit.remove = FALSE, char.keep = c(".", ",")),
-                                       texto = str_trunc(texto, 5000, side = "center")) |> 
+                                       texto = str_trunc(texto, 6000, side = "center")) |> 
                                 mutate(n_palabras = str_count(texto, "\\w+"))
                             })
 
@@ -62,11 +67,13 @@ datos_limpios <- future_map(datos_muestra_split,
 datos_limpios_split <- datos_limpios |> 
   list_rbind() |> 
   distinct(id, .keep_all = TRUE) |> 
-  group_by(id) |>
+  mutate(orden = row_number()) |> 
+  group_by(orden) |>
   group_split()
 
 
 # loop ----
+message(paste("iniciando loop sentimiento para", length(datos_limpios_split), "noticias"))
 
 # obtener sentimientos de todos los textos
 sentimientos <- map(datos_limpios_split, 
@@ -75,11 +82,15 @@ sentimientos <- map(datos_limpios_split,
                       message(paste("procesando", dato$id))
                       
                       tryCatch({
+                        # detener operación
+                        if (read.delim("stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
+                        
                         # obtener sentimiento
                         sentimiento <- dato$texto |> llm_vec_sentiment(options = c("positivo", "neutral", "negativo"))
                         
                         # reintentar 1 vez
                         if (is.na(sentimiento)) {
+                          message("reintentando...")
                           sentimiento <- dato$texto |> llm_vec_sentiment(options = c("positivo", "neutral", "negativo"))
                         }
                         final <- now()
@@ -105,7 +116,9 @@ sentimientos <- map(datos_limpios_split,
 # tiempo total
 sentimientos |> 
   list_rbind() |> 
-  summarize(tiempo_total = sum(tiempo))
+  summarize(tiempo_total = sum(tiempo),
+            tiempo_promeido = mean(tiempo),
+            n_noticias = n()) |> glimpse()
 
 
 

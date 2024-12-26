@@ -56,12 +56,12 @@ reciente |>
 reciente |> 
   filter(clasificacion == "farándula") |> 
   select(titulo, resumen) |> 
-  print(n=Inf)
+  print(n=20)
 
 reciente |> 
   filter(clasificacion == "deporte") |> 
   select(titulo, resumen) |> 
-  print(n=Inf)
+  print(n=20)
 
 # sentimiento de policiales
 reciente |> 
@@ -106,3 +106,20 @@ reciente |>
   aes(mes, n) +
   geom_line(aes(color = fuente)) +
   facet_wrap(~clasificacion)
+
+
+# gráfico sentimiento
+reciente |> 
+  filter(fecha >= today() - weeks(4)) |> 
+  filter(clasificacion == "policial") |> 
+  mutate(semana = floor_date(fecha, unit = "day", week_start = 1)) |> 
+  group_by(semana) |> 
+  count(sentimiento) |> 
+  filter(!is.na(sentimiento),
+         sentimiento != "neutral") |> 
+  group_by(semana) |> 
+  mutate(p = n/sum(n)) |> 
+  mutate(p = if_else(sentimiento == "negativo", -p, p)) |> 
+  ggplot() +
+  aes(semana, p) +
+  geom_col(aes(fill = sentimiento))

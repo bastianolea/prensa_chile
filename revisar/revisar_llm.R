@@ -14,7 +14,7 @@ resumen <- fs::dir_info("datos/prensa_llm/resumen/") |> slice_max(modification_t
 
 # unir
 datos <- bind_rows(sentimiento |> mutate(tipo = "sentimiento", orden = row_number()),
-                   clasificacion |> mutate(tipo = "clasificacion", orden = row_number()),
+                   # clasificacion |> mutate(tipo = "clasificacion", orden = row_number()),
                    # resumen |> mutate(tipo = "resumen", orden = row_number())
                    )
 

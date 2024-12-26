@@ -23,7 +23,7 @@ if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_d
 anterior <- read_parquet("datos/prensa_llm_clasificar.parquet")
 
 # extraer muestra
-muestra = 3000
+muestra = 20000
 
 # estimar tiempo
 message(paste("tiempo aproximado de procesamiento:", round((muestra * 5.2)/60/60, 1), "horas"))
@@ -31,7 +31,7 @@ message(paste("tiempo aproximado de procesamiento:", round((muestra * 5.2)/60/60
 
 datos_muestra <- datos_prensa |> 
   filter(año >= 2024) |> 
-  filter(fecha > (today() - weeks(2))) |> 
+  filter(fecha > (today() - weeks(6))) |> 
   filter(!id %in% anterior$id) |> 
   slice_sample(n = muestra)
 
