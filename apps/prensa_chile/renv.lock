@@ -364,20 +364,6 @@
       ],
       "Hash": "1a0a9a3d5083d0d573c4214576f1e690"
     },
-    "fresh": {
-      "Package": "fresh",
-      "Version": "0.2.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "bslib",
-        "htmltools",
-        "rstudioapi",
-        "sass",
-        "shiny"
-      ],
-      "Hash": "7bdb5c90d4fe3cb14dcefbe837ce01da"
-    },
     "fs": {
       "Package": "fs",
       "Version": "1.6.4",

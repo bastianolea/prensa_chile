@@ -180,8 +180,12 @@ ui <- page_fluid(
   ),
   fluidRow(
     column(9,
-           plotOutput("g_semanas", 
-                      width = "100%", height = "640px") |> withSpinner(),
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(min_width = "600px"),
+                   plotOutput("g_semanas", 
+                              width = "100%", height = "640px") |> withSpinner()
+               )
+           ),
            
            markdown("Todos los gráficos se generan automáticamente, mediante de un proceso automatizado de obtención de textos y procesamiento de datos.
                     A partir de todas las noticias publicadas por los medios comunicacionales escritos online, semana a semana, se transforman todas las noticias en palabras separadas, y se cuenta la repetición de cada palabra, tomando como una repetición las distintas conjugaciones de cada palabra (por ejemplo, _delincuente_ y _delincuencia_ cuentan como una sola palabra repetida 2 veces). Luego, se eliminan palabras irrelevantes (como artículos, pronombres y otras), y se genera un ranking de las palabras más frecuentes para cada semana."),
@@ -324,7 +328,10 @@ ui <- page_fluid(
   ),
   fluidRow(
     column(12,
-           plotOutput("g_palabras", height = "640px", width = "100%") |> withSpinner()
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(min_width = "600px"),
+                   plotOutput("g_palabras", height = "640px", width = "100%") |> withSpinner()
+               ))
     )
   ),
   
@@ -378,7 +385,10 @@ ui <- page_fluid(
   ),
   fluidRow(
     column(12,
-           plotOutput("g_semana_fuente", height = "640px", width = "100%") |> withSpinner()
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(min_width = "600px"),
+                   plotOutput("g_semana_fuente", height = "640px", width = "100%") |> withSpinner()
+               ))
     )
   ),
   
@@ -449,8 +459,10 @@ ui <- page_fluid(
   ),
   fluidRow(
     column(12,
-           
-           plotOutput("g_semana_fuente_palabra", height = "480px", width = "100%") |> withSpinner()
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(min_width = "600px"),
+                   plotOutput("g_semana_fuente_palabra", height = "480px", width = "100%") |> withSpinner()
+               ))
     )
   ),
   
@@ -494,7 +506,10 @@ ui <- page_fluid(
   
   fluidRow(
     column(12,
-           plotOutput("g_cor_total", height = "260px", width = "100%") |> withSpinner()
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(min_width = "600px"),
+                   plotOutput("g_cor_total", height = "260px", width = "100%") |> withSpinner()
+               ))
     )
     
   ),
@@ -548,7 +563,10 @@ ui <- page_fluid(
   ),
   fluidRow(
     column(12,
-           uiOutput("ui_g_cor_fuente") |> withSpinner(proxy.height = 300)
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(min_width = "600px"),
+                   uiOutput("ui_g_cor_fuente") |> withSpinner(proxy.height = 300)
+               ))
     )
   ),
   
@@ -569,15 +587,16 @@ ui <- page_fluid(
            markdown("Código de fuente de esta app y del procesamiento de los datos [disponible en GitHub.](https://github.com/bastianolea/prensa_chile)"),
            
            # cafecito ----
-           div(
-             style = css(max_width = "400px", margin = "auto", padding = "28px"),
-             
-             tags$style(HTML(".cafecito:hover {opacity: 70%; transition: 0.3s; color: black !important;} .cafecito a:hover {color: black}")),
-             
-             div(class = "cafecito",
-                 style = paste("width: 100%; background-color: #FFDD04; transform:scale(0.6); border: 1.2px", color_detalle, "solid; border-radius: 13px;"),
-                 tags$body(HTML('<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="bastimapache" data-color="#FFDD00" data-emoji=""  data-font="Bree" data-text="Regálame un cafecito" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>'))
-             )
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(width = "350px", margin = "auto", padding = "0px"),
+                   
+                   tags$style(HTML(".cafecito:hover {opacity: 70%; transition: 0.3s; color: black !important;} .cafecito a:hover {color: black}")),
+                   
+                   div(class = "cafecito",
+                       style = paste("width: 100%; background-color: #FFDD04; transform:scale(0.5); border: 1.2px", color_detalle, "solid; border-radius: 13px;"),
+                       tags$body(HTML('<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="bastimapache" data-color="#FFDD00" data-emoji=""  data-font="Bree" data-text="Regálame un cafecito" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>'))
+                   )
+               )
            )
     )
   )
@@ -1166,7 +1185,7 @@ server <- function(input, output, session) {
       # theme_minimal() +
       labs(y = "fuentes ordenadas por menciones", x = "frecuencia de mención, por semanas"
            # caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
-           )
+      )
     
     plot <- plot +
       theme(legend.text = element_text(margin = margin(l = 2))) +
