@@ -23,23 +23,29 @@ if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_d
 anterior <- read_parquet("datos/prensa_llm_clasificar.parquet")
 
 # extraer muestra
-muestra = 20000
+muestra = 20000 # definir cantidad de noticias a procesar
 
 # estimar tiempo
 message(paste("tiempo aproximado de procesamiento:", round((muestra * 5.2)/60/60, 1), "horas"))
 
 
+# datos_muestra <- datos_prensa |> 
+#   filter(año >= 2024) |> 
+#   filter(fecha > (today() - weeks(6))) |> 
+#   filter(!id %in% anterior$id) |> 
+#   slice_sample(n = muestra)
+
+# todas las noticias, partiendo por las más recientes
 datos_muestra <- datos_prensa |> 
-  filter(año >= 2024) |> 
-  filter(fecha > (today() - weeks(6))) |> 
+  # filter(año >= 2024) |> 
   filter(!id %in% anterior$id) |> 
-  slice_sample(n = muestra)
+  slice(1:muestra)
 
 
 # separar en piezas ----
 # el dataframe se separa en una lista de igual cantidad de filas para facilitar su procesamiento multiprocesador
 filas <- nrow(datos_muestra)
-grupos <- filas %/% 100 #un grupo cada 10000 observaciones
+grupos <- filas %/% 500 # un grupo cada x observaciones
 
 datos_muestra_split <- datos_muestra |> 
   mutate(grupos = (row_number()-1) %/% (n()/grupos)) |>
@@ -54,7 +60,7 @@ datos_limpios <- future_map(datos_muestra_split,
                                 select(id, titulo, bajada, cuerpo) |> 
                                 mutate(texto = paste(bajada, cuerpo),
                                        texto = textclean::strip(texto, digit.remove = FALSE, char.keep = c(".", ",")),
-                                       texto = str_trunc(texto, 5000, side = "center")) |> 
+                                       texto = str_trunc(texto, 6000, side = "center")) |> 
                                 mutate(n_palabras = str_count(texto, "\\w+"))
                             })
 
@@ -62,7 +68,8 @@ datos_limpios <- future_map(datos_muestra_split,
 datos_limpios_split <- datos_limpios |> 
   list_rbind() |> 
   distinct(id, .keep_all = TRUE) |> 
-  group_by(id) |>
+  mutate(orden = row_number()) |> 
+  group_by(orden) |>
   group_split()
 
 categorias = c("política", "economía", "policial",
@@ -71,6 +78,8 @@ categorias = c("política", "economía", "policial",
 
 
 # loop ----
+message(paste("iniciando loop clasificación para", length(datos_limpios_split), "noticias"))
+
 # obtener sentimientos de todos los textos
 clasificacion <- map(datos_limpios_split, 
                      \(dato) {
@@ -78,6 +87,9 @@ clasificacion <- map(datos_limpios_split,
                        message(paste("procesando", dato$id))
                        
                        tryCatch({
+                         # detener operación externamente
+                         if (read.delim("stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
+                         
                          # clasificar
                          clasificacion <- dato$texto |> llm_vec_classify(labels = categorias)
                          
@@ -109,7 +121,8 @@ clasificacion <- map(datos_limpios_split,
 clasificacion |> 
   list_rbind() |> 
   summarize(tiempo_total = sum(tiempo),
-            tiempo_prom = mean(tiempo))
+            tiempo_prom = mean(tiempo),
+            n_noticias = n()) |> glimpse()
 
 # clasificacion |> list_rbind() |>
 #   left_join(datos_limpios |> list_rbind()) |>

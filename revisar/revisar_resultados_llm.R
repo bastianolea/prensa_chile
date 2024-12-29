@@ -80,6 +80,11 @@ reciente |>
   select(titulo, resumen)
 
 
+reciente |> 
+  mutate(mes = floor_date(fecha, unit = "month"),
+         semana = floor_date(fecha, unit = "week")) |> 
+  count(semana)
+
 # sentimiento, por fuente
 reciente |> 
   mutate(mes = floor_date(fecha, unit = "month")) |> 
