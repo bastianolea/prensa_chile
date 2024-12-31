@@ -5,7 +5,15 @@ Proyecto de ciencia de datos desarrollado en R para analizar texto de noticias c
 
 Actualmente, el corpus de noticias obtenido supera las 600.000 noticias individuales, las cuales suman un total de 120 millones (!) de palabras, abarcando más de 33 fuentes periodísticas distintas.
 
-![Gráfico resumen de resultados del scraping de prensa](graficos/resultados/datos_prensa_scraping_2024-09-29.png)
+----
+
+## Datos
+Los datos obtenidos mediante este repositorio van sumando más de 600 mil noticias. Los datos, por su peso, no están disponibles de forma pública. Sin embargo, puedes acceder a una muestra de 3.000 noticias del año 2024, seleccionadas al azar, en la carpeta `datos` de este repositorio. Esta seleccion de datos contiene texto de titulares, cuerpo de noticia, fuente y fecha.
+
+![](graficos/resultados/datos_prensa_scraping_2024-12-31.mp4)
+
+<video src="https://raw.githubusercontent.com/bastianolea/prensa_chile/refs/heads/main/graficos/resultados/datos_prensa_scraping_2024-12-31.mp4" width="100%" autoplay loop></video>
+
 
 ----
 
@@ -28,16 +36,7 @@ Actualmente, el corpus de noticias obtenido supera las 600.000 noticias individu
 ![](apps/prensa_chile/pantallazos/p4.png)
 ![](apps/prensa_chile/pantallazos/p5b.png)
 
-----
 
-## Datos
-Los datos obtenidos mediante este repositorio van sumando más de 600 mil noticias. Los datos, por su peso, no están disponibles de forma pública. Sin embargo, puedes acceder a una muestra de 3.000 noticias del año 2024, seleccionadas al azar, en la carpeta `datos` de este repositorio. Esta seleccion de datos contiene texto de titulares, cuerpo de noticia, fuente y fecha.
-
-![](graficos/resultados/datos_prensa_scraping_2024-12-31.mp4)
-
-<video src="graficos/resultados/datos_prensa_scraping_2024-12-31.mp4" width="100%" autoplay loop></video>
-
-----
 
 ## Estructura del código
 
