@@ -62,17 +62,17 @@ datos_prensa_grafico_scraping_conteo_rellenado_sum <- datos_prensa_grafico_scrap
 # gráfico ----
 plot <- datos_prensa_grafico_scraping_conteo_rellenado_sum |> 
   ggplot(aes(mes, sum, fill = fuente)) +
-  geom_col(position = position_stack(), color = "white") +
+  geom_col(position = position_stack(), color = "white", linewidth = .2) +
   scale_y_continuous(expand = c(0, 0), labels = ~format(.x, big.mark = ".", decimal.mark = ",")) +
   theme_minimal() +
   guides(fill = guide_legend(position = "bottom", nrow = 3, title = NULL)) +
   facet_grid(~año, space = "free_x", scales = "free_x", switch = "x") +
   scale_fill_viridis_d(begin = 0.1, end = 0.6, option = "plasma") +
   theme(strip.text = element_text(margin = margin(t=20)),
-        axis.text.x = element_text(margin = margin(t=-25, b = 12)),
+        axis.text.x = element_text(margin = margin(t=-25, b = 14)),
         plot.subtitle = element_text(margin = margin(t = 0)),
         plot.title = element_text(margin = margin(t = 6, b = 6)),
-        plot.caption = element_text(margin = margin(t = 8)),
+        plot.caption = element_text(margin = margin(t = 10)),
         panel.grid.major.x = element_blank(),
         legend.key.size = unit(4, "mm"),
         legend.text = element_text(margin = margin(l = 2, r = 4)),
@@ -102,5 +102,3 @@ animate(anim,
         renderer = av_renderer(paste0("graficos/resultados/datos_prensa_scraping_", lubridate::today(), ".mov")),
         fps = 60, end_pause = 60, duration = 16, 
         width = 1080, height = 800, units = "px", res = 90)
-
-

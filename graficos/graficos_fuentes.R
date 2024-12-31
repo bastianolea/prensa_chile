@@ -11,7 +11,7 @@ Sys.setlocale("LC_TIME", "es_ES.UTF-8") # meses en español
 if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
 
 
-# gráfico noticias por fuentes ----
+# noticias por mes y fuente ----
 
 # gráfico noticias por fuente y mes
 datos_prensa_grafico <- datos_prensa |>
@@ -35,7 +35,7 @@ datos_prensa_grafico_conteo <- datos_prensa_grafico |>
 # gráfico
 datos_prensa_grafico_conteo |> 
   ggplot(aes(mes, n, fill = fuente)) +
-  geom_col(position = position_stack(), color = "white") +
+  geom_col(position = position_stack(), color = "white", linewidth = .2) +
   scale_y_continuous(expand = c(0, 0), labels = ~format(.x, big.mark = ".", decimal.mark = ",")) +
   theme_minimal() +
   scale_fill_viridis_d(begin = 0.1, end = 0.6, option = "plasma") +
@@ -46,9 +46,10 @@ datos_prensa_grafico_conteo |>
        subtitle = "Cantidad de noticias obtenidas por mes, según fuente",
        caption = "Elaboración propia. Bastián Olea Herrera") +
   facet_grid(~año, space = "free_x", scales = "free_x", switch = "x") +
-  theme(strip.text = element_text(margin = margin(t=20)),
-        axis.text.x = element_text(margin = margin(t=-25, b = 12)),
-        plot.caption = element_text(margin = margin(t = 8)),
+  theme(strip.text = element_text(margin = margin(t = 20)),
+        axis.text.x = element_text(size = 7, margin = margin(t = -25, b = 14)),
+        plot.title = element_text(margin = margin(t = 12, b = 6)),
+        plot.caption = element_text(margin = margin(t = 10)),
         panel.grid.major.x = element_blank(),
         legend.key.size = unit(4, "mm"),
         legend.text = element_text(margin = margin(l = 2, r = 4)),
@@ -59,7 +60,7 @@ ggsave(glue::glue("graficos/resultados/datos_prensa_scraping_{today()}.png"),
        width = 11, height = 8, bg = "white")
 
 
-# gráfico noticias mensuales, por fuentes y por año ----
+# noticias mensuales, por fuentes y por año ----
 datos_prensa_grafico |> 
   filter(año == 2024) |> 
   ggplot(aes(fecha, fill = fuente)) +
@@ -84,18 +85,19 @@ ggsave(glue::glue("graficos/resultados/datos_prensa_fuentes_2024_{today()}.png")
 #   filter(fuente == "agricultura") |> 
 #   arrange(desc(fecha))
 
-conteo_prensa_años <- datos_prensa |>
-  filter(year(fecha) >= 2019) |> 
-  group_by(fuente, año) |> 
-  summarize(n = n()) |> 
-  group_by(fuente) |> 
-  mutate(total = sum(n))
+# conteo_prensa_años <- datos_prensa |>
+#   filter(year(fecha) >= 2019) |> 
+#   group_by(fuente, año) |> 
+#   summarize(n = n()) |> 
+#   group_by(fuente) |> 
+#   mutate(total = sum(n))
+# 
+# conteo_prensa_años |> 
+#   filter(total >= 8000) |>
+#   # filter(total < 10000) |>
+#   ggplot(aes(año, n, color = fuente)) +
+#   geom_line(linewidth = 1.5, alpha = .3) +
+#   geom_point(size = 4, alpha = .8) +
+#   guides(color = guide_legend(position = "bottom")) +
+#   theme_minimal()
 
-conteo_prensa_años |> 
-  filter(total >= 8000) |>
-  # filter(total < 10000) |>
-  ggplot(aes(año, n, color = fuente)) +
-  geom_line(linewidth = 1.5, alpha = .3) +
-  geom_point(size = 4, alpha = .8) +
-  guides(color = guide_legend(position = "bottom")) +
-  theme_minimal()
