@@ -12,7 +12,7 @@ Los datos obtenidos mediante este repositorio van sumando más de 600 mil notici
 
 ![](graficos/resultados/datos_prensa_scraping_2024-12-31.mp4)
 
-<video src="https://raw.githubusercontent.com/bastianolea/prensa_chile/refs/heads/main/graficos/resultados/datos_prensa_scraping_2024-12-31.mp4" width="100%" autoplay loop></video>
+<video src="https://raw.githubusercontent.com/bastianolea/prensa_chile/refs/heads/main/graficos/resultados/datos_prensa_scraping_2024-12-31.mov" width="100%" autoplay loop></video>
 
 
 ----

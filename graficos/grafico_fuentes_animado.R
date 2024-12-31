@@ -99,7 +99,7 @@ library(future)
 plan(multicore, workers = 7)
 
 animate(anim, 
-        renderer = av_renderer(paste0("graficos/resultados/datos_prensa_scraping_", lubridate::today(), ".mp4")),
+        renderer = av_renderer(paste0("graficos/resultados/datos_prensa_scraping_", lubridate::today(), ".mov")),
         fps = 60, end_pause = 60, duration = 16, 
         width = 1080, height = 800, units = "px", res = 90)
 
