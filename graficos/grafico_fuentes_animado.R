@@ -55,7 +55,8 @@ datos_prensa_grafico_scraping_conteo_rellenado <- datos_prensa_grafico_scraping_
 datos_prensa_grafico_scraping_conteo_rellenado_sum <- datos_prensa_grafico_scraping_conteo_rellenado |> 
   mutate(n = replace_na(n, 0)) |> 
   group_by(fuente, fecha) |> 
-  mutate(sum = cumsum(n))
+  mutate(sum = cumsum(n)) |> 
+  recodificar_fuentes()
 
 
 # gráfico ----
@@ -66,26 +67,31 @@ plot <- datos_prensa_grafico_scraping_conteo_rellenado_sum |>
   theme_minimal() +
   guides(fill = guide_legend(position = "bottom", nrow = 3, title = NULL)) +
   facet_grid(~año, space = "free_x", scales = "free_x", switch = "x") +
+  scale_fill_viridis_d(begin = 0.1, end = 0.6, option = "plasma") +
   theme(strip.text = element_text(margin = margin(t=20)),
-        axis.text.x = element_text(margin = margin(t=-25)),
+        axis.text.x = element_text(margin = margin(t=-25, b = 12)),
+        plot.subtitle = element_text(margin = margin(t = 0)),
+        plot.title = element_text(margin = margin(t = 6, b = 6)),
+        plot.caption = element_text(margin = margin(t = 8)),
         panel.grid.major.x = element_blank(),
         legend.key.size = unit(4, "mm"),
         legend.text = element_text(margin = margin(l = 2, r = 4)),
         legend.margin = margin(t=15), 
         panel.spacing.x = unit(4, "mm")) +
-  labs(y = "noticias", x = NULL, 
-       caption = "Fuente: elaboración propia. Bastián Olea Herrera")
+  guides(fill = guide_none()) +
+  labs(y = "Noticias por mes", x = NULL, 
+       title = "Web scraping de medios digitales chilenos",
+       subtitle = "Cantidad de noticias obtenidas hasta {format(as_date(closest_state), '%B de %Y')}",
+       caption = "Elaboración propia. Bastián Olea Herrera")
 
 
 # animación ----
 anim <- plot +
   transition_states(fecha_scraping, 
-                    transition_length = 3, state_length = 1, 
+                    transition_length = 2, state_length = 0.5,
                     wrap = FALSE) +
-  enter_grow() +
-  ggtitle(label = "Web scraping de medios digitales chilenos",
-          subtitle = "Cantidad total de noticias obtenidas 
-          hasta {format(as_date(closest_state), '%B de %Y')}")
+  enter_grow()
+  # ggtitle()
 
 
 # render ----
@@ -94,7 +100,7 @@ plan(multicore, workers = 7)
 
 animate(anim, 
         renderer = av_renderer(paste0("graficos/resultados/datos_prensa_scraping_", lubridate::today(), ".mp4")),
-        fps = 60, end_pause = 30, duration = 16, 
+        fps = 60, end_pause = 60, duration = 16, 
         width = 1080, height = 800, units = "px", res = 90)
 
 

@@ -1,6 +1,7 @@
 library(dplyr)
 library(lubridate)
 library(ggplot2)
+source("funciones.R")
 
 Sys.setlocale("LC_TIME", "es_ES.UTF-8") # meses en español
 
@@ -14,7 +15,7 @@ if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_d
 
 # gráfico noticias por fuente y mes
 datos_prensa_grafico <- datos_prensa |>
-  filter(año >= 2019) |> 
+  filter(año >= 2018) |> 
   mutate(fecha = floor_date(fecha, "month"),
          mes = month(fecha) |> as.integer() |> as.factor())
 
@@ -22,11 +23,14 @@ datos_prensa_grafico <- datos_prensa |>
 datos_prensa_grafico_conteo <- datos_prensa_grafico |> 
   group_by(fecha, mes, año, fuente) |> 
   count() |> 
+  recodificar_fuentes() |> 
   # resumir fuentes chicas
   ungroup() |>
-  mutate(fuente = forcats::fct_lump_prop(fuente, w = n, prop = 0.01, other_level = "otros")) |>
+  mutate(fuente = forcats::fct_lump_prop(fuente, w = n, prop = 0.02, other_level = "Otros")) |>
   group_by(fecha, mes, año, fuente) |>
   summarize(n = sum(n))
+
+
 
 # gráfico
 datos_prensa_grafico_conteo |> 
