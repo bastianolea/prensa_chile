@@ -60,6 +60,11 @@ Luego del scraping se realiza el procesamiento de los datos. Todos los scripts d
 - `analisis/prensa_detectar_temas.R` donde se evalúa la presencia de términos específicos en cada noticia, y en base al porcentaje de términos coincidentes con respecto a las palabras totales, etiquetar cada noticia con la temática que engloba a los términos; por ejemplo, noticias donde más de 3% de las palabras tienen que ver con robos, asaltos, etc., serán categorizadas como noticias sobre delincuencia.
 - Y más...
 
+
+----
+
+![](graficos/resultados/datos_prensa_scraping_2024-12-31_b.png)
+
 ----
 
 ## Licencia

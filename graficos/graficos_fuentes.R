@@ -38,14 +38,17 @@ datos_prensa_grafico_conteo |>
   geom_col(position = position_stack(), color = "white") +
   scale_y_continuous(expand = c(0, 0), labels = ~format(.x, big.mark = ".", decimal.mark = ",")) +
   theme_minimal() +
-  guides(fill = guide_legend(position = "bottom", nrow = 3, title = NULL)) +
-  labs(y = "noticias", x = NULL, 
+  scale_fill_viridis_d(begin = 0.1, end = 0.6, option = "plasma") +
+  # guides(fill = guide_legend(position = "bottom", nrow = 3, title = NULL)) +
+  guides(fill = guide_none()) +
+  labs(y = "Noticias por mes", x = NULL, 
        title = "Noticias en medios digitales chilenos",
-       subtitle = "Cantidad total de noticias obtenidas por mes, según fuente",
-       caption = "Fuente: elaboración propia. Bastián Olea Herrera") +
+       subtitle = "Cantidad de noticias obtenidas por mes, según fuente",
+       caption = "Elaboración propia. Bastián Olea Herrera") +
   facet_grid(~año, space = "free_x", scales = "free_x", switch = "x") +
   theme(strip.text = element_text(margin = margin(t=20)),
-        axis.text.x = element_text(margin = margin(t=-25)),
+        axis.text.x = element_text(margin = margin(t=-25, b = 12)),
+        plot.caption = element_text(margin = margin(t = 8)),
         panel.grid.major.x = element_blank(),
         legend.key.size = unit(4, "mm"),
         legend.text = element_text(margin = margin(l = 2, r = 4)),
