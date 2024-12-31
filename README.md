@@ -12,8 +12,6 @@ Los datos obtenidos mediante este repositorio van sumando más de 600 mil notici
 
 ![](graficos/resultados/datos_prensa_scraping_2024-12-31.mov)
 
-<video src="https://raw.githubusercontent.com/bastianolea/prensa_chile/refs/heads/main/graficos/resultados/datos_prensa_scraping_2024-12-31.mov" width="100%" autoplay loop></video>
-
 
 ----
 
@@ -28,14 +26,6 @@ Los datos obtenidos mediante este repositorio van sumando más de 600 mil notici
 <a href = "https://bastianoleah.shinyapps.io/prensa_chile/">
 <img src="apps/prensa_chile/pantallazos/analisis_prensa_chile_semanal.jpg" height="900px" />
 </a>
-
-![](apps/prensa_chile/pantallazos/p1.png)
-![](apps/prensa_chile/pantallazos/p2b.png)
-![](apps/prensa_chile/pantallazos/p3.png)
-![](apps/prensa_chile/pantallazos/p2c.png)
-![](apps/prensa_chile/pantallazos/p4.png)
-![](apps/prensa_chile/pantallazos/p5b.png)
-
 
 
 ## Estructura del código
