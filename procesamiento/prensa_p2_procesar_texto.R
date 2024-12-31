@@ -68,7 +68,7 @@ n_palabras <- prensa_palabras |>
   nrow() |> 
   signif(digits = 3)
 
-n_palabras |> write("datos/prensa_n_noticias.txt")
+n_palabras |> write("datos/prensa_n_palabras.txt")
 n_palabras |> write("apps/prensa_chile/prensa_n_palabras.txt")
 
 plan(multisession)

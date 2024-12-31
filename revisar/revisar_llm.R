@@ -8,13 +8,13 @@ clasificacion <- read_parquet("datos/prensa_llm_clasificar.parquet")
 resumen <- read_parquet("datos/prensa_llm_resumen.parquet")
 
 # # # cargar sólo ultimo procesamiento
-sentimiento <- fs::dir_info("datos/prensa_llm/sentimiento/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
-clasificacion <- fs::dir_info("datos/prensa_llm/clasificar/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
-resumen <- fs::dir_info("datos/prensa_llm/resumen/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
+# sentimiento <- fs::dir_info("datos/prensa_llm/sentimiento/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
+# clasificacion <- fs::dir_info("datos/prensa_llm/clasificar/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
+# resumen <- fs::dir_info("datos/prensa_llm/resumen/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
 
 # unir
 datos <- bind_rows(sentimiento |> mutate(tipo = "sentimiento", orden = row_number()),
-                   # clasificacion |> mutate(tipo = "clasificacion", orden = row_number()),
+                   clasificacion |> mutate(tipo = "clasificacion", orden = row_number()),
                    # resumen |> mutate(tipo = "resumen", orden = row_number())
                    )
 

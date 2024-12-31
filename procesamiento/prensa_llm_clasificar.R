@@ -23,7 +23,7 @@ if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_d
 anterior <- read_parquet("datos/prensa_llm_clasificar.parquet")
 
 # extraer muestra
-muestra = 20000 # definir cantidad de noticias a procesar
+muestra = 3000 # definir cantidad de noticias a procesar
 
 # estimar tiempo
 message(paste("tiempo aproximado de procesamiento:", round((muestra * 5.2)/60/60, 1), "horas"))

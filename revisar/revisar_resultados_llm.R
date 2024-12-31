@@ -46,6 +46,11 @@ reciente <- datos_prensa_3 |>
   filter(fecha > (today() - months(4)))
 
 
+reciente |> 
+  arrange(desc(fecha)) |> 
+  # filter(!is.na(sentimiento)) |> 
+  print(n=300)
+
 reciente |> count(sentimiento)
 
 reciente |> count(clasificacion)

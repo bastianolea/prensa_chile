@@ -27,12 +27,14 @@ archivos_modulos <- map(carpetas_modulos, ~dir_ls(.x, regexp = ".rds"))
 
 # archivos_modulos <- list(archivos_modulos[[11]], 
 #                          archivos_modulos[[25]])
+# archivos_modulos <- archivos_modulos[[3]]
 
 # carga ----
 # cargar resultados de módulos 
 modulos_cargados <- future_map(archivos_modulos, \(archivo_modulo) {
   # archivo_modulo <- archivos_modulos[[3]]
   # archivo_modulo <- archivos_modulos[["resultados/emol"]]
+  # archivo_modulo <- "resultados/agricultura/agricultura_cron_6913_2024-12-30.rds"
   
   # cargar todos los archivos de la carpeta del módulo
   resultados_modulo <- map(unlist(archivo_modulo), read_rds)
@@ -77,11 +79,12 @@ modulos_cargados <- future_map(archivos_modulos, \(archivo_modulo) {
 # separar fuentes con muchos datos en partes mas pequeñas para luego procesarlas
 modulos_cargados <- map(modulos_cargados, \(modulo) {
   # modulo <- modulos_cargados[[2]]
+  # map(modulos_cargados, nrow)
 
   filas <- nrow(modulo)
-  grupos <- filas %/% 10000 #un grupo cada 10000 observaciones
+  grupos <- filas %/% 20000 # un grupo cada 10000 observaciones
 
-  if (filas >= 10000) {
+  if (filas >= 20000) {
     modulo <- modulo |>
       mutate(grupos = (row_number()-1) %/% (n()/grupos)) |>
       group_by(grupos) |>
@@ -95,12 +98,17 @@ modulos_cargados <- map(modulos_cargados, \(modulo) {
 }) |> list_flatten()
 
 
-# modulos_cargados_split[1:4]
 
 # limpieza ----
 # future_walk(modulos_cargados, \(modulo) {
 modulos_limpios <- future_map(modulos_cargados, \(modulo) {
-  # modulo <- modulos_cargados[[1]]
+  # modulo <- modulos_cargados[[2]]
+  # modulo <- modulos_cargados[[23]]
+  # modulo <- modulos_cargados[["resultados/agricultura/agricultura_cron_6913_2024-12-30.rds"]]
+  # modulo <- modulos_cargados[["resultados/agricultura/agricultura_cron_2024-09-24.rds"]]
+  
+  if (length(modulo) <= 4) return(NULL)
+  if (nrow(modulo) == 0) return(NULL)
   
   datos_2 <- modulo |>
     # noticias únicas
@@ -117,6 +125,7 @@ modulos_limpios <- future_map(modulos_cargados, \(modulo) {
   # que tengan todas las columnas necesarias
   if (!"bajada" %in% names(datos_2)) datos_2 <- datos_2 |> mutate(bajada = NA_character_)
   if (!"fecha_scraping" %in% names(datos_2)) datos_2 <- datos_2 |> mutate(fecha_scraping = NA_Date_)
+  # if (!"url" %in% names(datos_2)) 
   
   ## eliminar textos ----
   datos_4 <- datos_2 |> 
@@ -134,29 +143,22 @@ modulos_limpios <- future_map(modulos_cargados, \(modulo) {
     rowwise() |>
     mutate(id = rlang::hash(url)) |> 
     ungroup()
-  
-  # descomentar esto para usar paso intermedio que guarda resultados por piezas en el disco duro, para evitar que se caiga el proceso por falta de memoria
-  # fuente <- unique(datos_prensa$fuente)
-  # grupo <- unique(datos_4$grupos)
-  # 
-  # # guardar resultados individuales
-  # readr::write_rds(datos_prensa, 
-  #                  file = paste0("datos/preprocesados_datos/", fuente, "_", grupo, ".rds"))
-  # remove(datos_prensa, datos_4, datos_3, datos_2, modulo)
-  # # beepr::beep()
+
   return(datos_prensa)
 })
 
 
-# fechas ----
 
+# fechas ----
 modulos_limpios_fechas <- future_map(modulos_limpios, \(modulo) {
   
+  # modulo <- modulos_limpios[["resultados/agricultura/agricultura_cron_6913_2024-12-30.rds"]]
   # names(modulos_limpios)
   # modulo <- modulos_limpios[[28]]
   
   if (is.null(modulo)) return(NULL)
   
+  # instrucciones especiales para fuentes específicas
   resultado_1 <- modulo |> 
     # extracción de fecha por fuente
     mutate(fecha2 = as_date(fecha)) |> 
@@ -166,7 +168,8 @@ modulos_limpios_fechas <- future_map(modulos_limpios, \(modulo) {
     # mutate(fecha2 = if_else(fuente == "24horas", dmy(fecha), fecha2)) |> 
     # mutate(fecha2 = if_else(fuente == "exante", ymd(fecha), fecha2)) |> 
     # mutate(fecha2 = if_else(fuente == "meganoticias" & is.na(fecha2), str_extract(url, "(?<=(-))(\\d{2}-\\d+-\\d{4})(?=\\.html)") |> dmy(), fecha2)) |> 
-    mutate(fecha2 = case_when(fuente == "cnnchile" ~ str_extract(url, "\\d{8}") |> as_date(),
+    mutate(fecha2 = case_when(fuente == "agricultura" & fecha == "2024-05-31" ~ str_extract(url, "\\d{8}") |> as_date(), # corregir fecha incorrecta scrapeada
+                              fuente == "cnnchile" ~ str_extract(url, "\\d{8}") |> as_date(),
                               fuente == "adnradio" ~ str_extract(url, "(?<=(\\/))(\\d{4}\\/\\d{2}\\/\\d{2})(?=\\/)") |> ymd(),
                               fuente == "24horas" ~ dmy(fecha),
                               fuente == "exante" ~ ymd(fecha),
@@ -192,16 +195,21 @@ modulos_limpios_fechas <- future_map(modulos_limpios, \(modulo) {
     mutate(fecha_original = fecha, 
            fecha = fecha2,
            año = year(fecha)) |> 
-    # select(-fecha_scraping)
+    select(-fecha2, -fecha_original) |> 
     mutate(fecha_scraping = as_date(fecha_scraping))
   
-  return(resultado_3)
+  resultado_4 <- resultado_3 |> 
+    arrange(desc(fecha))
+  
+  return(resultado_4)
 })
 
 # resultado |> 
 #   filter(fecha < "2000-01-01")
 
 # plan(multisession)
+
+
 
 # unir ----
 
@@ -214,8 +222,9 @@ modulos_limpios_fechas <- future_map(modulos_limpios, \(modulo) {
 # segunda forma de hacerlo, directamente desde memoria
 datos_prensa <- modulos_limpios_fechas |> 
   list_rbind() |>
-  arrange(desc(fecha)) #|>
-  # distinct(url, .keep_all = TRUE)
+  distinct(url, .keep_all = TRUE)
+
+
 
 # revisar ----
 # noticias por fuente
@@ -241,12 +250,14 @@ datos_prensa <- modulos_limpios_fechas |>
 #   arrange(desc(fecha))
 
 
+
 # guardar ----
 arrow::write_parquet(datos_prensa, "datos/prensa_datos.parquet")
 
 
 
 # guardar cantidad de noticias
+options(scipen=9999)
 n_noticias <- datos_prensa |> 
   nrow() |> 
   signif(digits = 3) 

@@ -54,11 +54,11 @@ ggsave(glue::glue("graficos/resultados/datos_prensa_scraping_{today()}.png"),
 
 # gráfico noticias mensuales, por fuentes y por año ----
 datos_prensa_grafico |> 
-  filter(año == 2022) |> 
+  filter(año == 2024) |> 
   ggplot(aes(fecha, fill = fuente)) +
   geom_bar() +
   scale_x_date(date_breaks = "months", date_labels = "%m", expand = c(0, 0), minor_breaks = NULL) +
-  facet_wrap(~fuente, ncol = 3, axes = "all_x") +
+  facet_wrap(~fuente, ncol = 3, scales = "free_y", axes = "all_x") +
   guides(fill = guide_none()) +
   theme_minimal() +
   theme(axis.text = element_text(size = 7),
@@ -73,6 +73,9 @@ ggsave(glue::glue("graficos/resultados/datos_prensa_fuentes_2024_{today()}.png")
        width = 11, height = 8, bg = "white")
 
 
+# datos_prensa_grafico |> 
+#   filter(fuente == "agricultura") |> 
+#   arrange(desc(fecha))
 
 conteo_prensa_años <- datos_prensa |>
   filter(year(fecha) >= 2019) |> 

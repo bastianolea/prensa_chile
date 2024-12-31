@@ -29,7 +29,7 @@ rm(prensa_palabras_conteo,
 prensa_palabras_conteo_3 <- prensa_palabras_conteo_2 |> 
   # rango de fechas 
   filter(fecha >= today() - months(4)) |> 
-  filter(fecha <= dmy(fecha_limite)) |> # fecha límite, para no incluir días de la semana siguiente
+  filter(fecha <= fecha_limite) |> # fecha límite, para no incluir días de la semana siguiente
   mutate(semana = week(fecha),
          fecha = floor_date(fecha, unit = "week", week_start = 1)) |> 
   group_split(fuente)

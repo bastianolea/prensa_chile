@@ -1,6 +1,6 @@
 # ejecutar todos los pasos de procesamiento, post scraping (prensa_obtener_datos.R)
 
-fecha_limite = "22-12-2024" # domingo que termina la semana, para prensa semanal
+fecha_limite = floor_date(today(), unit = "week", week_start = 7) # domingo que termina la semana, para prensa semanal
   
 options(future.globals.maxSize = 1.0 * 3e9)
 
@@ -33,7 +33,7 @@ source("procesamiento/prensa_correlacion.R", echo = T)
 # output: datos/prensa_correlacion.parquet, datos/prensa_correlacion_fuente.parquet
 
 # sentimiento de noticias usando modelos de lenguaje
-source("procesamiento/prensa_llm_sentimiento.R", echo = T)
+# source("procesamiento/prensa_llm_sentimiento.R", echo = T)
 # output: prensa_llm_sentimiento.parquet
 
 # resumen de noticias usando modelos de lenguaje
@@ -41,7 +41,7 @@ source("procesamiento/prensa_llm_sentimiento.R", echo = T)
 # output: prensa_llm_resumen.parquet
 
 # tópico de noticias usando modelos de lenguaje
-source("procesamiento/prensa_llm_clasificar.R", echo = T)
+# source("procesamiento/prensa_llm_clasificar.R", echo = T)
 # output: prensa_llm_clasificar.parquet
 
 final <- Sys.time()
