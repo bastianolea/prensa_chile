@@ -10,7 +10,7 @@ Actualmente, el corpus de noticias obtenido supera las 600.000 noticias individu
 ## Datos
 Los datos obtenidos mediante este repositorio van sumando más de 600 mil noticias. Los datos, por su peso, no están disponibles de forma pública. Sin embargo, puedes acceder a una muestra de 3.000 noticias del año 2024, seleccionadas al azar, en la carpeta `datos` de este repositorio. Esta seleccion de datos contiene texto de titulares, cuerpo de noticia, fuente y fecha.
 
-![](graficos/resultados/datos_prensa_scraping_2024-12-31.mp4)
+![](graficos/resultados/datos_prensa_scraping_2024-12-31.mov)
 
 <video src="https://raw.githubusercontent.com/bastianolea/prensa_chile/refs/heads/main/graficos/resultados/datos_prensa_scraping_2024-12-31.mov" width="100%" autoplay loop></video>
 
