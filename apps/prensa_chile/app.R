@@ -775,32 +775,38 @@ server <- function(input, output, session) {
   
   datos_semana_fuente_2 <- reactive({
     # retorna vector con numero de las semanas a mostrar
-    .semanas = (week(today())-(input$semanas_fuentes-1)):week(today())
+    # .semanas = (week(today())-(input$semanas_fuentes-1)):week(today())
 
+    # browser()
     # # bug: no puede filtrar por semanas de distintos años, porque nada indica el año
     # # entonces sería como desde semana 50 a semana 1
     # # también la resta está mal hecha en consideración de semanas entre dos años
     # # tampoco viene con fecha, habría que filtrar por fecha
-    # semanas_atras = (weeks(input$semanas_fuentes) - 1)
-    # fecha_min = today() - semanas_atras
-    # fecha_max = today()
+    semanas_atras = weeks(input$semanas_fuentes+1)
+    fecha_min = today() - semanas_atras
+    fecha_max = today()
     
+    # palabras_semana_fuente |> 
+    #   filter(semana %in% .semanas) |> 
+    #   ungroup()
     palabras_semana_fuente |> 
-      filter(semana %in% .semanas) |> 
-      ungroup()
+      filter(fecha >= fecha_min,
+             fecha <= fecha_max)
   })
   
   datos_semana_fuente_3 <- reactive({
+    # browser()
     datos_semana_fuente_2() |> 
       # agrupar fuentes chicas
       mutate(fuente = fct_reorder(fuente, n_total_fuente, .desc = FALSE)) |>
       mutate(fuente = fct_lump(fuente, w = n_total_fuente, n = input$semana_fuentes_fuentes, ties.method = "first", 
                                other_level = "Otros")) |>
-      group_by(fuente, semana, fecha, palabra) |>
+      group_by(fuente, semana, fecha, fecha_texto, palabra) |>
       summarize(n = sum(n), .groups = "drop")
   })
   
   datos_semana_fuente_4 <- reactive({
+    # browser()
     datos_semana_fuente_3() |> 
       # maximo palabras por semana
       group_by(semana, palabra) |> 
@@ -809,7 +815,7 @@ server <- function(input, output, session) {
       mutate(rank = dense_rank(desc(n_semana))) |>
       # mutate(rank2 = row_number(desc(n_semana))) |>
       filter(rank <= input$semana_fuentes_palabras_n) |> # cantidad de palabras por semana
-      distinct(semana, rank, fuente, .keep_all = TRUE) |>
+      distinct(semana, fecha, rank, fuente, .keep_all = TRUE) |>
       # ordenar palabras
       group_by(semana, palabra) |> 
       mutate(n_palabra_semana = sum(n)) |> 
@@ -817,6 +823,7 @@ server <- function(input, output, session) {
       mutate(palabra = tidytext::reorder_within(palabra, n_palabra_semana, semana)) |> 
       ungroup()
   })
+  
   
   ## puntos fuente palabra ----
   # palabra específica por fuente
@@ -829,11 +836,21 @@ server <- function(input, output, session) {
   
   datos_semana_fuente_palabra_2 <- reactive({
     # browser()
-    .semanas = (week(today())-(input$semanas_fuentes_palabras-1)):week(today()) #29:32
+    
+    # .semanas = (week(today())-(input$semanas_fuentes_palabras-1)):week(today()) #29:32
+    # # bug: no puede filtrar por semanas de distintos años, porque nada indica el año
+    # # entonces sería como desde semana 50 a semana 1
+    # # también la resta está mal hecha en consideración de semanas entre dos años
+    # # tampoco viene con fecha, habría que filtrar por fecha
+    semanas_atras = weeks(input$semanas_fuentes_palabras+1)
+    fecha_min = today() - semanas_atras
+    fecha_max = today()
     
     datos_semana_fuente_palabra_1() |> 
       # filtrar semanas
-      filter(semana %in% .semanas) |> 
+      # filter(semana %in% .semanas) |> 
+      filter(fecha >= fecha_min,
+             fecha <= fecha_max) |> 
       # # ranking de fuentes con mayor cantidad de palabras
       group_by(fuente) |>
       mutate(n_total_fuente = sum(n)) |>
@@ -849,7 +866,7 @@ server <- function(input, output, session) {
                                n = .n_fuentes, other_level = "Otros")) |>
       mutate(fuente = fct_reorder(fuente, n_total_fuente, .desc = T),
              fuente = fct_relevel(fuente, "Otros", after = 0)) |> 
-      group_by(fuente, semana, fecha, palabra) |>
+      group_by(fuente, semana, fecha, fecha_texto, palabra) |>
       summarize(n = sum(n)) |>
       # ordenar palabras
       group_by(semana, fuente) |> 
@@ -1131,15 +1148,18 @@ server <- function(input, output, session) {
   output$g_semana_fuente <- renderPlot({
     req(datos_semana_fuente_4())
     # browser()
+    # dev.new()
+    # datos_semana_fuente_4() |> 
+    #   distinct(semana, fecha, fecha_texto)
     
-    plot <- datos_semana_fuente_4() |> 
+    plot <- datos_semana_fuente_4() |>
       ggplot(aes(x = n, y = palabra, fill = fuente)) +
       geom_col(width = .7, color = color_fondo) +
       geom_point(aes(color = fuente), alpha = 0) +
       tidytext::scale_y_reordered() +
       scale_x_continuous(expand = expansion(c(0, .1))) +
       scale_fill_viridis_d(begin = .2, direction = 1, end = .7, option = "magma", aesthetics = c("color", "fill")) +
-      facet_wrap(~fecha, 
+      facet_wrap(~fecha_texto, 
                  scales = "free", nrow = 1)  +
       guides(fill = guide_none(),
              color = guide_legend(position = "bottom", 
@@ -1177,6 +1197,8 @@ server <- function(input, output, session) {
   })
   
   output$g_semana_fuente_palabra <- renderPlot({
+    req(datos_semana_fuente_palabra_4())
+    # browser()
     plot <- datos_semana_fuente_palabra_4() |> 
       ggplot(aes(x = n, y = fuente2,
                  color = destacado)) +
@@ -1193,7 +1215,7 @@ server <- function(input, output, session) {
       scale_x_continuous(expand = expansion(c(0, 0.1))) +
       # scale_fill_viridis_d(begin = .2, direction = -1, end = .7, option = "magma", aesthetics = c("color", "fill")) +
       scale_color_manual(values = c(color_destacado, color_texto)) +
-      facet_wrap(~fecha, 
+      facet_wrap(~fecha_texto, 
                  scales = "free", nrow = 1)  +
       # theme_minimal() +
       labs(y = "fuentes ordenadas por menciones", x = "frecuencia de mención, por semanas"
