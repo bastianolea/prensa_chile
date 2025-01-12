@@ -13,8 +13,8 @@ source("funciones.R")
 plan(multisession, workers = 7)
 
 # configurar LLM
-llm_use("ollama", "llama3.1:8b", 
-        .cache = "", temperature = 0)
+llm_use("ollama", "llama3.1:8b", .cache = "", temperature = 0.5)
+# llm_use("ollama", "qwen2.5:14b", .cache = "", temperature = 0.5)
 
 # cargar datos ----
 if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.parquet")
@@ -23,7 +23,7 @@ if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.pa
 anterior <- read_parquet("datos/prensa_llm_resumen.parquet")
 
 # extraer muestra
-muestra = 20000 # definir cantidad de noticias a procesar
+muestra = 30 # definir cantidad de noticias a procesar
 
 # estimar tiempo
 message(paste("tiempo aproximado de procesamiento:", round((muestra * 8.1)/60/60, 1), "horas"))
@@ -54,14 +54,16 @@ datos_limpios <- future_map(datos_muestra_split,
                                 select(id, bajada, cuerpo) |> 
                                 mutate(texto = paste(bajada, cuerpo),
                                        texto = textclean::strip(texto, digit.remove = FALSE, char.keep = c(".", ",")),
-                                       texto = str_trunc(texto, 5000, side = "center")) |> 
+                                       texto = str_trunc(texto, 7000, side = "center")) |> 
                                 mutate(n_palabras = str_count(texto, "\\w+"))
                             })
 
 # separar por id
 datos_limpios_split <- datos_limpios |> 
   list_rbind() |> 
-  group_by(id) |>
+  distinct(id, .keep_all = TRUE) |> 
+  mutate(orden = row_number()) |> 
+  group_by(orden) |>
   group_split()
 
 
@@ -73,6 +75,9 @@ resumenes <- map(datos_limpios_split,
                    message(paste("procesando", dato$id))
                    
                    tryCatch({
+                     # detener operación externamente
+                     if (read.delim("stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
+                     
                      # obtener sentimiento
                      resumen <- dato$texto |> llm_vec_summarize(max_words = 30, additional_prompt = "en español")
                      
@@ -95,7 +100,7 @@ resumenes <- map(datos_limpios_split,
                      return(resultado)
                    },
                    error = function(e) {
-                     cli::cli_alert_danger("error:", e)
+                     warning(paste("error:", e))
                      return(NULL)
                    })
                  }); beep()
@@ -106,11 +111,13 @@ resumenes |>
   summarize(tiempo_total = sum(tiempo),
             tiempo_prom = mean(tiempo))
 
-resumenes |> 
-  list_rbind() |> 
-  slice_sample(n = 10) |> 
-  pull(resumen)
-
+# resumenes_b <- resumenes |>
+#   list_rbind() |>
+#   # slice_sample(n = 10) |>
+#   pull(resumen)
+# 
+# resumenes_a #llama 3.2:3b
+# resumenes_b #qwen2.5:14b
 
 # guardar avance ----
 resumenes |> 

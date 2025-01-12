@@ -14,6 +14,7 @@ plan(multisession, workers = 7)
 
 # configurar LLM
 llm_use("ollama", "llama3.1:8b", .cache = "", temperature = 0)
+# llm_use("ollama", "qwen2.5:14b", .cache = "", temperature = 0)
 
 # cargar datos ----
 if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")

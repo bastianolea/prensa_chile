@@ -100,13 +100,7 @@ modulos_cargados <- map(modulos_cargados, \(modulo) {
 
 
 # limpieza ----
-# future_walk(modulos_cargados, \(modulo) {
 modulos_limpios <- future_map(modulos_cargados, \(modulo) {
-  # modulo <- modulos_cargados[[2]]
-  # modulo <- modulos_cargados[[23]]
-  # modulo <- modulos_cargados[["resultados/agricultura/agricultura_cron_6913_2024-12-30.rds"]]
-  # modulo <- modulos_cargados[["resultados/agricultura/agricultura_cron_2024-09-24.rds"]]
-  
   if (length(modulo) <= 4) return(NULL)
   if (nrow(modulo) == 0) return(NULL)
   
