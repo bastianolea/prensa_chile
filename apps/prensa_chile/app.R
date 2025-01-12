@@ -14,8 +14,8 @@ library(htmltools)
 library(shinyjs) |> suppressPackageStartupMessages()
 library(thematic)
 library(shinycssloaders)
-library(showtext)
 library(sysfonts)
+library(showtext)
 library(ragg)
 
 source("funciones.R")
@@ -29,20 +29,7 @@ color_detalle = "#A5876A"
 color_destacado = "#C7392B"
 
 
-# configuraciones ----
-options(spinner.type = 8, spinner.color = color_detalle)
-options(shiny.useragg = TRUE)
-showtext::showtext_opts(dpi = 180)
-thematic_shiny(font = "auto", accent = color_destacado)
-.texto_ejes = 9
-
-# tipografías para ragg/sysfonts
-# sysfonts::font_add_google("Lato", "Lato", db_cache = TRUE)
-# sysfonts::font_add_google("Libre Baskerville", "Libre Baskerville", db_cache = TRUE)
-
-# descargar tipografía local (descargada con gfonts)
-# gfonts::setup_font(id = "lato", output_dir = "www/") # instalar tipografía localmente
-# gfonts::setup_font(id = "libre-baskerville", output_dir = "www/")
+# tipografías ----
 
 sysfonts::font_add("Lato",
                    regular = "www/fonts/lato-v24-latin-regular.ttf",
@@ -57,7 +44,18 @@ sysfonts::font_add("Libre Baskerville",
                    bolditalic = "www/fonts/libre-baskerville-v14-latin-italic.ttf",
 )
 
-showtext_auto()
+# showtext_auto() # esto echaba a perder la resolución
+
+
+# configuraciones ----
+thematic_shiny(font = "Lato", accent = color_destacado)
+options(spinner.type = 8, spinner.color = color_detalle)
+options(shiny.useragg = TRUE)
+# showtext::showtext_opts(dpi = 180) # esto junto al showtext_auto() echa a perder la resolución
+.texto_ejes = 9
+resolucion = 110
+
+
 
 
 # cargar datos ----
@@ -120,7 +118,7 @@ ui <- page_fluid(
     font_scale = 1.2,
     bg = color_fondo, fg = color_texto, primary = color_destacado, 
     # tipografías 
-    # base_font = "Lato",
+    base_font = "Lato",
     # # heading_font = "Libre Baskerville"
   ),
   
@@ -700,7 +698,7 @@ server <- function(input, output, session) {
   datos_conteo_semanas_3 <- reactive({
     req(datos_conteo_semanas_2())
     message("datos líneas semanas 3")
-    
+    # browser()
     datos_conteo_semanas_2() |> 
       filter(!palabra %in% input$palabras_excluir) |> 
       # ordenar palabras por frecuencia
@@ -776,7 +774,16 @@ server <- function(input, output, session) {
   # })
   
   datos_semana_fuente_2 <- reactive({
-    .semanas = (week(today())-(input$semanas_fuentes-1)):week(today()) #29:32
+    # retorna vector con numero de las semanas a mostrar
+    .semanas = (week(today())-(input$semanas_fuentes-1)):week(today())
+
+    # # bug: no puede filtrar por semanas de distintos años, porque nada indica el año
+    # # entonces sería como desde semana 50 a semana 1
+    # # también la resta está mal hecha en consideración de semanas entre dos años
+    # # tampoco viene con fecha, habría que filtrar por fecha
+    # semanas_atras = (weeks(input$semanas_fuentes) - 1)
+    # fecha_min = today() - semanas_atras
+    # fecha_max = today()
     
     palabras_semana_fuente |> 
       filter(semana %in% .semanas) |> 
@@ -928,6 +935,7 @@ server <- function(input, output, session) {
   
   ## líneas semanas ----
   output$g_semanas <- renderPlot({
+    req(length(input$destacar_palabra) > 0)
     req(input$destacar_palabra != "")
     req(datos_conteo_semanas_4())
     # browser()
@@ -1016,7 +1024,7 @@ server <- function(input, output, session) {
     
     return(plot)
     
-  }, res = 100)
+  }, res = resolucion)
   
   
   ## palabras semana ----
@@ -1040,6 +1048,9 @@ server <- function(input, output, session) {
   
   output$g_palabras <- renderPlot({
     # if (length(input$selector_palabras) > 4) {
+    req(datos_conteo_semanas_palabras_2())
+    # browser()
+    
     if (input$tipo_grafico == "Líneas") {
       ### líneas ----
       plot <- datos_conteo_semanas_palabras_2() |> 
@@ -1113,11 +1124,13 @@ server <- function(input, output, session) {
     
     
     return(plot)
-  }, res = 100)
+  }, res = resolucion)
   
   
   ## barras semana fuente ----
   output$g_semana_fuente <- renderPlot({
+    req(datos_semana_fuente_4())
+    # browser()
     
     plot <- datos_semana_fuente_4() |> 
       ggplot(aes(x = n, y = palabra, fill = fuente)) +
@@ -1154,7 +1167,7 @@ server <- function(input, output, session) {
       theme(strip.text = element_text(family = "Lato"))
     
     return(plot)
-  }, res = 100)
+  }, res = resolucion)
   
   
   ## puntos fuente palabra ----
@@ -1202,7 +1215,7 @@ server <- function(input, output, session) {
       theme(strip.text = element_text(family = "Lato"))
     
     return(plot)
-  }, res = 100)
+  }, res = resolucion)
   
   
   ## correlación ----
@@ -1240,7 +1253,7 @@ server <- function(input, output, session) {
     
     
     return(plot)
-  }, res = 100)
+  }, res = resolucion)
   
   
   ### correlación fuentes ----
@@ -1280,7 +1293,7 @@ server <- function(input, output, session) {
       labs(x = paste("términos más correlacionados con:", str_to_sentence(input$cor_fuente_palabra)), y = NULL)
     
     return(plot)
-  }, res = 100)
+  }, res = resolucion)
   
   output$ui_g_cor_fuente <- renderUI({
     req(cor_fuente_dato_3())
