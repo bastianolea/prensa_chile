@@ -41,6 +41,8 @@ scraping_prensa("modulos/cron_cnnchile.r") #hist
 
 scraping_prensa("modulos/cron_exante.r") #hist
 
+scraping_prensa("modulos/cron_izquierdadiario.R") "hist
+
 scraping_prensa("modulos/cron_elsiglo.r") #hist
 
 scraping_prensa("modulos/cron_ciper.r") #hist

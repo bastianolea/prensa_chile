@@ -17,7 +17,7 @@ if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_d
 datos_prensa_grafico_scraping <- datos_prensa |>
   select(fuente, fecha, año, fecha_scraping) |> 
   filter(año >= 2019) |>
-  # filter(año == 2024) |>
+  filter(año <= 2024) |>
   filter(!is.na(fecha_scraping)) |> 
   mutate(fecha = floor_date(fecha, "month"),
          fecha_scraping = floor_date(fecha_scraping, "month"),
@@ -95,9 +95,6 @@ anim <- plot +
 
 
 # render ----
-library(future)
-plan(multicore, workers = 7)
-
 animate(anim, 
         renderer = av_renderer(paste0("graficos/resultados/datos_prensa_scraping_", lubridate::today(), ".mov")),
         fps = 60, end_pause = 60, duration = 16, 

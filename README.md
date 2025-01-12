@@ -67,6 +67,21 @@ Luego del scraping se realiza el procesamiento de los datos. Todos los scripts d
 
 ----
 
+## Actualizaciones
+
+**11 de enero 2025:**
+- Solucionado el Y2K (errores en gráficos por el cambio de año, específicamente por el conteo de semanas)
+- Corrección de resolución de gráficos en pantallas de densidad estándar (las típicas de resolución 1080p)
+
+**31 de diciembre 2024:**
+- Nuevas fuentes de datos
+
+**19 de diciembre:
+- Procesamiento de datos con modelos de inteligencia artificial (LLM)
+
+
+----
+
 ## Licencia
 Este código se rige por la licencia **GNU General Public License**, una licencia de código abierto, por lo que puedes usar el código libremente y modificarlo, pero debes compartir tus modificaciones bajo la misma licencia. Esto permite a los usuarios usar y modificar el software, garantizando que el código resultante seguirá siendo libre (copyleft) al imponer que subsecuentes usos o modificaciones del código deban tamnbién ser compartidas de forma abierta. Por favor, citar este repositorio, y su autor, Bastián Olea Herrera.
 

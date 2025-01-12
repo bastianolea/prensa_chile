@@ -13,8 +13,7 @@ source("funciones.R")
 plan(multisession, workers = 7)
 
 # configurar LLM
-llm_use("ollama", "llama3.1:8b", 
-        .cache = "", temperature = 0)
+llm_use("ollama", "llama3.1:8b", .cache = "", temperature = 0)
 
 # cargar datos ----
 if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
@@ -27,7 +26,6 @@ muestra = 3000 # definir cantidad de noticias a procesar
 
 # estimar tiempo
 message(paste("tiempo aproximado de procesamiento:", round((muestra * 5.2)/60/60, 1), "horas"))
-
 
 # datos_muestra <- datos_prensa |> 
 #   filter(año >= 2024) |> 
@@ -60,7 +58,7 @@ datos_limpios <- future_map(datos_muestra_split,
                                 select(id, titulo, bajada, cuerpo) |> 
                                 mutate(texto = paste(bajada, cuerpo),
                                        texto = textclean::strip(texto, digit.remove = FALSE, char.keep = c(".", ",")),
-                                       texto = str_trunc(texto, 6000, side = "center")) |> 
+                                       texto = str_trunc(texto, 7000, side = "center")) |> 
                                 mutate(n_palabras = str_count(texto, "\\w+"))
                             })
 
@@ -112,7 +110,7 @@ clasificacion <- map(datos_limpios_split,
                          return(resultado)
                        },
                        error = function(e) {
-                         cli::cli_alert_danger("error:", e)
+                         warning(paste("error:", e))
                          return(NULL)
                        })
                      }); beep()
