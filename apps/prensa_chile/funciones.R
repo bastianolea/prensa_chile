@@ -52,3 +52,17 @@ recodificar_fuentes <- function(data) {
                                "quintopoder" ~ "El Quinto Poder",
                                .default = fuente))
 }
+
+
+sentimiento_calcular <- function(data) {
+  data |> 
+    summarize(n = n(),
+              n_positivo = sum(sentimiento == 1, na.rm = T),
+              # n_neutral = sum(sentimiento == 0, na.rm = T),
+              n_negativo = sum(sentimiento == -1, na.rm = T),
+              sentimiento = mean(sentimiento, na.rm = T),
+              fecha = min(fecha), 
+              .groups = "drop") |> 
+    mutate(p_negativas = n_negativo/n,
+           p_positivas = n_positivo/n)
+}

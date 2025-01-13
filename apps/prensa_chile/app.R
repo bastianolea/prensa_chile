@@ -4,6 +4,7 @@ library(dplyr) |> suppressPackageStartupMessages()
 library(arrow) |> suppressPackageStartupMessages()
 
 library(ggplot2)
+library(scales)
 library(forcats)
 library(stringr)
 library(lubridate) |> suppressPackageStartupMessages()
@@ -13,6 +14,7 @@ library(bslib) |> suppressPackageStartupMessages()
 library(htmltools)
 library(shinyjs) |> suppressPackageStartupMessages()
 library(thematic)
+library(shinyWidgets)
 library(shinycssloaders)
 library(sysfonts)
 library(showtext)
@@ -56,14 +58,13 @@ options(shiny.useragg = TRUE)
 resolucion = 110
 
 
-
-
 # cargar datos ----
 # setwd("apps/prensa_semanal")
 palabras_semana <- read_parquet("palabras_semana.parquet")
 palabras_semana_fuente <- read_parquet("palabras_semana_fuente.parquet")
 correlacion <- read_parquet("prensa_correlacion.parquet")
 correlacion_fuente <- read_parquet("prensa_correlacion_fuente.parquet")
+sentimiento <- read_parquet("prensa_sentimiento.parquet")
 
 n_noticias <- readLines("prensa_n_noticias.txt") |> as.numeric() |> format(big.mark = ".", decimal.mark = ",")
 n_palabras <- readLines("prensa_n_palabras.txt") |> as.numeric()
@@ -85,6 +86,9 @@ palabras_posibles <- palabras_semana |>
   pull(palabra)
 
 fuentes <- palabras_semana_fuente$fuente |> unique() |> sort()
+
+topicos <- sentimiento$clasificacion |> unique() |> na.exclude()
+
 
 
 # ui ----
@@ -131,39 +135,41 @@ ui <- page_fluid(
   tags$style(
     HTML(".selectize-input.items.not-full { color: red !important;}")),
   
+  # color del texto placeholder de pickerInput
+  tags$style(
+    HTML(".dropdown-toggle.bs-placeholder {
+    color: unset !important;}")),
   
   # —----
   
   # header ----
-  fluidRow(
-    column(12,
-           
-           div(style = css(margin_top = "12px", margin_bottom = "12px"),
-               h1("Análisis de prensa en Chile",
-                  style = css(font_style = "italic")),
-               
-               div(style = css("color!" = color_detalle,
-                               opacity = "60%",
-                               font_size = "80%",
-                               text_decoration = "none"),
-                   
-                   em(tags$a("Bastián Olea Herrera", href = "https://bastianolea.rbind.io"),
-                   ),
-                   br(),
-                   
-                   em("Última actualización de datos:", textOutput("ultimos_datos_fecha", inline = TRUE)
-                   )
-               )
-           ),
-           
-           
-           markdown(
-             paste0("Proyecto de _análisis de texto_ de noticias publicadas por medios de comunicación digitales de Chile. Actualmente, el material obtenido supera las **", n_noticias, " noticias** individuales, 
+  div(style = css(margin_top = "12px", margin_bottom = "12px"),
+      h1("Análisis de prensa en Chile",
+         style = css(font_style = "italic")),
+      
+      div(style = css("color!" = color_detalle,
+                      opacity = "60%",
+                      font_size = "80%",
+                      text_decoration = "none"),
+          
+          em(tags$a("Bastián Olea Herrera", href = "https://bastianolea.rbind.io"),
+          ),
+          br(),
+          
+          em("Última actualización de datos:", textOutput("ultimos_datos_fecha", inline = TRUE)
+          )
+      )
+  ),
+  
+  
+  # texto introducción
+  div(
+    markdown(
+      paste0("Proyecto de _análisis de texto_ de noticias publicadas por medios de comunicación digitales de Chile. Actualmente, el material obtenido supera las **", n_noticias, " noticias** individuales, 
                     las cuales suman un total de **", n_palabras/1000000, " millones de palabras**, abarcando más de 20 fuentes periodísticas distintas.")),
-           markdown("Un sistema automatizado obtiene y procesa grandes cantidades de datos de noticias diariamente, creando una base de datos de noticias con su texto (título, cuerpo, bajada) y metadatos (fecha, fuente, dirección web). A partir de esta información es posible realizar distintos análisis sobre el texto. Este visualizador permite describir _sobre qué_ hablan las noticias en determinadas fechas, en intervalos de semanas, y fuentes periodísticas."),
-           markdown("Para más información técnica sobre este proyecto, [visite el repositorio](https://github.com/bastianolea/prensa_chile)."),
-           hr()
-    )
+    markdown("Un sistema automatizado obtiene y procesa grandes cantidades de datos de noticias diariamente, creando una base de datos de noticias con su texto (título, cuerpo, bajada) y metadatos (fecha, fuente, dirección web). A partir de esta información es posible realizar distintos análisis sobre el texto. Este visualizador permite describir _sobre qué_ hablan las noticias en determinadas fechas, en intervalos de semanas, y fuentes periodísticas."),
+    markdown("Para más información técnica sobre este proyecto, [visite el repositorio](https://github.com/bastianolea/prensa_chile)."),
+    hr()
   ),
   
   
@@ -384,7 +390,7 @@ ui <- page_fluid(
   fluidRow(
     column(12,
            div(style = css(overflow_x = "scroll"),
-               div(style = css(min_width = "600px"),
+               div(style = css(min_width = "900px"),
                    plotOutput("g_semana_fuente", height = "640px", width = "100%") |> withSpinner()
                ))
     )
@@ -458,7 +464,7 @@ ui <- page_fluid(
   fluidRow(
     column(12,
            div(style = css(overflow_x = "scroll"),
-               div(style = css(min_width = "600px"),
+               div(style = css(min_width = "900px"),
                    plotOutput("g_semana_fuente_palabra", height = "480px", width = "100%") |> withSpinner()
                ))
     )
@@ -568,8 +574,71 @@ ui <- page_fluid(
     )
   ),
   
+  hr(),
   
   
+  # sentimiento ----
+  div(
+    h3("Análisis de sentimiento"),
+    
+    markdown("Para esta visualización, se utilizó un [modelo extenso de lenguaje (LLM) de inteligencia artificial](https://bastianolea.rbind.io/blog/analisis_sentimiento_llm/) para procesar el contenido de cada noticia, y en base a su texto, asignarle un sentimiento y un tema. 
+             Por _sentimiento_ nos referimos a si el contenido semántico del texto describe un suceso positivo, neutro o negativo; por ejemplo, una noticia sobre un suceso trágico será negativa. Por _tema_ nos referimos a la clasificación de los textos noticiosos en distintas categorías temáticas o tópicos, como pueden ser noticias sobre política, economía, policial, etc."),
+    
+    layout_columns(col_widths = c(4, 4, 4),
+                   div(
+                     pickerInput("sentimiento_tema",
+                                 "Seleccionar temas",
+                                 choices = c("Todos", topicos),
+                                 selected = "Todos",
+                                 multiple = FALSE,
+                                 width = "100%",
+                                 options = pickerOptions(maxOptions = 1,
+                                                         maxOptionsText = "Máximo 1",
+                                                         noneSelectedText = "Todos")
+                     ),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("Visualice noticias sin distinguir entre sus temáticas, o seleccione temáticas para filtrar los resultados sólo considerando noticias clasificadas en temas específicos.")
+                     )
+                   ),
+                   div(
+                     pickerInput("sentimiento_fuente",
+                                 "Seleccionar medios",
+                                 choices = c(fuentes),
+                                 selected = NULL,
+                                 multiple = TRUE,
+                                 width = "100%",
+                                 options = pickerOptions(maxOptions = 3,
+                                                         maxOptionsText = "Máximo 3",
+                                                         noneSelectedText = "Todos")
+                     ),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("Visualice todas las noticias, o seleccione algunos medios de comunicación para filtrar y separar la visualización. Des-seleccione los medios para volver a ver los resultados de todas las noticias.")
+                     )
+                   ),
+                   div(
+                     sliderInput("sentimiento_semanas",
+                                 "Rango de semanas",
+                                 min = 4*1, max = 4*4,
+                                 value = 4*2,
+                                 width = "100%"),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("Rango de tiempo que abarcará la visualización.")
+                     )
+                   )
+    ),
+    
+    # gráfico
+    div(
+      div(style = css(overflow_x = "scroll"),
+          div(style = css(min_width = "600px"),
+              plotOutput("g_sentimiento", height = "480px", width = "100%") |> withSpinner()
+          ))
+    ),
+    # disclaimer ia
+    div(style = css(font_size = "70%", margin_top = "6px"),
+        markdown("_Recordar que los modelos de inteligencia artificial pueden cometer errores y clasificar textos de forma incorrecta. Si en este procesamiento de datos no han supervisado, las pruebas manuales que hemos realizado indican que los resultados suelen ser altamente certeros, pero ciertas noticias complejas o ambiguas pueden confundir al modelo._")
+    )
+  ),
   
   
   
@@ -776,7 +845,7 @@ server <- function(input, output, session) {
   datos_semana_fuente_2 <- reactive({
     # retorna vector con numero de las semanas a mostrar
     # .semanas = (week(today())-(input$semanas_fuentes-1)):week(today())
-
+    
     # browser()
     # # bug: no puede filtrar por semanas de distintos años, porque nada indica el año
     # # entonces sería como desde semana 50 a semana 1
@@ -946,6 +1015,19 @@ server <- function(input, output, session) {
   })
   
   
+  ## sentimiento ----
+  sentimiento_semanas <- reactive({
+    semanas_atras = weeks(input$sentimiento_semanas)
+    fecha_min = today() - semanas_atras
+    fecha_max = today()
+    
+    sentimiento |> 
+      filter(fecha >= fecha_min,
+             fecha <= fecha_max) |> 
+      recodificar_fuentes()
+  })
+  
+  
   # —----
   # gráficos ----
   # la idea es que los datos pasen ya procesados acá y esta sección sólo se enfoque en las visualizaciones
@@ -1026,7 +1108,7 @@ server <- function(input, output, session) {
     if (input$palabras_semanas_tipo == "Porcentaje") {
       plot <- plot +
         scale_y_continuous(expand = expansion(c(.espaciado_y*0.7, .espaciado_y)),
-                           labels = scales::label_percent()) +
+                           labels = label_percent()) +
         labs(y = "porcentaje de palabras más frecuentes por semana")
     }
     
@@ -1245,8 +1327,8 @@ server <- function(input, output, session) {
   output$g_cor_total <- renderPlot({
     
     dato <- cor_total_dato_2() |> 
-      mutate(tamaño = scales::rescale(correlacion, to = c(1.2, 2), 
-                                      from = range(min(correlacion), .7)),
+      mutate(tamaño = rescale(correlacion, to = c(1.2, 2), 
+                              from = range(min(correlacion), .7)),
              tamaño = ifelse(tamaño > 2, 2, tamaño) # from = range(correlacion, na.rm = TRUE, finite = TRUE))
       ) |> 
       mutate(orden = dense_rank(desc(correlacion))) |>
@@ -1284,8 +1366,8 @@ server <- function(input, output, session) {
     message("gráfico correlación fuentes")
     
     dato <- cor_fuente_dato_3() |> 
-      mutate(tamaño = scales::rescale(correlacion, to = c(1.2, 2), 
-                                      from = range(min(correlacion), .7)),
+      mutate(tamaño = rescale(correlacion, to = c(1.2, 2), 
+                              from = range(min(correlacion), .7)),
              tamaño = ifelse(tamaño > 2, 2, tamaño) # from = range(correlacion, na.rm = TRUE, finite = TRUE))
       ) |> 
       group_by(fuente) |> 
@@ -1329,6 +1411,148 @@ server <- function(input, output, session) {
     # height = reactive(60 + (input$cor_fuente_fuente_n*150))
   })
   
+  
+  
+  # sentimiento ----
+  output$g_sentimiento <- renderPlot({
+    # browser()
+    
+    sentimiento <- sentimiento_semanas()
+    
+    if (is.null(input$sentimiento_fuente) & input$sentimiento_tema == "Todos") {
+      # sin fuente ni tema
+      
+      sentimiento_2 <- sentimiento |>
+        group_by(semana, fecha) |>
+        sentimiento_calcular()
+      
+    } else if (!is.null(input$sentimiento_fuente) & input$sentimiento_tema == "Todos") {
+      # sólo fuente
+      # browser()
+      sentimiento_2 <- sentimiento |>
+        filter(fuente %in% input$sentimiento_fuente) |> 
+        group_by(fuente, semana, fecha) |>
+        sentimiento_calcular()
+      
+      faceta <- facet_wrap(~fuente)
+      
+    } else if (is.null(input$sentimiento_fuente) & input$sentimiento_tema != "Todos") {
+      # sólo tema
+      
+      sentimiento_2 <- sentimiento |>
+        filter(clasificacion == input$sentimiento_tema) |>
+        group_by(clasificacion, semana, fecha) |>
+        sentimiento_calcular()
+      
+      faceta <- facet_wrap(vars(clasificacion))
+      
+    } else if (!is.null(input$sentimiento_fuente) & input$sentimiento_tema != "Todos") {
+      # fuente y tema
+      
+      sentimiento_2 <- sentimiento |>
+        filter(clasificacion %in% input$sentimiento_tema) |>
+        filter(fuente %in% input$sentimiento_fuente) |> 
+        group_by(fuente, clasificacion, semana, fecha) |>
+        sentimiento_calcular()
+      
+      faceta <- facet_wrap(vars(fuente))
+    }
+    
+    # browser()
+    
+    sentimiento_3 <- sentimiento_2 |>
+      mutate(tipo = ifelse(sentimiento > 0, "Mayormente\npositivo", "Mayormente\nnegativo")) |> 
+      mutate(tipo_texto = ifelse(sentimiento > 0, "% de noticias\npositivas", "% de noticias\nnegativas"))
+    
+    
+    # fechas
+    # browser()
+    if (input$sentimiento_semanas <= 8) {
+      sentimiento_4 <- sentimiento_3 |> 
+        group_by(semana) |> 
+        mutate(fecha_etiqueta = redactar_fecha(min(fecha))) |> 
+        ungroup() |> 
+        mutate(fecha_etiqueta = fct_reorder(fecha_etiqueta, fecha))
+    } else {
+      sentimiento_4 <- sentimiento_3 |> 
+        mutate(fecha_etiqueta = fecha)
+    }
+    
+    # ancho texto
+    if (input$sentimiento_semanas > 10 | !is.null(input$sentimiento_fuente)) {
+      ancho_texto = 2.2
+    } else {
+      ancho_texto = 3
+    }
+    
+    # browser()
+    # gráfico
+    plot <- sentimiento_4 |> 
+      ggplot() +
+      aes(fecha_etiqueta, sentimiento, fill = tipo) +
+      geom_col(color = color_fondo, linewidth = 0.6) +
+      geom_text(aes(color = tipo_texto,
+                    label = ifelse(sentimiento <= 0, percent(p_negativas, 1), "")), 
+                vjust = 1, size = ancho_texto, nudge_y = -0.04) +
+      geom_text(aes(color = tipo_texto,
+                    label = ifelse(sentimiento > 0, percent(p_positivas, 1), "")), 
+                vjust = 0, size = ancho_texto, nudge_y = 0.04,
+                show.legend = F) +
+      scale_y_continuous(limits = c(-1.1, 1.1),
+                         # expand = expansion(c(0.1, 0.1)),
+                         breaks = c(1, 0, -1),
+                         # labels = label_percent(accuracy = 1)
+                         labels = c("Positivo", "Neutro", "Negativo")
+      ) +
+      scale_fill_manual(values = c("Mayormente\npositivo" = "#B0987E", 
+                                   "Mayormente\nnegativo" = color_destacado)) +
+      scale_color_manual(values = c("% de noticias\npositivas" = "#B0987E", 
+                                    "% de noticias\nnegativas" = color_destacado)) +
+      coord_cartesian(clip = "off") +
+      guides(fill = guide_legend(reverse = TRUE, title = NULL, direction = "vertical",
+                                 override.aes = list(label = "")),
+             color = guide_legend(reverse = TRUE, title = NULL, direction = "vertical",
+                                  override.aes = list(label = "%", vjust = .5, size = 3.3)),
+             ) +
+      labs(y = "sentimiento promedio de noticias semanales",
+           x = NULL) +
+      theme(legend.key.spacing.y = unit(2, "mm"))
+    
+    # si el gráfico tiene faceta
+    if (!is.null(input$sentimiento_fuente) | input$sentimiento_tema != "Todos") {
+      plot <- plot + faceta +
+        guides(fill = guide_legend(position = "top", reverse = TRUE, direction = "horizontal", title = NULL,
+                                   override.aes = list(label = "")),
+               color = guide_legend(position = "top", reverse = TRUE, direction = "horizontal", title = NULL,
+                                    override.aes = list(label = "%", vjust = .5, size = 3.3)))
+    }
+    
+    # si el gráfico tiene faceta y muchas semanas
+    # if (!is.null(input$sentimiento_fuente) | input$sentimiento_tema != "Todos") {
+    #   if (input$sentimiento_semana > 6) {
+    #     plot <- plot +
+    #       
+    #   }
+    # }
+    
+    # si se cambia el eje x porque tiene muchas semanas
+    if (input$sentimiento_semanas > 8) {
+      plot <- plot +
+        scale_x_date(date_labels = "%d/%m/%y")
+    } else {
+      plot <- plot +
+      theme(axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1, angle = 40))
+    }
+    
+    # tema
+    plot <- plot +
+      theme(axis.ticks.x = element_blank(),
+            axis.text.y = element_text(family = "Lato", size = .texto_ejes, angle = 90, hjust = .5),
+            axis.title.y = element_text(family = "Libre Baskerville", face = "italic")
+      )
+    
+    return(plot)
+  }, res = resolucion)
 }
 
 # Run the application 
