@@ -102,9 +102,11 @@ resultados_elsiglo <- map(enlaces_elsiglo, \(enlace) {
 
 # guardar ----
 # crea una carpeta para guardar los resultados y los guarda con la fecha de hoy
-dir.create("resultados/elsiglo/", showWarnings = F)
+# dir.create("resultados/elsiglo/", showWarnings = F)
 
 readr::write_rds(resultados_elsiglo, 
-                 glue("resultados/elsiglo/elsiglo_cron_{rng()}_{today()}.rds"))
+                 # glue("resultados/elsiglo/elsiglo_cron_{rng()}_{today()}.rds")
+                 ruta_resultado("elsiglo", hist)
+                 )
 
 message(glue("listo cron elsiglo {now()}"))

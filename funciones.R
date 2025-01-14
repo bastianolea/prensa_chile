@@ -15,11 +15,12 @@ ejecutar <- function(script = "modulos/cron_elsiglo.r",
 }
 
 
-scraping_prensa <- function(script = "modulos/cron_radiopaulina.r") {
+scraping_prensa <- function(script = "cron_radiopaulina.r",
+                            ruta = "scraping/fuentes/") {
   message(glue::glue("iniciando {script} - {format(now(), '%d/%m/%y %H:%M:%S')}"))
   
   ### en subproceso (sesión) interactivo (RStudio Background Job, compatible con cualquier sistema operativo)
-  rstudioapi::jobRunScript(script, workingDir = getwd())
+  rstudioapi::jobRunScript(paste0(ruta, script), workingDir = getwd())
   
   ###
   # # en subproceso (callr) no interactivo
@@ -343,22 +344,22 @@ rng <- function() {
 
 
 ruta_resultado <- function(fuente = "latercera", hist = "", formato = "rds") {
-  glue::glue("resultados/{fuente}/{fuente}_cron_{rng()}_{lubridate::today()}{hist}.{formato}")
+  glue::glue("scraping/datos/{fuente}/{fuente}_cron_{rng()}_{lubridate::today()}{hist}.{formato}")
 }
 
 
 modulos_n <- function() {
-  fs::dir_ls("resultados") |> length()
+  fs::dir_ls("scraping/datos") |> length()
 }
 
 sin_cambios_hoy <- function() {
-  directorios <- fs::dir_info("resultados") |> 
+  directorios <- fs::dir_info("scraping/datos") |> 
     arrange(desc(modification_time))
   
   # directorios sin cambios hoy
   sin_cambios <- directorios |> 
     filter(modification_time < lubridate::today()) |> 
-    mutate(fuente = stringr::str_extract(path, "resultados/\\w+") |> stringr::str_remove("resultados/")) |> 
+    mutate(fuente = stringr::str_extract(path, "scraping/datos/\\w+") |> stringr::str_remove("scraping/datos/")) |> 
     select(fuente, size, modification_time)
   
   return(sin_cambios)

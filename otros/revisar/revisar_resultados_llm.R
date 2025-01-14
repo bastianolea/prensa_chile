@@ -13,10 +13,36 @@ clasificacion <- read_parquet("datos/prensa_llm_clasificar.parquet")
 resumen <- read_parquet("datos/prensa_llm_resumen.parquet")
 
 
+# estado ca
+
 # unir resultados llm
 datos <- bind_rows(sentimiento |> mutate(tipo = "sentimiento", orden = row_number()),
                    clasificacion |> mutate(tipo = "clasificacion", orden = row_number()),
                    resumen |> mutate(tipo = "resumen", orden = row_number()))
+
+
+# estado cálculos
+datos_muestra <- datos_prensa |>
+  filter(año >= 2024) |>
+  filter(fecha > (today() - weeks(12)))
+
+estado <- datos_muestra |> 
+  mutate(calculado = ifelse(id %in% anterior$id, "calculado", "calcular")) |> 
+  count(fuente, calculado)
+
+estado_2 <- estado |> 
+  mutate(total = sum(n), .by = fuente) |> 
+  tidyr::pivot_wider(names_from = calculado, values_from = n) |> 
+  mutate(p = calcular/total) |> 
+  print(n=Inf)
+
+estado_2 |> 
+  filter(p > 0.5) |> 
+  pull(fuente)
+
+
+-# —----
+
 
 
 datos_2 <- datos |>

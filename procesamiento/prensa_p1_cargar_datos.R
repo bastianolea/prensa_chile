@@ -22,26 +22,19 @@ plan(multisession, workers = 7)
 
 
 # datos ----
-carpetas_modulos <- dir_ls("resultados")
+carpetas_modulos <- dir_ls("scraping/datos")
 archivos_modulos <- map(carpetas_modulos, ~dir_ls(.x, regexp = ".rds"))
 
-# archivos_modulos <- list(archivos_modulos[[11]], 
-#                          archivos_modulos[[25]])
-# archivos_modulos <- archivos_modulos[[3]]
 
 # carga ----
 # cargar resultados de módulos 
 modulos_cargados <- future_map(archivos_modulos, \(archivo_modulo) {
-  # archivo_modulo <- archivos_modulos[[3]]
-  # archivo_modulo <- archivos_modulos[["resultados/emol"]]
-  # archivo_modulo <- "resultados/agricultura/agricultura_cron_6913_2024-12-30.rds"
   
   # cargar todos los archivos de la carpeta del módulo
   resultados_modulo <- map(unlist(archivo_modulo), read_rds)
   
   # por cada pieza de datos del módulo, convertir a dataframe si es necesario
   modulo_cargado <- map(resultados_modulo, \(resultado_modulo) {
-    # resultado_modulo <- resultados_modulo[[3]]
     
     # revisar si datos son válidos
     if ("list" %in% class(resultado_modulo)) {
@@ -78,8 +71,6 @@ modulos_cargados <- future_map(archivos_modulos, \(archivo_modulo) {
 
 # separar fuentes con muchos datos en partes mas pequeñas para luego procesarlas
 modulos_cargados <- map(modulos_cargados, \(modulo) {
-  # modulo <- modulos_cargados[[2]]
-  # map(modulos_cargados, nrow)
 
   filas <- nrow(modulo)
   grupos <- filas %/% 20000 # un grupo cada 10000 observaciones
@@ -119,7 +110,6 @@ modulos_limpios <- future_map(modulos_cargados, \(modulo) {
   # que tengan todas las columnas necesarias
   if (!"bajada" %in% names(datos_2)) datos_2 <- datos_2 |> mutate(bajada = NA_character_)
   if (!"fecha_scraping" %in% names(datos_2)) datos_2 <- datos_2 |> mutate(fecha_scraping = NA_Date_)
-  # if (!"url" %in% names(datos_2)) 
   
   ## eliminar textos ----
   datos_4 <- datos_2 |> 
@@ -142,14 +132,8 @@ modulos_limpios <- future_map(modulos_cargados, \(modulo) {
 })
 
 
-
 # fechas ----
 modulos_limpios_fechas <- future_map(modulos_limpios, \(modulo) {
-  
-  # modulo <- modulos_limpios[["resultados/agricultura/agricultura_cron_6913_2024-12-30.rds"]]
-  # names(modulos_limpios)
-  # modulo <- modulos_limpios[[28]]
-  
   if (is.null(modulo)) return(NULL)
   
   # instrucciones especiales para fuentes específicas
@@ -192,32 +176,15 @@ modulos_limpios_fechas <- future_map(modulos_limpios, \(modulo) {
     select(-fecha2, -fecha_original) |> 
     mutate(fecha_scraping = as_date(fecha_scraping))
   
-  resultado_4 <- resultado_3 |> 
-    arrange(desc(fecha))
-  
-  return(resultado_4)
+  return(resultado_3)
 })
-
-# resultado |> 
-#   filter(fecha < "2000-01-01")
-
-# plan(multisession)
-
 
 
 # unir ----
-
-# descomentar esto para usar paso intermedio que guarda resultados por piezas en el disco duro, para evitar que se caiga el proceso por falta de memoria
-# datos_prensa <- map(dir_ls("datos/preprocesados_datos"), read_rds) |> 
-#   list_rbind() |> 
-#   arrange(desc(fecha)) |> 
-#   distinct(url, .keep_all = TRUE)
-
-# segunda forma de hacerlo, directamente desde memoria
 datos_prensa <- modulos_limpios_fechas |> 
   list_rbind() |>
-  distinct(url, .keep_all = TRUE)
-
+  distinct(url, .keep_all = TRUE) |> 
+  arrange(desc(fecha))
 
 
 # revisar ----

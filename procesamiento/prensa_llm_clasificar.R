@@ -23,10 +23,10 @@ if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_d
 anterior <- read_parquet("datos/prensa_llm_clasificar.parquet")
 
 # extraer muestra
-muestra = 3000 # definir cantidad de noticias a procesar
+if (!exists("muestra_llm")) muestra_llm = 3000 # definir cantidad de noticias a procesar
 
 # estimar tiempo
-message(paste("tiempo aproximado de procesamiento:", round((muestra * 5.2)/60/60, 1), "horas"))
+message(paste("tiempo aproximado de procesamiento:", round((muestra_llm * 5.2)/60/60, 1), "horas"))
 
 # datos_muestra <- datos_prensa |> 
 #   filter(año >= 2024) |> 
@@ -36,9 +36,11 @@ message(paste("tiempo aproximado de procesamiento:", round((muestra * 5.2)/60/60
 
 # todas las noticias, partiendo por las más recientes
 datos_muestra <- datos_prensa |> 
-  # filter(año >= 2024) |> 
+  select(id, bajada, cuerpo) |> 
   filter(!id %in% anterior$id) |> 
-  slice(1:muestra)
+  slice(1:muestra_llm)
+
+rm(datos_prensa)
 
 
 # separar en piezas ----
@@ -56,7 +58,6 @@ datos_muestra_split <- datos_muestra |>
 datos_limpios <- future_map(datos_muestra_split, 
                             \(datos) {
                               datos |> 
-                                select(id, titulo, bajada, cuerpo) |> 
                                 mutate(texto = paste(bajada, cuerpo),
                                        texto = textclean::strip(texto, digit.remove = FALSE, char.keep = c(".", ",")),
                                        texto = str_trunc(texto, 7000, side = "center")) |> 

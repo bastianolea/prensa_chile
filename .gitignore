@@ -10,7 +10,6 @@
 datos/*
 !datos/prensa_datos_muestra.csv
 !datos/stopwords_es.txt
-resultados/*
-modulos/*
-!modulos/cron_ejemplo.R
-logs/*
+scraping/datos/*
+scraping/fuentes/*
+!scraping/fuentes/scraping_ejemplo.R

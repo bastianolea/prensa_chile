@@ -1,10 +1,20 @@
 # ejecutar todos los pasos de procesamiento, post scraping (prensa_obtener_datos.R)
+library(lubridate)
 
-fecha_limite = lubridate::floor_date(lubridate::today(), unit = "week", week_start = 7) # domingo que termina la semana, para prensa semanal
-  
+# setup ----
+# fecha límite para app de datos semanales
+fecha_limite = floor_date(today(), unit = "week", week_start = 7) # domingo que termina la semana, para prensa semanal
+
+# cantidad de textos a procesar con LLM
+muestra_llm = 100
+
+# memoria por thread
 options(future.globals.maxSize = 1.0 * 3e9)
 
-inicio <- Sys.time()
+inicio <- now()
+
+
+# procesamiento ----
 
 # unión de scraping en una sola base de datos
 # cargar datos scrapeados, los limpia y los guarda en una sola base, una noticia por fila
@@ -32,20 +42,24 @@ source("procesamiento/prensa_semanal_fuente.R", echo = T)
 source("procesamiento/prensa_correlacion.R", echo = T)
 # output: datos/prensa_correlacion.parquet, datos/prensa_correlacion_fuente.parquet
 
-# sentimiento de noticias usando modelos de lenguaje
-# source("procesamiento/prensa_llm_sentimiento.R", echo = T)
-# output: prensa_llm_sentimiento.parquet
+# # resumen de noticias usando modelos de lenguaje
+# source("procesamiento/prensa_llm_resumen.R", echo = T)
+# # output: prensa_llm_resumen.parquet
 
+# sentimiento de noticias usando modelos de lenguaje
+source("procesamiento/prensa_llm_sentimiento.R", echo = T)
+# output: prensa_llm_sentimiento.parquet
+# 
 # tópico de noticias usando modelos de lenguaje
-# source("procesamiento/prensa_llm_clasificar.R", echo = T)
+source("procesamiento/prensa_llm_clasificar.R", echo = T)
 # output: prensa_llm_clasificar.parquet
 
-# resumen de noticias usando modelos de lenguaje
-# source("procesamiento/prensa_llm_resumen.R", echo = T)
-# output: prensa_llm_resumen.parquet
+# datos para análisis de sentimiento
+source("procesamiento/prensa_semanal_sentimiento.R", echo = T)
 
 
-final <- Sys.time()
+# finalizar ----
+final <- now()
 
 tiempo = final - inicio
 print(round(tiempo, 1))

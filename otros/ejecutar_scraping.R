@@ -19,34 +19,34 @@ plan(multisession, workers = 8)
 notificacion("Scraping de prensa", "Iniciando scripts…")
 
 modulos <- c(
-  "modulos/cron_diariofinanciero.r",
-  "modulos/cron_eldesconcierto.r",
-  "modulos/cron_emol.r",
-  "modulos/cron_lacuarta.r",
-  "modulos/cron_latercera.r",
-  "modulos/cron_meganoticias.r",
-  "modulos/cron_eldinamo.r",
-  "modulos/cron_lanacion.r",
-  "modulos/cron_publimetro.r",
-  "modulos/cron_theclinic.r",
-  "modulos/cron_elciudadano.r",
-  "modulos/cron_radiouchile.r",
-  "modulos/cron_24horas.r",
-  "modulos/cron_cnnchile.r",
-  "modulos/cron_exante.r",
-  "modulos/cron_elsiglo.r",
-  "modulos/cron_ciper.r",
-  "modulos/cron_agricultura.r",
-  "modulos/cron_redgol.r",
-  "modulos/cron_quintopoder.r",
-  "modulos/cron_cooperativa.r",
-  "modulos/cron_elmostrador.r",
-  "modulos/cron_chvnoticias.r",
-  "modulos/cron_t13.r",
-  "modulos/cron_biobio.r",
-  "modulos/cron_lahora.r",
-  "modulos/cron_adnradio.r",
-  "modulos/cron_lasegunda.r"
+  "scraping/fuentes/scraping_diariofinanciero.r",
+  "scraping/fuentes/scraping_eldesconcierto.r",
+  "scraping/fuentes/scraping_emol.r",
+  "scraping/fuentes/scraping_lacuarta.r",
+  "scraping/fuentes/scraping_latercera.r",
+  "scraping/fuentes/scraping_meganoticias.r",
+  "scraping/fuentes/scraping_eldinamo.r",
+  "scraping/fuentes/scraping_lanacion.r",
+  "scraping/fuentes/scraping_publimetro.r",
+  "scraping/fuentes/scraping_theclinic.r",
+  "scraping/fuentes/scraping_elciudadano.r",
+  "scraping/fuentes/scraping_radiouchile.r",
+  "scraping/fuentes/scraping_24horas.r",
+  "scraping/fuentes/scraping_cnnchile.r",
+  "scraping/fuentes/scraping_exante.r",
+  "scraping/fuentes/scraping_elsiglo.r",
+  "scraping/fuentes/scraping_ciper.r",
+  "scraping/fuentes/scraping_agricultura.r",
+  "scraping/fuentes/scraping_redgol.r",
+  "scraping/fuentes/scraping_quintopoder.r",
+  "scraping/fuentes/scraping_cooperativa.r",
+  "scraping/fuentes/scraping_elmostrador.r",
+  "scraping/fuentes/scraping_chvnoticias.r",
+  "scraping/fuentes/scraping_t13.r",
+  "scraping/fuentes/scraping_biobio.r",
+  "scraping/fuentes/scraping_lahora.r",
+  "scraping/fuentes/scraping_adnradio.r",
+  "scraping/fuentes/scraping_lasegunda.r"
   )
 
 modulos <- paste0("/Users/baolea/R/prensa/", modulos)
@@ -66,5 +66,5 @@ notificacion("Scraping de prensa", "Datos de noticias descargados")
 
 plan(multisession)
 
-source("revisar/revisar_scraping.R")
+source("otros/revisar/revisar_scraping.R")
 
