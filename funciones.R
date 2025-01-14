@@ -344,6 +344,7 @@ rng <- function() {
 
 
 ruta_resultado <- function(fuente = "latercera", hist = "", formato = "rds") {
+  if (class(hist)[1] == "function") hist <- ""
   glue::glue("scraping/datos/{fuente}/{fuente}_cron_{rng()}_{lubridate::today()}{hist}.{formato}")
 }
 

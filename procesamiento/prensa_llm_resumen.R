@@ -76,7 +76,7 @@ resumenes <- map(datos_limpios_split,
                    
                    tryCatch({
                      # detener operación externamente
-                     if (read.delim("stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
+                     if (read.delim("otros/stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
                      
                      # obtener sentimiento
                      resumen <- dato$texto |> llm_vec_summarize(max_words = 30, additional_prompt = "en español")

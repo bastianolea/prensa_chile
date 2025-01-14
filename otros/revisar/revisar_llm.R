@@ -15,7 +15,7 @@ resumen <- read_parquet("datos/prensa_llm_resumen.parquet")
 # unir
 datos <- bind_rows(sentimiento |> mutate(tipo = "sentimiento", orden = row_number()),
                    clasificacion |> mutate(tipo = "clasificacion", orden = row_number()),
-                   # resumen |> mutate(tipo = "resumen", orden = row_number())
+                   resumen |> mutate(tipo = "resumen", orden = row_number())
                    )
 
 # tiempo promedio
@@ -70,3 +70,16 @@ datos |>
 # ggsave(filename = "plot_c.png", width = 4, height = 2.5, scale = 1.8)
 
 
+Sys.setlocale("LC_TIME", "es_ES.UTF-8") # meses en español
+
+# por fecha de procesamiento
+datos |> 
+  filter(tipo != "resumen") |> 
+  ggplot() +
+  aes(tiempo_1, tiempo) +
+  geom_jitter(size = 0.2, alpha = .1, height = .7) +
+  geom_smooth(method = "lm", se = F, color = "purple2") +
+  facet_wrap(~tipo, scales = "free_x", ncol = 1) +
+  coord_cartesian(ylim = c(0, 15),
+                  expand = F) +
+  labs(subtitle = "por fecha de ejecución y tiempo de ejecución")

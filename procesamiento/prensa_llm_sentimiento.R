@@ -14,6 +14,7 @@ plan(multisession, workers = 7)
 
 # configurar LLM
 llm_use("ollama", "llama3.1:8b", .cache = "", temperature = 0)
+# llm_use("ollama", "llama3.2:3b", .cache = "", temperature = 0)
 # llm_use("ollama", "qwen2.5:14b", .cache = "", temperature = 0)
 
 # cargar datos ----
@@ -85,7 +86,7 @@ sentimientos <- map(datos_limpios_split,
                       
                       tryCatch({
                         # detener operación
-                        if (read.delim("stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
+                        if (read.delim("otros/stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
                         
                         # obtener sentimiento
                         sentimiento <- dato$texto |> llm_vec_sentiment(options = c("positivo", "neutral", "negativo"))
@@ -119,7 +120,7 @@ sentimientos <- map(datos_limpios_split,
 sentimientos |> 
   list_rbind() |> 
   summarize(tiempo_total = sum(tiempo),
-            tiempo_promeido = mean(tiempo),
+            tiempo_promedio = mean(tiempo),
             n_noticias = n()) |> glimpse()
 
 

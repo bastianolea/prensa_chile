@@ -14,6 +14,7 @@ plan(multisession, workers = 7)
 
 # configurar LLM
 llm_use("ollama", "llama3.1:8b", .cache = "", temperature = 0)
+# llm_use("ollama", "llama3.2:3b", .cache = "", temperature = 0)
 # llm_use("ollama", "qwen2.5:14b", .cache = "", temperature = 0)
 
 # cargar datos ----
@@ -88,7 +89,7 @@ clasificacion <- map(datos_limpios_split,
                        
                        tryCatch({
                          # detener operación externamente
-                         if (read.delim("stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
+                         if (read.delim("otros/stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
                          
                          # clasificar
                          clasificacion <- dato$texto |> llm_vec_classify(labels = categorias)

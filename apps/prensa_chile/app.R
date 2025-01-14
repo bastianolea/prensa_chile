@@ -50,7 +50,8 @@ sysfonts::font_add("Libre Baskerville",
 
 
 # configuraciones ----
-thematic_shiny(font = "Lato", accent = color_destacado)
+thematic_shiny(font = c("Lato", "Libre Baskerbille"), 
+               accent = color_destacado)
 options(spinner.type = 8, spinner.color = color_detalle)
 options(shiny.useragg = TRUE)
 # showtext::showtext_opts(dpi = 180) # esto junto al showtext_auto() echa a perder la resolución
@@ -59,22 +60,14 @@ resolucion = 110
 
 
 # cargar datos ----
-# setwd("apps/prensa_semanal")
 palabras_semana <- read_parquet("palabras_semana.parquet")
 palabras_semana_fuente <- read_parquet("palabras_semana_fuente.parquet")
 correlacion <- read_parquet("prensa_correlacion.parquet")
 correlacion_fuente <- read_parquet("prensa_correlacion_fuente.parquet")
-# sentimiento <- read_parquet("prensa_sentimiento.parquet")
+sentimiento <- read_parquet("prensa_sentimiento.parquet")
 
 n_noticias <- readLines("prensa_n_noticias.txt") |> as.numeric() |> format(big.mark = ".", decimal.mark = ",")
 n_palabras <- readLines("prensa_n_palabras.txt") |> as.numeric()
-
-
-# setwd("apps/prensa_semanal")
-# palabras_semana <- read_rds("palabras_semana.rds")
-# palabras_semana_fuente <- read_rds("palabras_semana_fuente.rds")
-# correlacion <- read_rds("prensa_correlacion.rds")
-# correlacion_fuente <- read_rds("prensa_correlacion_fuente.rds")
 
 
 # vectores ----
@@ -87,7 +80,7 @@ palabras_posibles <- palabras_semana |>
 
 fuentes <- palabras_semana_fuente$fuente |> unique() |> sort()
 
-# topicos <- sentimiento$clasificacion |> unique() |> na.exclude()
+topicos <- sentimiento$clasificacion |> unique() |> na.exclude()
 
 
 
@@ -574,70 +567,77 @@ ui <- page_fluid(
     )
   ),
   
-  # hr(),
-  # 
-  # # sentimiento ----
-  # div(
-  #   h3("Análisis de sentimiento"),
-  #   
-  #   markdown("Para esta visualización, se utilizó un [modelo extenso de lenguaje (LLM) de inteligencia artificial](https://bastianolea.rbind.io/blog/analisis_sentimiento_llm/) para procesar el contenido de cada noticia, y en base a su texto, asignarle un sentimiento y un tema. 
-  #            Por _sentimiento_ nos referimos a si el contenido semántico del texto describe un suceso positivo, neutro o negativo; por ejemplo, una noticia sobre un suceso trágico será negativa. Por _tema_ nos referimos a la clasificación de los textos noticiosos en distintas categorías temáticas o tópicos, como pueden ser noticias sobre política, economía, policial, etc."),
-  #   
-  #   layout_columns(col_widths = c(4, 4, 4),
-  #                  div(
-  #                    pickerInput("sentimiento_tema",
-  #                                "Seleccionar temas",
-  #                                choices = c("Todos", topicos),
-  #                                selected = "Todos",
-  #                                multiple = FALSE,
-  #                                width = "100%",
-  #                                options = pickerOptions(maxOptions = 1,
-  #                                                        maxOptionsText = "Máximo 1",
-  #                                                        noneSelectedText = "Todos")
-  #                    ),
-  #                    div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-  #                        em("Visualice noticias sin distinguir entre sus temáticas, o seleccione temáticas para filtrar los resultados sólo considerando noticias clasificadas en temas específicos.")
-  #                    )
-  #                  ),
-  #                  div(
-  #                    pickerInput("sentimiento_fuente",
-  #                                "Seleccionar medios",
-  #                                choices = c(fuentes),
-  #                                selected = NULL,
-  #                                multiple = TRUE,
-  #                                width = "100%",
-  #                                options = pickerOptions(maxOptions = 3,
-  #                                                        maxOptionsText = "Máximo 3",
-  #                                                        noneSelectedText = "Todos")
-  #                    ),
-  #                    div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-  #                        em("Visualice todas las noticias, o seleccione algunos medios de comunicación para filtrar y separar la visualización. Des-seleccione los medios para volver a ver los resultados de todas las noticias.")
-  #                    )
-  #                  ),
-  #                  div(
-  #                    sliderInput("sentimiento_semanas",
-  #                                "Rango de semanas",
-  #                                min = 4*1, max = 4*4,
-  #                                value = 4*2,
-  #                                width = "100%"),
-  #                    div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-  #                        em("Rango de tiempo que abarcará la visualización.")
-  #                    )
-  #                  )
-  #   ),
-  #   
-  #   # gráfico
-  #   div(
-  #     div(style = css(overflow_x = "scroll"),
-  #         div(style = css(min_width = "600px"),
-  #             plotOutput("g_sentimiento", height = "480px", width = "100%") |> withSpinner()
-  #         ))
-  #   ),
-  #   # disclaimer ia
-  #   div(style = css(font_size = "70%", margin_top = "6px"),
-  #       markdown("_Recordar que los modelos de inteligencia artificial pueden cometer errores y clasificar textos de forma incorrecta. Si en este procesamiento de datos no han supervisado, las pruebas manuales que hemos realizado indican que los resultados suelen ser altamente certeros, pero ciertas noticias complejas o ambiguas pueden confundir al modelo._")
-  #   )
-  # ),
+  hr(),
+
+  # sentimiento ----
+  div(
+    h3("Análisis de sentimiento"),
+
+    markdown("Para esta visualización, se utilizó un [modelo extenso de lenguaje (LLM) de inteligencia artificial](https://bastianolea.rbind.io/blog/analisis_sentimiento_llm/) para procesar el contenido de cada noticia, y en base a su texto, asignarle un sentimiento y un tema.
+             Por _sentimiento_ nos referimos a si el contenido semántico del texto describe un suceso positivo, neutro o negativo; por ejemplo, una noticia sobre un suceso trágico será negativa. Por _tema_ nos referimos a la clasificación de los textos noticiosos en distintas categorías temáticas o tópicos, como pueden ser noticias sobre política, economía, policial, etc."),
+
+    layout_columns(col_widths = c(4, 4, 4),
+                   div(
+                     pickerInput("sentimiento_tema",
+                                 "Seleccionar temas",
+                                 choices = c("Todos", topicos),
+                                 selected = "Todos",
+                                 multiple = FALSE,
+                                 width = "100%",
+                                 options = pickerOptions(maxOptions = 1,
+                                                         maxOptionsText = "Máximo 1",
+                                                         noneSelectedText = "Todos")
+                     ),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("Visualice noticias sin distinguir entre sus temáticas, o seleccione temáticas para filtrar los resultados sólo considerando noticias clasificadas en temas específicos.")
+                     )
+                   ),
+                   div(
+                     pickerInput("sentimiento_fuente",
+                                 "Seleccionar medios",
+                                 choices = c(fuentes),
+                                 selected = NULL,
+                                 multiple = TRUE,
+                                 width = "100%",
+                                 options = pickerOptions(maxOptions = 3,
+                                                         maxOptionsText = "Máximo 3",
+                                                         noneSelectedText = "Todos")
+                     ),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("Visualice todas las noticias, o seleccione algunos medios de comunicación para filtrar y separar la visualización. Des-seleccione los medios para volver a ver los resultados de todas las noticias.")
+                     )
+                   ),
+                   div(
+                     sliderInput("sentimiento_semanas",
+                                 "Rango de semanas",
+                                 min = 4*1, max = 4*4,
+                                 value = 4*2,
+                                 width = "100%"),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("Rango de tiempo que abarcará la visualización.")
+                     )
+                   )
+    ),
+
+    # interpretación
+    div(
+      markdown("Las barras indican el promedio de sentimiento semanal de las noticias: si se acerca a la parte superior significa que la mayoría de las noticias fueron positivas, y si se acerca a la inferior, que fueron negativas. Si la barra está cerca a la línea central, significa que las noticias fueron en promedio neutras (ni buenas ni malas), o bien, que hubo un balance entre noticias positivas y negativas.")
+      ),
+    
+    # gráfico
+    div(
+      div(style = css(overflow_x = "scroll"),
+          div(style = css(min_width = "600px"),
+              plotOutput("g_sentimiento", height = "480px", width = "100%") |> withSpinner()
+          ))
+    ),
+    
+    
+    # disclaimer ia
+    div(style = css(font_size = "70%", margin_top = "6px"),
+        markdown("_Recordar que los modelos de inteligencia artificial pueden cometer errores y clasificar textos de forma incorrecta. Si en este procesamiento de datos no han supervisado, las pruebas manuales que hemos realizado indican que los resultados suelen ser altamente certeros, pero ciertas noticias complejas o ambiguas pueden confundir al modelo._")
+    )
+  ),
   
   
   
@@ -1014,17 +1014,17 @@ server <- function(input, output, session) {
   })
   
   
-  # ## sentimiento ----
-  # sentimiento_semanas <- reactive({
-  #   semanas_atras = weeks(input$sentimiento_semanas)
-  #   fecha_min = today() - semanas_atras
-  #   fecha_max = today()
-  #   
-  #   sentimiento |> 
-  #     filter(fecha >= fecha_min,
-  #            fecha <= fecha_max) |> 
-  #     recodificar_fuentes()
-  # })
+  ## sentimiento ----
+  sentimiento_semanas <- reactive({
+    semanas_atras = weeks(input$sentimiento_semanas)
+    fecha_min = today() - semanas_atras
+    fecha_max = today()
+
+    sentimiento |>
+      filter(fecha >= fecha_min,
+             fecha <= fecha_max) |>
+      recodificar_fuentes()
+  })
   
   
   # —----
@@ -1497,6 +1497,7 @@ server <- function(input, output, session) {
                     label = ifelse(sentimiento > 0, percent(p_positivas, 1), "")), 
                 vjust = 0, size = ancho_texto, nudge_y = 0.04,
                 show.legend = F) +
+      geom_hline(yintercept = 0, linewidth = 0.7, color = color_texto) +
       scale_y_continuous(limits = c(-1.1, 1.1),
                          # expand = expansion(c(0.1, 0.1)),
                          breaks = c(1, 0, -1),

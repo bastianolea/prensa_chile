@@ -27,21 +27,24 @@ datos_muestra <- datos_prensa |>
   filter(fecha > (today() - weeks(12)))
 
 estado <- datos_muestra |> 
-  mutate(calculado = ifelse(id %in% anterior$id, "calculado", "calcular")) |> 
-  count(fuente, calculado)
+  mutate(calculado = ifelse(id %in% sentimiento$id, "calculado", "calcular")) |> 
+  count(fuente, calculado) |> 
+  group_by(fuente) |> 
+  mutate(p = n/sum(n))
+# 
+# estado_2 <- estado |> 
+#   mutate(total = sum(n), .by = fuente) |> 
+#   tidyr::pivot_wider(names_from = calculado, values_from = n) |> 
+#   mutate(p = calcular/total) |> 
+#   print(n=Inf)
 
-estado_2 <- estado |> 
-  mutate(total = sum(n), .by = fuente) |> 
-  tidyr::pivot_wider(names_from = calculado, values_from = n) |> 
-  mutate(p = calcular/total) |> 
+estado |> 
+  filter(calculado == "calculado") |> 
+  filter(p > 0.5) |> 
   print(n=Inf)
 
-estado_2 |> 
-  filter(p > 0.5) |> 
-  pull(fuente)
 
-
--# —----
+# —----
 
 
 
