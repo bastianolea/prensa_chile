@@ -10,7 +10,7 @@ Actualmente, el corpus de noticias obtenido supera las 800.000 noticias individu
 ## Datos
 Los datos obtenidos mediante este repositorio van sumando más de 800 mil noticias. Los datos, por su peso, no están disponibles de forma pública. Sin embargo, [puedes acceder a una muestra de 3.000 noticias del año 2024, seleccionadas al azar, en la carpeta datos de este repositorio.](https://github.com/bastianolea/prensa_chile/tree/main/datos) Esta seleccion de datos contiene texto de titulares, cuerpo de noticia, fuente y fecha.
 
-![](graficos/resultados/datos_prensa_scraping_2024-12-31.mov)
+![](otros/graficos/resultados/datos_prensa_scraping_2024-12-31.mov)
 
 
 ----
@@ -63,11 +63,14 @@ Luego del scraping se realiza el procesamiento de los datos. Todos los scripts d
 
 ----
 
-![](graficos/resultados/datos_prensa_scraping_2024-12-31.png)
+![](otros/graficos/resultados/datos_prensa_scraping_2024-12-31.png)
 
 ----
 
 ## Actualizaciones
+
+**15 de enero 2025:**
+- Nueva visualización de análisis de sentimiento de noticias, según clasificación y fuente, en base a procesamiento de datos usando [inteligencia artificial](https://bastianolea.rbind.io/blog/2025-01-14/).
 
 **11 de enero 2025:**
 - Solucionado el Y2K (errores en gráficos por el cambio de año, específicamente por el conteo de semanas)
@@ -76,7 +79,7 @@ Luego del scraping se realiza el procesamiento de los datos. Todos los scripts d
 **31 de diciembre 2024:**
 - Nuevas fuentes de datos
 
-**19 de diciembre:
+**19 de diciembre:**
 - Procesamiento de datos con modelos de inteligencia artificial (LLM)
 
 

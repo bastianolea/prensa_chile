@@ -94,9 +94,8 @@ clasificacion <- map(datos_limpios_split,
                          # clasificar
                          clasificacion <- dato$texto |> llm_vec_classify(labels = categorias)
                          
-                         # reintentar 1 vez
                          if (is.na(clasificacion)) {
-                           clasificacion <- dato$texto |> llm_vec_classify(labels = categorias)
+                           clasificacion <- dato$texto |> llm_vec_classify(labels = c(categorias, "otros"))
                          }
                          final <- now()
                          

@@ -5,7 +5,7 @@ library(ggplot2)
 # cargar datos ----
 # source("prensa_cargar_datos.R")
 
-if (!exists("datos_prensa")) datos_prensa <- arrow::read_feather("datos/prensa_datos.feather")
+if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
 
 # revisar
 cat("total de noticias únicas:", scales::comma(nrow(datos_prensa)))
