@@ -32,7 +32,6 @@ color_destacado = "#C7392B"
 
 
 # tipografías ----
-
 sysfonts::font_add("Lato",
                    regular = "www/fonts/lato-v24-latin-regular.ttf",
                    bold = "www/fonts/lato-v24-latin-900.ttf",
@@ -46,11 +45,18 @@ sysfonts::font_add("Libre Baskerville",
                    bolditalic = "www/fonts/libre-baskerville-v14-latin-italic.ttf",
 )
 
+# para gráficos
+tipografia <- list(sans = "Lato",
+                   # serif = "Libre Baskerville"
+                   # serif = "Libre Baskerville Italic" # no aparece en shinyapps
+                   serif = "Lato"
+)
+
 # showtext_auto() # esto echaba a perder la resolución
 
 
 # configuraciones ----
-thematic_shiny(font = c("Lato", "Libre Baskerbille"), 
+thematic_shiny(font = c("Lato", "Libre Baskerville"), 
                accent = color_destacado)
 options(spinner.type = 8, spinner.color = color_detalle)
 options(shiny.useragg = TRUE)
@@ -86,7 +92,7 @@ topicos <- sentimiento$clasificacion |> unique() |> na.exclude()
 
 # ui ----
 ui <- page_fluid(
-  title = "Prensa en Chile", 
+  title = "Análisis de Prensa en Chile", 
   lang = "es",
   
   # tipografías en html
@@ -96,6 +102,7 @@ ui <- page_fluid(
   # fresh::use_googlefont("Libre Baskerville"),
   # fresh::use_googlefont("Libre Baskerville Italic"),
   
+  # aplicar tipografías al texto del sitio
   tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "css/libre-baskerville.css")),
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "css/libre-baskerville.css"),
@@ -116,7 +123,7 @@ ui <- page_fluid(
     bg = color_fondo, fg = color_texto, primary = color_destacado, 
     # tipografías 
     base_font = "Lato",
-    # # heading_font = "Libre Baskerville"
+    heading_font = "Libre Baskerville"
   ),
   
   shinyjs::useShinyjs(),
@@ -643,7 +650,7 @@ ui <- page_fluid(
   
   # firma ----
   fluidRow(
-    column(12, style = css(padding = "28px", font_size = "70%", font_family = "Libre Baskerville"),
+    column(12, style = css(padding = "28px", font_size = "70%", font_family = tipografia$serif),
            hr(),
            
            markdown("Desarrollado por [Bastián Olea Herrera.](https://bastianolea.rbind.io) usando el lenguaje de programación R. Puedes [hacerme llegar](https://bastianolea.rbind.io/contact/) cualquier duda, consulta, sugerencia o comentario."),
@@ -1079,7 +1086,7 @@ server <- function(input, output, session) {
         aes(label = ifelse(inv, paste(palabra, "  "), paste("  ", palabra)),
             hjust = ifelse(inv, 1, 0),
             color = !!sym(variable), group = palabra),
-        family = "Lato",
+        family = tipografia$sans,
         bg.colour = color_fondo, bg.r = 0.3, angle = input$angulo, size = as.numeric(input$texto_tamaño), vjust = 0.3, 
         position = position_dodge(.dodge), check_overlap = T, show.legend = F) +
       # escalas
@@ -1093,9 +1100,9 @@ server <- function(input, output, session) {
       coord_cartesian(clip = "off") +
       theme(panel.grid.major.x = element_line(),
             axis.ticks.x = element_blank(),
-            axis.text.y = element_text(family = "Lato", size = .texto_ejes),
-            axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
-            axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1, angle = input$angulo),
+            axis.text.y = element_text(family = tipografia$sans, size = .texto_ejes),
+            axis.title.y = element_text(family = tipografia$serif, face = "italic"),
+            axis.text.x = element_text(family = tipografia$sans, size = .texto_ejes, hjust = 1, angle = input$angulo),
             # panel.background = element_rect(fill = color_destacado),
             plot.caption = element_text(color = color_detalle)) +
       labs(y = "frecuencia de palabras por semana",
@@ -1159,10 +1166,10 @@ server <- function(input, output, session) {
         geom_text(data = ~group_by(.x, palabra) |> slice_max(n),
                   aes(label = palabra,
                       y = n + (prom*0.25)),
-                  family = "Lato", size = 3) +
+                  family = tipografia$sans, size = 3) +
         ggrepel::geom_text_repel(data = ~filter(.x, semana == max(semana)),
                                  aes(label = palabra, color = palabra),
-                                 size = 3, family = "Lato",
+                                 size = 3, family = tipografia$sans,
                                  hjust = 0, 
                                  # xlim = c(0, ~pull(.x, fecha) |> max()),
                                  nudge_x = 0.3, segment.alpha = .3,
@@ -1188,14 +1195,14 @@ server <- function(input, output, session) {
         ),
         position = position_stack(),
         color = "white", angle = 90, 
-        family = "Lato",
+        family = tipografia$sans,
         hjust = 1,
         size = 3) +
         geom_text(data = ~filter(.x, rank == 1),
                   aes(label = ifelse(chico, as.character(palabra), ""),
                       y = n_semana + (prom*0.09),
                       color = palabra),
-                  family = "Lato",
+                  family = tipografia$sans,
                   vjust = 0, show.legend = F, check_overlap = T,
                   size = 2.8) +
         scale_fill_viridis_d(begin = .2, end = .7, direction = -1, option = "magma", aesthetics = c("color", "fill")) +
@@ -1209,13 +1216,13 @@ server <- function(input, output, session) {
       theme(legend.text = element_text(margin = margin(l = 2))) +
       theme(panel.grid.major.x = element_line(),
             axis.ticks.x = element_blank(),
-            axis.text.y = element_text(family = "Lato", size = .texto_ejes),
-            axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
-            axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1),
-            legend.title = element_text(family = "Libre Baskerville", face = "italic"),
-            legend.text =  element_text(family = "Lato"),
+            axis.text.y = element_text(family = tipografia$sans, size = .texto_ejes),
+            axis.title.y = element_text(family = tipografia$serif, face = "italic"),
+            axis.text.x = element_text(family = tipografia$sans, size = .texto_ejes, hjust = 1),
+            legend.title = element_text(family = tipografia$serif, face = "italic"),
+            legend.text =  element_text(family = tipografia$sans),
             plot.caption = element_text(color = color_detalle)) +
-      theme(axis.text.x = element_text(family = "Lato", angle = 40)) + #, hjust = 1, angle = 40))
+      theme(axis.text.x = element_text(family = tipografia$sans, angle = 40)) + #, hjust = 1, angle = 40))
       labs(color = "Palabras", y = "frecuencia de palabras", x = NULL
            # caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
       )
@@ -1257,15 +1264,15 @@ server <- function(input, output, session) {
       theme(panel.grid.major.x = element_line(),
             panel.grid.major.y = element_blank(),
             axis.ticks.y = element_blank(),
-            axis.text.y = element_text(family = "Lato", size = .texto_ejes),
-            axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
-            axis.title.x = element_text(family = "Libre Baskerville", face = "italic",
+            axis.text.y = element_text(family = tipografia$sans, size = .texto_ejes),
+            axis.title.y = element_text(family = tipografia$serif, face = "italic"),
+            axis.title.x = element_text(family = tipografia$serif, face = "italic",
                                         margin = margin(t = 6, b = -10)),
-            axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1, angle = 40),
-            legend.title = element_blank(), #element_text(family = "Libre Baskerville", face = "italic"),
-            legend.text =  element_text(family = "Lato"), 
+            axis.text.x = element_text(family = tipografia$sans, size = .texto_ejes, hjust = 1, angle = 40),
+            legend.title = element_blank(), #element_text(family = tipografia$serif, face = "italic"),
+            legend.text =  element_text(family = tipografia$sans), 
             plot.caption = element_text(color = color_detalle)) +
-      theme(strip.text = element_text(family = "Lato"))
+      theme(strip.text = element_text(family = tipografia$sans))
     
     return(plot)
   }, res = resolucion)
@@ -1308,14 +1315,14 @@ server <- function(input, output, session) {
       theme(panel.grid.major.x = element_line(),
             panel.grid.major.y = element_blank(),
             axis.ticks.y = element_blank(),
-            axis.text.y = element_text(family = "Lato", size = .texto_ejes),
-            axis.title.y = element_text(family = "Libre Baskerville", face = "italic"),
-            axis.title.x = element_text(family = "Libre Baskerville", face = "italic",
+            axis.text.y = element_text(family = tipografia$sans, size = .texto_ejes),
+            axis.title.y = element_text(family = tipografia$serif, face = "italic"),
+            axis.title.x = element_text(family = tipografia$serif, face = "italic",
                                         margin = margin(t=6)),
-            axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1, vjust = .5, angle = 90),
-            legend.title = element_text(family = "Libre Baskerville", face = "italic"),
+            axis.text.x = element_text(family = tipografia$sans, size = .texto_ejes, hjust = 1, vjust = .5, angle = 90),
+            legend.title = element_text(family = tipografia$serif, face = "italic"),
             plot.caption = element_text(color = color_detalle)) +
-      theme(strip.text = element_text(family = "Lato"))
+      theme(strip.text = element_text(family = tipografia$sans))
     
     return(plot)
   }, res = resolucion)
@@ -1341,12 +1348,12 @@ server <- function(input, output, session) {
       ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = 2), alpha = .2, linewidth = .1) +
       ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = tamaño), alpha = .9) +
       shadowtext::geom_shadowtext(aes(label = palabra2),
-                                  family = "Lato",
+                                  family = tipografia$sans,
                                   bg.colour = color_fondo, bg.r = 0.2, color = color_negro, size = 3.2) +
       geom_text(aes(label = round(correlacion, 3), y = -1.5), vjust = 1, size = 2.6, alpha = .5) +
       guides(color = guide_none(), fill = guide_none(), size = guide_none()) +
       theme(strip.background = element_blank(), strip.text = element_blank(),
-            axis.title.x = element_text(family = "Libre Baskerville", face = "italic", margin = margin(t = 8)),
+            axis.title.x = element_text(family = tipografia$serif, face = "italic", margin = margin(t = 8)),
             axis.ticks = element_blank(), axis.text = element_blank(),
             panel.grid = element_blank(), panel.background = element_blank()) +
       coord_equal(clip = "off") +
@@ -1381,14 +1388,14 @@ server <- function(input, output, session) {
       ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = 2), alpha = .2, linewidth = .1) +
       ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = tamaño), alpha = .9) +
       shadowtext::geom_shadowtext(aes(label = palabra2),
-                                  family = "Lato",
+                                  family = tipografia$sans,
                                   bg.colour = color_fondo, bg.r = 0.2, color = color_negro, size = 3.2) +
       geom_text(aes(label = round(correlacion, 3), y = -1.5), vjust = 1, size = 2.6, alpha = .5) +
       guides(color = guide_none(), fill = guide_none(), size = guide_none()) +
       theme(strip.background = element_blank(), strip.text = element_text(face = "bold", vjust = 1),
             strip.text.x = element_blank(),
             axis.ticks = element_blank(), axis.text = element_blank(),
-            axis.title.x = element_text(family = "Libre Baskerville", face = "italic", margin = margin(t = 8)),
+            axis.title.x = element_text(family = tipografia$serif, face = "italic", margin = margin(t = 8)),
             panel.grid = element_blank(), panel.background = element_blank()) +
       coord_equal(clip = "off") +
       scale_y_continuous(limits = c(-1.5, 3)) +
@@ -1541,14 +1548,14 @@ server <- function(input, output, session) {
         scale_x_date(date_labels = "%d/%m/%y")
     } else {
       plot <- plot +
-      theme(axis.text.x = element_text(family = "Lato", size = .texto_ejes, hjust = 1, angle = 40))
+      theme(axis.text.x = element_text(family = tipografia$sans, size = .texto_ejes, hjust = 1, angle = 40))
     }
     
     # tema
     plot <- plot +
       theme(axis.ticks.x = element_blank(),
-            axis.text.y = element_text(family = "Lato", size = .texto_ejes, angle = 90, hjust = .5),
-            axis.title.y = element_text(family = "Libre Baskerville", face = "italic")
+            axis.text.y = element_text(family = tipografia$sans, size = .texto_ejes, angle = 90, hjust = .5),
+            axis.title.y = element_text(family = tipografia$serif, face = "italic")
       )
     
     return(plot)
