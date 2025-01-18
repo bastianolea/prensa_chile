@@ -27,7 +27,7 @@ anterior <- read_parquet("datos/prensa_llm_sentimiento.parquet")
 if (!exists("muestra_llm")) muestra_llm = 2000 # definir cantidad de noticias a procesar
 
 # estimar tiempo
-message(paste("tiempo aproximado de procesamiento:", round((muestra_llm * 4.9)/60/60, 1), "horas"))
+estimar_tiempo(muestra_llm, 4.9)
 
 # datos_muestra <- datos_prensa |> 
 #   filter(año >= 2024) |> 
@@ -82,23 +82,25 @@ message(paste("iniciando loop sentimiento para", length(datos_limpios_split), "n
 sentimientos <- map(datos_limpios_split, 
                     \(dato) {
                       inicio <- now()
-                      message(paste("procesando", dato$id))
+                      message(paste("procesando", dato$id), appendLF = F)
                       
                       tryCatch({
                         # detener operación
-                        if (read.delim("otros/stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
+                        detencion_manual()
                         
                         # obtener sentimiento
                         sentimiento <- dato$texto |> llm_vec_sentiment(options = c("positivo", "neutral", "negativo"))
                         
                         # reintentar 1 vez
                         if (is.na(sentimiento)) {
-                          message("reintentando...")
+                          message(" ...reintentando...")
                           sentimiento <- dato$texto |> llm_vec_sentiment(options = c("positivo", "neutral", "negativo"))
                         }
                         final <- now()
                         
                         if (is.na(sentimiento)) return(NULL)
+                        
+                        mensaje_segundos(final - inicio)
                         
                         # resultado
                         resultado <- tibble(id = dato$id,

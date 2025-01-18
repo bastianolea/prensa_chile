@@ -222,8 +222,8 @@ limpiar_texto_poquito <- function(x) {
 
 revisar_scraping <- function(data) {
   try({
-  message(paste("listo", deparse(substitute(data)), "-", lubridate::now()))
-  if ("tbl" %in% class(data)) message(paste(nrow(data), "noticias obtenidas"))
+    message(paste("listo", deparse(substitute(data)), "-", lubridate::now()))
+    if ("tbl" %in% class(data)) message(paste(nrow(data), "noticias obtenidas"))
   })
 }
 
@@ -257,36 +257,36 @@ palabras_eliminar = c(palabras_irrelevantes,
 recodificar_fuentes <- function(data) {
   data |> 
     mutate(fuente = case_match(fuente,
-                           "24horas" ~ "24 Horas",
-                           "adnradio" ~ "ADN Radio",
-                           "agricultura" ~ "Agricultura",
-                           "biobio" ~ "Radio BíoBío",
-                           "chvnoticias" ~ "CHV Noticias",
-                           "ciper" ~ "Ciper",
-                           "cnnchile" ~ "CNN Chile",
-                           "cooperativa" ~ "Cooperativa",
-                           "diariofinanciero" ~ "D. Financiero",
-                           "elciudadano" ~ "El Ciudadano",
-                           "eldinamo" ~ "El Dínamo",
-                           "elmostrador" ~ "El Mostrador",
-                           "elsiglo" ~ "El Siglo",
-                           "emol" ~ "Emol",
-                           "exante" ~ "Ex-Ante",
-                           "lacuarta" ~ "La Cuarta",
-                           "lahora" ~ "La Hora",
-                           "lanacion" ~ "La Nación",
-                           "latercera" ~ "La Tercera",
-                           "meganoticias" ~ "Meganoticias",
-                           "publimetro" ~ "Publimetro",
-                           "radiouchile" ~ "Radio U. de Ch.",
-                           "t13" ~ "T13",
-                           "theclinic" ~ "The Clinic", 
-                           "redgol" ~ "RedGol",
-                           "lasegunda" ~ "La Segunda",
-                           "eldesconcierto" ~ "El Desconcierto",
-                           "quintopoder" ~ "El Quinto Poder",
-                           "izquierdadiario" ~ "La Izquierda Diario",
-                           .default = fuente))
+                               "24horas" ~ "24 Horas",
+                               "adnradio" ~ "ADN Radio",
+                               "agricultura" ~ "Agricultura",
+                               "biobio" ~ "Radio BíoBío",
+                               "chvnoticias" ~ "CHV Noticias",
+                               "ciper" ~ "Ciper",
+                               "cnnchile" ~ "CNN Chile",
+                               "cooperativa" ~ "Cooperativa",
+                               "diariofinanciero" ~ "D. Financiero",
+                               "elciudadano" ~ "El Ciudadano",
+                               "eldinamo" ~ "El Dínamo",
+                               "elmostrador" ~ "El Mostrador",
+                               "elsiglo" ~ "El Siglo",
+                               "emol" ~ "Emol",
+                               "exante" ~ "Ex-Ante",
+                               "lacuarta" ~ "La Cuarta",
+                               "lahora" ~ "La Hora",
+                               "lanacion" ~ "La Nación",
+                               "latercera" ~ "La Tercera",
+                               "meganoticias" ~ "Meganoticias",
+                               "publimetro" ~ "Publimetro",
+                               "radiouchile" ~ "Radio U. de Ch.",
+                               "t13" ~ "T13",
+                               "theclinic" ~ "The Clinic", 
+                               "redgol" ~ "RedGol",
+                               "lasegunda" ~ "La Segunda",
+                               "eldesconcierto" ~ "El Desconcierto",
+                               "quintopoder" ~ "El Quinto Poder",
+                               "izquierdadiario" ~ "La Izquierda Diario",
+                               .default = fuente))
 }
 
 redactar_fecha <- function(x) { 
@@ -311,18 +311,18 @@ redactar_fecha <- function(x) {
 
 mes_a_numero <- function(x) {
   recode(x, 
-          "enero" = "1",
-          "febrero" = "2",
-          "marzo" = "3",
-          "abril" = "4",
-          "mayo" = "5",
-          "junio" = "6",
-          "julio" = "7",
-          "agosto" = "8",
-          "septiembre" = "9",
-            "octubre" = "10",
-            "noviembre" = "11",
-            "diciembre" = "12")
+         "enero" = "1",
+         "febrero" = "2",
+         "marzo" = "3",
+         "abril" = "4",
+         "mayo" = "5",
+         "junio" = "6",
+         "julio" = "7",
+         "agosto" = "8",
+         "septiembre" = "9",
+         "octubre" = "10",
+         "noviembre" = "11",
+         "diciembre" = "12")
 }
 
 # sólo funciona en macOS
@@ -364,4 +364,17 @@ sin_cambios_hoy <- function() {
     select(fuente, size, modification_time)
   
   return(sin_cambios)
+}
+
+
+estimar_tiempo <- function(muestra, estimacion = 4.9) {
+  message(paste("tiempo aproximado de procesamiento:", round((muestra * estimacion)/60/60, 1), "horas")) 
+}
+
+detencion_manual <- function() {
+  if (read.delim("otros/stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
+}
+
+mensaje_segundos <- function(...) {
+  message("(", seconds(round(..., 1)) |> as.numeric(), " segundos)")
 }

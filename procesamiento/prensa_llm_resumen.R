@@ -26,7 +26,7 @@ anterior <- read_parquet("datos/prensa_llm_resumen.parquet")
 if (!exists("muestra_llm")) muestra_llm = 3000 # definir cantidad de noticias a procesar
 
 # estimar tiempo
-message(paste("tiempo aproximado de procesamiento:", round((muestra_llm * 8.1)/60/60, 1), "horas"))
+estimar_tiempo(muestra_llm, 8.1)
 
 datos_muestra <- datos_prensa |> 
   filter(año >= 2024) |> 
@@ -76,7 +76,7 @@ resumenes <- map(datos_limpios_split,
                    
                    tryCatch({
                      # detener operación externamente
-                     if (read.delim("otros/stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
+                     detencion_manual()
                      
                      # obtener sentimiento
                      resumen <- dato$texto |> llm_vec_summarize(max_words = 30, additional_prompt = "en español")
@@ -88,6 +88,8 @@ resumenes <- map(datos_limpios_split,
                      final <- now()
                      
                      if (is.na(resumen)) return(NULL)
+                     
+                     mensaje_segundos(final - inicio)
                      
                      # resultado
                      resultado <- tibble(id = dato$id,

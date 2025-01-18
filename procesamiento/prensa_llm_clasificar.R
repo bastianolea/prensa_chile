@@ -27,7 +27,7 @@ anterior <- read_parquet("datos/prensa_llm_clasificar.parquet")
 if (!exists("muestra_llm")) muestra_llm = 3000 # definir cantidad de noticias a procesar
 
 # estimar tiempo
-message(paste("tiempo aproximado de procesamiento:", round((muestra_llm * 5.2)/60/60, 1), "horas"))
+estimar_tiempo(muestra_llm, 5.2)
 
 # datos_muestra <- datos_prensa |> 
 #   filter(año >= 2024) |> 
@@ -89,7 +89,7 @@ clasificacion <- map(datos_limpios_split,
                        
                        tryCatch({
                          # detener operación externamente
-                         if (read.delim("otros/stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
+                         detencion_manual()
                          
                          # clasificar
                          clasificacion <- dato$texto |> llm_vec_classify(labels = categorias)
@@ -100,6 +100,8 @@ clasificacion <- map(datos_limpios_split,
                          final <- now()
                          
                          if (is.na(clasificacion)) return(NULL)
+                         
+                         mensaje_segundos(final - inicio)
                          
                          # resultado
                          resultado <- tibble(id = dato$id,
