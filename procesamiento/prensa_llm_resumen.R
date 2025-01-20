@@ -76,7 +76,7 @@ resumenes <- map(datos_limpios_split,
                    
                    tryCatch({
                      # detener operación externamente
-                     detencion_manual()
+                     if (detencion_manual()) return(NULL)
                      
                      # obtener sentimiento
                      resumen <- dato$texto |> llm_vec_summarize(max_words = 30, additional_prompt = "en español")
@@ -89,16 +89,14 @@ resumenes <- map(datos_limpios_split,
                      
                      if (is.na(resumen)) return(NULL)
                      
-                     mensaje_segundos(final - inicio)
+                     mensaje_segundos(dato$n_palabras, final - inicio)
                      
                      # resultado
-                     resultado <- tibble(id = dato$id,
-                                         resumen,
+                     resultado <- tibble(id = dato$id, resumen,
                                          tiempo = final - inicio,
                                          tiempo_1 = inicio, tiempo_2 = final,
                                          n_palabras = dato$n_palabras
                      )
-                     
                      return(resultado)
                    },
                    error = function(e) {
@@ -113,13 +111,6 @@ resumenes |>
   summarize(tiempo_total = sum(tiempo),
             tiempo_prom = mean(tiempo))
 
-# resumenes_b <- resumenes |>
-#   list_rbind() |>
-#   # slice_sample(n = 10) |>
-#   pull(resumen)
-# 
-# resumenes_a #llama 3.2:3b
-# resumenes_b #qwen2.5:14b
 
 # guardar avance ----
 resumenes |> 

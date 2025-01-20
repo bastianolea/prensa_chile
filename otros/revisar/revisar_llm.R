@@ -8,8 +8,8 @@ clasificacion <- read_parquet("datos/prensa_llm_clasificar.parquet")
 resumen <- read_parquet("datos/prensa_llm_resumen.parquet")
 
 # # # cargar sólo ultimo procesamiento
-# sentimiento <- fs::dir_info("datos/prensa_llm/sentimiento/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
-# clasificacion <- fs::dir_info("datos/prensa_llm/clasificar/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
+sentimiento <- fs::dir_info("datos/prensa_llm/sentimiento/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
+clasificacion <- fs::dir_info("datos/prensa_llm/clasificar/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
 # resumen <- fs::dir_info("datos/prensa_llm/resumen/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
 
 # unir
@@ -80,6 +80,20 @@ datos |>
   geom_jitter(size = 0.2, alpha = .1, height = .7) +
   geom_smooth(method = "lm", se = F, color = "purple2") +
   facet_wrap(~tipo, scales = "free_x", ncol = 1) +
-  coord_cartesian(ylim = c(0, 15),
+  coord_cartesian(ylim = c(0, 20),
+                  expand = F) +
+  labs(subtitle = "por fecha de ejecución y tiempo de ejecución")
+
+
+datos |> 
+  filter(tipo != "resumen") |> 
+  mutate(segundos = seconds(round(tiempo, 1)) |> as.numeric(),
+         p_seg = n_palabras/segundos) |> 
+  ggplot() +
+  aes(tiempo_1, p_seg) +
+  geom_jitter(size = 0.2, alpha = .1, height = .7) +
+  geom_smooth(method = "lm", se = F, color = "purple2") +
+  facet_wrap(~tipo, scales = "free_x", ncol = 1) +
+  coord_cartesian(ylim = c(0, 200),
                   expand = F) +
   labs(subtitle = "por fecha de ejecución y tiempo de ejecución")

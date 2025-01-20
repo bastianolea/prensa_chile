@@ -375,9 +375,18 @@ estimar_tiempo <- function(muestra, estimacion = 4.9) {
 }
 
 detencion_manual <- function() {
-  if (read.delim("otros/stop.txt", header = FALSE)[[1]] == "stop") return(NULL)
+  read.delim("otros/stop.txt", header = FALSE)[[1]] == "stop"
 }
+# if detencion_manual() return(NULL)
 
-mensaje_segundos <- function(...) {
-  message("(", seconds(round(..., 1)) |> as.numeric(), " segundos)")
+# mensaje_segundos <- function(...) {
+#   message("(", seconds(round(..., 1)) |> as.numeric(), " segundos)")
+# }
+
+mensaje_segundos <- function(palabras, tiempo) {
+  segundos = seconds(round(tiempo, 1)) |> as.numeric()
+  palabras_segundos = round(palabras/segundos, 0)
+  
+  message(" (",  segundos, " segundos, ",
+          palabras_segundos, " palabras/segundo)")
 }

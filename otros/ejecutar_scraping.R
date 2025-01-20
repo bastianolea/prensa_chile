@@ -8,6 +8,8 @@ Sys.setlocale("LC_ALL", "en_US.UTF-8")
 
 library(furrr)
 library(glue)
+library(dplyr)
+library(stringr)
 plan(multisession, workers = 8)
 
 
@@ -53,10 +55,13 @@ modulos <- paste0("/Users/baolea/R/prensa/", modulos)
 
 # ejecutar paralelamente
 future_walk(modulos, ~{
+  # .x <- sample(modulos, 1)
   source(.x, local = TRUE, echo = FALSE)
   
+  modulo <- str_extract(.x, '\\w+\\.(r|R)')
+  
   notificacion("Scraping de prensa", 
-               glue("{.x} terminado.
+               glue("{modulo} terminado.
                     Listos {modulos_n() - nrow(sin_cambios_hoy())} de {modulos_n()}."))
   
   print(paste(nrow(sin_cambios_hoy()), "de", modulos_n()))

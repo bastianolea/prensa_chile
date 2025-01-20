@@ -89,7 +89,7 @@ clasificacion <- map(datos_limpios_split,
                        
                        tryCatch({
                          # detener operación externamente
-                         detencion_manual()
+                         if (detencion_manual()) return(NULL)
                          
                          # clasificar
                          clasificacion <- dato$texto |> llm_vec_classify(labels = categorias)
@@ -101,16 +101,14 @@ clasificacion <- map(datos_limpios_split,
                          
                          if (is.na(clasificacion)) return(NULL)
                          
-                         mensaje_segundos(final - inicio)
+                         mensaje_segundos(dato$n_palabras, final - inicio)
                          
                          # resultado
-                         resultado <- tibble(id = dato$id,
-                                             clasificacion,
+                         resultado <- tibble(id = dato$id, clasificacion,
                                              tiempo = final - inicio,
                                              tiempo_1 = inicio, tiempo_2 = final,
                                              n_palabras = dato$n_palabras
                          )
-                         
                          return(resultado)
                        },
                        error = function(e) {

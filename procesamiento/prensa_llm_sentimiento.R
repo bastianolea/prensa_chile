@@ -86,7 +86,7 @@ sentimientos <- map(datos_limpios_split,
                       
                       tryCatch({
                         # detener operación
-                        detencion_manual()
+                        if (detencion_manual()) return(NULL)
                         
                         # obtener sentimiento
                         sentimiento <- dato$texto |> llm_vec_sentiment(options = c("positivo", "neutral", "negativo"))
@@ -100,16 +100,14 @@ sentimientos <- map(datos_limpios_split,
                         
                         if (is.na(sentimiento)) return(NULL)
                         
-                        mensaje_segundos(final - inicio)
+                        mensaje_segundos(dato$n_palabras, final - inicio)
                         
                         # resultado
-                        resultado <- tibble(id = dato$id,
-                                            sentimiento,
+                        resultado <- tibble(id = dato$id, sentimiento,
                                             tiempo = final - inicio,
                                             tiempo_1 = inicio, tiempo_2 = final,
                                             n_palabras = dato$n_palabras
                         )
-                        
                         return(resultado)
                       },
                       error = function(e) {
