@@ -21,27 +21,6 @@ datos <- bind_rows(sentimiento |> mutate(tipo = "sentimiento", orden = row_numbe
                    resumen |> mutate(tipo = "resumen", orden = row_number()))
 
 
-# estado cálculos
-datos_muestra <- datos_prensa |>
-  filter(año >= 2024) |>
-  filter(fecha > (today() - weeks(12)))
-
-estado <- datos_muestra |> 
-  mutate(calculado = ifelse(id %in% sentimiento$id, "calculado", "calcular")) |> 
-  count(fuente, calculado) |> 
-  group_by(fuente) |> 
-  mutate(p = n/sum(n))
-# 
-# estado_2 <- estado |> 
-#   mutate(total = sum(n), .by = fuente) |> 
-#   tidyr::pivot_wider(names_from = calculado, values_from = n) |> 
-#   mutate(p = calcular/total) |> 
-#   print(n=Inf)
-
-estado |> 
-  filter(calculado == "calculado") |> 
-  filter(p > 0.5) |> 
-  print(n=Inf)
 
 
 # —----

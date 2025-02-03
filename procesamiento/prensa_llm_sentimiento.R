@@ -13,9 +13,9 @@ source("funciones.R")
 plan(multisession, workers = 7)
 
 # configurar LLM
+# llm_use("ollama", "deepseek-r1:8b", .cache = "", temperature = 0)
 llm_use("ollama", "llama3.1:8b", .cache = "", temperature = 0)
 # llm_use("ollama", "llama3.2:3b", .cache = "", temperature = 0)
-# llm_use("ollama", "qwen2.5:14b", .cache = "", temperature = 0)
 
 # cargar datos ----
 if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.parquet")
@@ -24,7 +24,7 @@ if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.pa
 anterior <- read_parquet("datos/prensa_llm_sentimiento.parquet")
 
 # extraer muestra
-if (!exists("muestra_llm")) muestra_llm = 2000 # definir cantidad de noticias a procesar
+if (!exists("muestra_llm")) muestra_llm = 2600 # definir cantidad de noticias a procesar
 
 # estimar tiempo
 estimar_tiempo(muestra_llm, 4.9)

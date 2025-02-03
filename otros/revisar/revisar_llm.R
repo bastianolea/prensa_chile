@@ -1,6 +1,7 @@
 library(dplyr)
 library(arrow)
 library(ggplot2)
+library(lubridate)
 
 # cargar bases unificadas
 sentimiento <- read_parquet("datos/prensa_llm_sentimiento.parquet")
@@ -8,8 +9,8 @@ clasificacion <- read_parquet("datos/prensa_llm_clasificar.parquet")
 resumen <- read_parquet("datos/prensa_llm_resumen.parquet")
 
 # # # cargar sólo ultimo procesamiento
-sentimiento <- fs::dir_info("datos/prensa_llm/sentimiento/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
-clasificacion <- fs::dir_info("datos/prensa_llm/clasificar/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
+# sentimiento <- fs::dir_info("datos/prensa_llm/sentimiento/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
+# clasificacion <- fs::dir_info("datos/prensa_llm/clasificar/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
 # resumen <- fs::dir_info("datos/prensa_llm/resumen/") |> slice_max(modification_time) |> pull(path) |> read_parquet()
 
 # unir
@@ -23,6 +24,31 @@ datos |>
   summarize(mean(tiempo), 
             n(), 
             .by = tipo)
+
+# estado ----
+
+# cargar datos prensa
+if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
+
+# revisar estado de cálculos
+datos_muestra <- datos_prensa |>
+  filter(año >= 2024) |>
+  filter(fecha > (today() - months(2)))
+
+estado <- datos_muestra |> 
+  mutate(calculado = ifelse(id %in% unique(datos$id), "calculado", "calcular")) |> 
+  count(fuente, calculado) |> 
+  group_by(fuente) |> 
+  mutate(p = n/sum(n))
+
+estado |> 
+  filter(calculado == "calculado") |> 
+  # filter(p > 0.5) |> 
+  arrange(p) |> 
+  print(n=Inf)
+
+
+# gráficos ----
 
 # tema
 theme_set(theme_linedraw() +
