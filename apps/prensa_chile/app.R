@@ -1051,7 +1051,7 @@ server <- function(input, output, session) {
     # opciones gráfico
     .dodge = 3
     .espaciado_y = 0.08
-    .espaciado_x = 0.05
+    .espaciado_x = 0.06
     
     # hace que los colores del gráfico sean por palabras, o por palabra destacada vs otras
     variable <- ifelse(input$destacar_palabra != "Ninguna",

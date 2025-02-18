@@ -94,6 +94,11 @@ prensa_palabras_raiz <- prensa_palabras_split |>
                                            "alcaldesa" ~ "alcalde",
                                            c("presidenta", "presidencial") ~ "presidente",
                                            c("pública", "públicas", "públicos") ~ "público",
+                                           .default = palabra)) |> 
+               # corregir palabras lematizadas
+               mutate(palabra = case_match(palabra,
+                                           "pensionar" ~ "pensiones",
+                                           "reformar" ~ "reforma",
                                            .default = palabra))
   )
 

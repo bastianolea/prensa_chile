@@ -6,7 +6,7 @@ library(lubridate)
 fecha_limite = floor_date(today(), unit = "week", week_start = 7) # domingo que termina la semana, para prensa semanal
 
 # cantidad de textos a procesar con LLM
-muestra_llm = 2000
+muestra_llm = 100
 
 # memoria por thread
 options(future.globals.maxSize = 1.0 * 3e9)
@@ -20,7 +20,7 @@ inicio <- now()
 # cargar datos scrapeados, los limpia y los guarda en una sola base, una noticia por fila
 source("procesamiento/prensa_p1_cargar_datos.R", echo = T)
 # output: datos/prensa_datos.parquet
-
+# 
 # tokenización de textos en palabras
 # transformar datos de prensa en base tokenizada por palabras para análisis de texto
 source("procesamiento/prensa_p2_procesar_texto.R", echo = T)
