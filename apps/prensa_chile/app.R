@@ -705,8 +705,8 @@ server <- function(input, output, session) {
   
   
   updateSelectizeInput(session, 'selector_palabras', 
-                       choices = c("corrupción", "delincuencia", palabras_posibles),
-                       selected = c("delincuencia", "corrupción", "hermosilla", "monsalve"),
+                       choices = c("delincuencia", "corrupción", "Hermosilla", "Boric", palabras_posibles),
+                       selected = c("delincuencia", "corrupción", "Hermosilla", "Boric"),
                        server = TRUE)
   
   updateSelectizeInput(session, 'selector_palabras_fuente', 
@@ -717,12 +717,12 @@ server <- function(input, output, session) {
   
   
   updateSelectizeInput(session, 'cor_total_palabra', 
-                       choices = c("Hermosilla", "Monsalve", "corrupción", "delincuencia", palabras_posibles),
+                       choices = c("Hermosilla", "Boric", "corrupción", "delincuencia", palabras_posibles),
                        selected = "Hermosilla",
                        server = TRUE)
   
   updateSelectizeInput(session, 'cor_fuente_palabra', 
-                       choices = c("Hermosilla", "Monsalve", "corrupción", "delincuencia", palabras_posibles),
+                       choices = c("Hermosilla", "Boric", "corrupción", "delincuencia", palabras_posibles),
                        selected = "Hermosilla",
                        server = TRUE)
   
@@ -819,7 +819,7 @@ server <- function(input, output, session) {
     req(input$selector_palabras != "")
     
     datos_conteo_semanas_palabras_1() |> 
-      filter(palabra %in% input$selector_palabras) |> 
+      filter(palabra %in% tolower(input$selector_palabras)) |> 
       group_by(palabra) |> 
       mutate(freq_total_palabra = sum(n)) |> 
       ungroup() |> 
@@ -880,6 +880,78 @@ server <- function(input, output, session) {
       summarize(n = sum(n), .groups = "drop")
   })
   
+  # 
+  # datos_semana_fuente_4 <- reactive({
+  #   browser()
+  #   
+  #   datos_1 <- datos_semana_fuente_3() |> 
+  #     # filter(semana == 4) |> 
+  #     group_by(semana, fecha_texto, palabra) |> 
+  #     summarize(fuente = list(c(fuente, n)),
+  #               n_semana = sum(n)) |> 
+  #     group_by(semana) |> 
+  #     arrange(semana, desc(n_semana)) |> 
+  #     mutate(rank = row_number(desc(n_semana))) |> 
+  #     filter(rank <= input$semana_fuentes_palabras_n)
+  #     
+  #   # 
+  #   # datos_1 <- datos_semana_fuente_3() |> 
+  #   #   # maximo palabras por semana
+  #   #   group_by(semana, palabra) |> 
+  #   #   mutate(n_semana = sum(n)) |>
+  #   #   arrange(semana, desc(n_semana)) |> 
+  #   #   group_by(semana) |>
+  #   #   mutate(rank = dense_rank(desc(n_semana))) |> 
+  #   #   ungroup() |> 
+  #   #   # mutate(rank2 = row_number(desc(n_semana))) |>
+  #   #   filter(rank <= input$semana_fuentes_palabras_n) |> # cantidad de palabras por semana
+  #   #   # distinct(semana, rank) |> 
+  #   #   # add_count(semana) |> print(n=Inf)
+  #   #   arrange(semana, rank)
+  #   
+  #  
+  #   # el filtro tiene que ser contando 15 palabras por cada semana, 
+  #   # indiferente a si la palabra sale en multiples fuentes
+  #   
+  #   # palabras <- datos_1 |> 
+  #   #   arrange(semana, rank) |> 
+  #   #   distinct(semana, palabra, rank) |> 
+  #   #   rename(palabra_rank = palabra) |> 
+  #   #   select(-rank) |> 
+  #   #   tidyr::nest(palabra_rank = palabra_rank)
+  #   
+  #   # palabras <- datos_1 |> 
+  #   #   arrange(semana, rank) |> 
+  #   #   distinct(semana, palabra, rank) |> 
+  #   #   rename(palabra_rank = palabra) |> 
+  #   #   select(-rank) |> 
+  #   #   group_by(semana) |> 
+  #   #   summarize(palabra_rank = list(palabra_rank))
+  #   
+  #   # palabras <-  tibble(semana = 4, 
+  #   #        palabra_rank = list("presidente"))
+  #   
+  #   datos_2 <- datos_1 |> 
+  #     # ordenar palabras
+  #     group_by(semana, rank) |> 
+  #     mutate(n_palabra_semana = sum(n_semana)) |> 
+  #     group_by(semana) |> 
+  #     mutate(palabra = tidytext::reorder_within(palabra,
+  #                                               # semana,
+  #                                               n_palabra_semana,
+  #                                               semana)) |> 
+  #     ungroup()
+  #   
+  #   # datos_2
+  #   # datos_2 |> 
+  #   #   print(n=100)
+  #   
+  #   datos_3 <- datos_2 |> 
+  #     tidyr::unnest_longer(fuente)
+  #   
+  #   datos_3
+  # })
+  
   datos_semana_fuente_4 <- reactive({
     # browser()
     datos_semana_fuente_3() |> 
@@ -898,6 +970,7 @@ server <- function(input, output, session) {
       mutate(palabra = tidytext::reorder_within(palabra, n_palabra_semana, semana)) |> 
       ungroup()
   })
+  
   
   
   ## puntos fuente palabra ----
