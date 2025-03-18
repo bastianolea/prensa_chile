@@ -6,7 +6,7 @@ library(lubridate)
 fecha_limite = floor_date(today(), unit = "week", week_start = 7) # domingo que termina la semana, para prensa semanal
 
 # cantidad de textos a procesar con LLM
-muestra_llm = 100
+muestra_llm = 15000
 
 # memoria por thread
 options(future.globals.maxSize = 1.0 * 3e9)
