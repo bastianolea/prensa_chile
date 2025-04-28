@@ -864,6 +864,10 @@ server <- function(input, output, session) {
     # palabras_semana_fuente |> 
     #   filter(semana %in% .semanas) |> 
     #   ungroup()
+    # 
+    # palabras_semana_fuente |> 
+    #   distinct(semana, fecha, fecha_texto)
+    
     palabras_semana_fuente |> 
       filter(fecha >= fecha_min,
              fecha <= fecha_max)
@@ -954,20 +958,40 @@ server <- function(input, output, session) {
   
   datos_semana_fuente_4 <- reactive({
     # browser()
-    datos_semana_fuente_3() |> 
+    
+    datos1 <- datos_semana_fuente_3() |> 
       # maximo palabras por semana
       group_by(semana, palabra) |> 
       mutate(n_semana = sum(n)) |>
       group_by(semana) |>
-      mutate(rank = dense_rank(desc(n_semana))) |>
-      # mutate(rank2 = row_number(desc(n_semana))) |>
-      filter(rank <= input$semana_fuentes_palabras_n) |> # cantidad de palabras por semana
-      distinct(semana, fecha, rank, fuente, .keep_all = TRUE) |>
+      mutate(rank = dense_rank(desc(n_semana)))
+    
+    ranking <- datos1 |> 
+      filter(rank <= input$semana_fuentes_palabras_n) |> 
+      group_by(palabra) |> 
+      summarize(n = sum(n)) |> 
+      arrange(desc(n)) |> 
+      mutate(rank = 1:n()) |> 
+      filter(rank <= input$semana_fuentes_palabras_n) # cantidad de palabras por semana
+    
+    # browser()
+    
+    datos1 |> 
+      filter(palabra %in% ranking$palabra) |> 
+      # print(n=100)
+    # están malas las semanas
+      group_by(fecha_texto, fuente, palabra) |> 
+      # ungroup() |> 
+      # distinct(semana, fecha, fecha_texto)
+      summarize(n = sum(n),
+                fecha = min(fecha), 
+                fecha_texto = first(fecha_texto)) |> 
+      # distinct(semana, fecha, rank, fuente, .keep_all = TRUE) |>
       # ordenar palabras
-      group_by(semana, palabra) |> 
+      group_by(fecha_texto, palabra) |> 
       mutate(n_palabra_semana = sum(n)) |> 
-      group_by(semana) |> 
-      mutate(palabra = tidytext::reorder_within(palabra, n_palabra_semana, semana)) |> 
+      group_by(fecha_texto) |> 
+      mutate(palabra = tidytext::reorder_within(palabra, n_palabra_semana, fecha_texto)) |> 
       ungroup()
   })
   
@@ -1006,7 +1030,7 @@ server <- function(input, output, session) {
   })
   
   datos_semana_fuente_palabra_3 <- reactive({
-    .n_fuentes = input$semana_fuentes_palabras_fuentes
+    .n_fuentes = input$semana_fuentes_palabras_fuentes-1
     
     datos_semana_fuente_palabra_2() |>
       # agrupar fuentes chicas
@@ -1014,13 +1038,13 @@ server <- function(input, output, session) {
                                n = .n_fuentes, other_level = "Otros")) |>
       mutate(fuente = fct_reorder(fuente, n_total_fuente, .desc = T),
              fuente = fct_relevel(fuente, "Otros", after = 0)) |> 
-      group_by(fuente, semana, fecha, fecha_texto, palabra) |>
+      group_by(fuente, fecha, fecha_texto, palabra) |>
       summarize(n = sum(n)) |>
       # ordenar palabras
-      group_by(semana, fuente) |> 
+      group_by(fecha_texto, fuente) |> 
       mutate(n_palabra_fuente = sum(n)) |> 
-      group_by(semana) |> 
-      mutate(fuente2 = tidytext::reorder_within(fuente, n_palabra_fuente, semana)) |> 
+      group_by(fecha_texto) |> 
+      mutate(fuente2 = tidytext::reorder_within(fuente, n_palabra_fuente, fecha_texto)) |> 
       ungroup()
   })
   
