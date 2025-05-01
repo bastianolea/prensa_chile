@@ -702,27 +702,28 @@ server <- function(input, output, session) {
   #                        choices = c(rev(selector_semanas_palabras())),
   #                        server = TRUE)
   # )
-  
+  conceptos_interes <- c("delincuencia", "corrupción", "Hermosilla", "Boric",
+                         "Tohá", "Matthei", "Winter", "Jara")
   
   updateSelectizeInput(session, 'selector_palabras', 
-                       choices = c("delincuencia", "corrupción", "Hermosilla", "Boric", palabras_posibles),
+                       choices = c(conceptos_interes, palabras_posibles),
                        selected = c("delincuencia", "corrupción", "Hermosilla", "Boric"),
                        server = TRUE)
   
   updateSelectizeInput(session, 'selector_palabras_fuente', 
-                       # choices = c("Hermosilla", "Cubillos", "corrupción", "delincuencia", palabras_posibles),
-                       choices = c(palabras_posibles),
+                       choices = c(conceptos_interes, palabras_posibles),
+                       # choices = c(palabras_posibles),
                        # selected = "Hermosilla",
                        server = TRUE)
   
   
   updateSelectizeInput(session, 'cor_total_palabra', 
-                       choices = c("Hermosilla", "Boric", "corrupción", "delincuencia", palabras_posibles),
+                       choices = c(conceptos_interes, palabras_posibles),
                        selected = "Hermosilla",
                        server = TRUE)
   
   updateSelectizeInput(session, 'cor_fuente_palabra', 
-                       choices = c("Hermosilla", "Boric", "corrupción", "delincuencia", palabras_posibles),
+                       choices = c(conceptos_interes, palabras_posibles),
                        selected = "Hermosilla",
                        server = TRUE)
   
