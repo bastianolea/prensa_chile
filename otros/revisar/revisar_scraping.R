@@ -59,6 +59,21 @@ cantidad_archivos <- map(directorios$path, ~dir_info(.x)) |>
   print(n=Inf)
 
 
+
+# directorios con cambios hoy
+ultimos_cambios <- map(directorios$path, ~{
+  # .x <- directorios$path[2]
+  directorio <- dir_info(.x)
+  
+  directorio |> 
+    slice_max(modification_time) |> 
+    mutate(fuente = stringr::str_extract(path, "scraping/datos/\\w+") |> stringr::str_remove("scraping/datos/")) |> 
+    select(fuente, size, modification_time)
+}) |> 
+  list_rbind() |> 
+  arrange(modification_time)
+
+
 cat("\ncantidad de archivos por fuente:\n"); print(cantidad_archivos, n = Inf)
 
 cat("\nfuentes con datos guardados hoy:\n"); print(con_cambios, n = Inf)
@@ -66,6 +81,6 @@ cat("\nfuentes con datos guardados hoy:\n"); print(con_cambios, n = Inf)
 cat("\nfuentes sin datos guardados hoy:\n"); print(sin_cambios, n = Inf)
 
 
-
+ultimos_cambios
 
 

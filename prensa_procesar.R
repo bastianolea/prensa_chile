@@ -1,4 +1,5 @@
 # ejecutar todos los pasos de procesamiento, post scraping (prensa_obtener_datos.R)
+library(future)
 library(lubridate)
 
 # setup ----
@@ -6,9 +7,10 @@ library(lubridate)
 fecha_limite = floor_date(today(), unit = "week", week_start = 7) # domingo que termina la semana, para prensa semanal
 
 # cantidad de textos a procesar con LLM
-muestra_llm = 15000
+muestra_llm = 6000
 
 # memoria por thread
+plan(multisession, workers = 8)
 options(future.globals.maxSize = 1.0 * 3e9)
 
 inicio <- now()
@@ -43,7 +45,7 @@ source("procesamiento/prensa_correlacion.R", echo = T)
 # output: datos/prensa_correlacion.parquet, datos/prensa_correlacion_fuente.parquet
 
 # # resumen de noticias usando modelos de lenguaje
-# source("procesamiento/prensa_llm_resumen.R", echo = T)
+source("procesamiento/prensa_llm_resumen.R", echo = T)
 # # output: prensa_llm_resumen.parquet
 
 # sentimiento de noticias usando modelos de lenguaje

@@ -69,6 +69,9 @@ Luego del scraping se realiza el procesamiento de los datos. Todos los scripts d
 
 ## Actualizaciones
 
+**1 de mayo 2025:**
+- Actualización de datos, corrección de scraping de algunos medios.
+
 **15 de enero 2025:**
 - Nueva visualización de análisis de sentimiento de noticias, según clasificación y fuente, en base a procesamiento de datos usando [inteligencia artificial](https://bastianolea.rbind.io/blog/2025-01-14/).
 
