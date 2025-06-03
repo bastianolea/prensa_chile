@@ -1,5 +1,2 @@
-.parquet
-*.parquet
-.rds
 /rsconnect
 .Rproj
