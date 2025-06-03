@@ -36,7 +36,8 @@ estimar_tiempo(muestra_llm, 5.2)
 #   slice_sample(n = muestra)
 
 # todas las noticias, partiendo por las más recientes
-datos_muestra <- datos_prensa |> 
+datos_muestra <- datos_prensa |>
+  filter(año >= 2024) |> 
   select(id, bajada, cuerpo) |> 
   filter(!id %in% anterior$id) |> 
   slice(1:muestra_llm)
@@ -96,6 +97,8 @@ clasificacion <- map(datos_limpios_split,
                          
                          if (is.na(clasificacion)) {
                            clasificacion <- dato$texto |> llm_vec_classify(labels = c(categorias, "otros"))
+                           
+                           if (is.na(clasificacion)) clasificacion <- "Sin interpretación"
                          }
                          final <- now()
                          

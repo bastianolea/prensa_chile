@@ -7,7 +7,7 @@ library(lubridate)
 fecha_limite = floor_date(today(), unit = "week", week_start = 7) # domingo que termina la semana, para prensa semanal
 
 # cantidad de textos a procesar con LLM
-muestra_llm = 6000
+muestra_llm = 2000
 
 # memoria por thread
 plan(multisession, workers = 8)
@@ -48,13 +48,13 @@ source("procesamiento/prensa_correlacion.R", echo = T)
 source("procesamiento/prensa_llm_resumen.R", echo = T)
 # # output: prensa_llm_resumen.parquet
 
-# sentimiento de noticias usando modelos de lenguaje
-source("procesamiento/prensa_llm_sentimiento.R", echo = T)
-# output: prensa_llm_sentimiento.parquet
-#
-# tópico de noticias usando modelos de lenguaje
-source("procesamiento/prensa_llm_clasificar.R", echo = T)
-# output: prensa_llm_clasificar.parquet
+# # sentimiento de noticias usando modelos de lenguaje
+# source("procesamiento/prensa_llm_sentimiento.R", echo = T)
+# # output: prensa_llm_sentimiento.parquet
+# #
+# # tópico de noticias usando modelos de lenguaje
+# source("procesamiento/prensa_llm_clasificar.R", echo = T)
+# # output: prensa_llm_clasificar.parquet
 
 # datos para análisis de sentimiento
 source("procesamiento/prensa_semanal_sentimiento.R", echo = T)

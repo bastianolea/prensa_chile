@@ -30,7 +30,7 @@ estimar_tiempo(muestra_llm, 8.1)
 
 datos_muestra <- datos_prensa |> 
   filter(año >= 2024) |> 
-  filter(fecha > (today() - weeks(6))) |> 
+  # filter(fecha > (today() - months(4))) |> 
   filter(!id %in% anterior$id) |> 
   slice_sample(n = muestra_llm)
 
@@ -84,6 +84,8 @@ resumenes <- map(datos_limpios_split,
                      # reintentar 1 vez
                      if (is.na(resumen)) {
                        resumen <- dato$texto |> llm_vec_summarize(max_words = 30, additional_prompt = "en español")
+                       
+                       if (is.na(resumen)) resumen <- "Sin interpretación"
                      }
                      final <- now()
                      

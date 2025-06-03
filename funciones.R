@@ -387,6 +387,6 @@ mensaje_segundos <- function(palabras, tiempo) {
   segundos = seconds(round(tiempo, 1)) |> as.numeric()
   palabras_segundos = round(palabras/segundos, 0)
   
-  message(" (",  segundos, " segundos, ",
-          palabras_segundos, " palabras/segundo)")
+  message("    ",  segundos, " segundos, ",
+          palabras_segundos, " palabras/seg.")
 }

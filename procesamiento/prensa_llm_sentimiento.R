@@ -37,6 +37,7 @@ estimar_tiempo(muestra_llm, 4.9)
 
 # todas las noticias, partiendo por las más recientes
 datos_muestra <- datos_prensa |>
+  filter(año >= 2024) |> 
   select(id, bajada, cuerpo) |>
   filter(!id %in% anterior$id) |> 
   slice(1:muestra_llm)
@@ -95,6 +96,8 @@ sentimientos <- map(datos_limpios_split,
                         if (is.na(sentimiento)) {
                           message(" ...reintentando...")
                           sentimiento <- dato$texto |> llm_vec_sentiment(options = c("positivo", "neutral", "negativo"))
+                          
+                          if (is.na(sentimiento)) sentimiento <- "Sin interpretación"
                         }
                         final <- now()
                         

@@ -81,6 +81,6 @@ cat("\nfuentes con datos guardados hoy:\n"); print(con_cambios, n = Inf)
 cat("\nfuentes sin datos guardados hoy:\n"); print(sin_cambios, n = Inf)
 
 
-ultimos_cambios
+ultimos_cambios |> print(n=Inf)
 
 

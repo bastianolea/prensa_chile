@@ -25,27 +25,6 @@ datos |>
             n(), 
             .by = tipo)
 
-# estado ----
-
-# cargar datos prensa
-if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
-
-# revisar estado de cálculos
-datos_muestra <- datos_prensa |>
-  filter(año >= 2024) |>
-  filter(fecha > (today() - months(1)))
-
-estado <- datos_muestra |> 
-  mutate(calculado = ifelse(id %in% unique(datos$id), "calculado", "calcular")) |> 
-  count(fuente, calculado) |> 
-  group_by(fuente) |> 
-  mutate(p = n/sum(n))
-
-estado |> 
-  filter(calculado == "calculado") |> 
-  # filter(p > 0.5) |> 
-  arrange(p) |> 
-  print(n=Inf)
 # 
 # 
 # # gráficos ----
@@ -123,3 +102,26 @@ estado |>
 #   coord_cartesian(ylim = c(0, 200),
 #                   expand = F) +
 #   labs(subtitle = "por fecha de ejecución y tiempo de ejecución")
+
+
+# estado ----
+
+# cargar datos prensa
+if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
+
+# revisar estado de cálculos
+datos_muestra <- datos_prensa |>
+  filter(año >= 2024) |>
+  filter(fecha > (today() - months(4)))
+
+estado <- datos_muestra |> 
+  mutate(calculado = ifelse(id %in% unique(datos$id), "calculado", "calcular")) |> 
+  count(fuente, calculado) |> 
+  group_by(fuente) |> 
+  mutate(p = n/sum(n))
+
+estado |> 
+  filter(calculado == "calculado") |> 
+  # filter(p > 0.5) |> 
+  arrange(p) |> 
+  print(n=Inf)
