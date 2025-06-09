@@ -1,299 +1,252 @@
 library(dplyr)
-library(dbplyr)
+library(purrr)
+library(arrow)
 library(ggplot2)
 library(lubridate)
 library(slider)
+library(furrr)
+library(future)
+
+plan(multisession, workers = 8)
+
 
 # cargar datos ----
-if (!exists("prensa_palabras_conteo")) prensa_palabras_conteo <- arrow::read_parquet("datos/prensa_palabras_conteo.parquet")
+if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.parquet")
 
-# definir conceptos para temas ----
-# palabras_delincuencia = c("homicidio", "homicidios", "asesinato", "asesinatos", "asesinó", 
-#                           "hurto", "hurtos", "hurtó", "hurtaron",
-#                           "robo", "robos", "robar", "robando", "robaron",
-#                           "asalto", "asaltaron", "asaltar", "asaltó", "asaltantes", "asaltante",
-#                           "arma", "armas", "calibre", "pistola", "revolver", "revólver",
-#                           "secuestro", "secuestro", "secuestrado", "secuestran",
-#                           "delito", "delitos", "delincuencia", 
-#                           "delincuente", "delincuentes", "ladrón", "ladrones", "antisocial", "antisociales",
-#                           "crimen", "criminal", "criminales", 
-#                           "narcotráfico", "narco", "droga",
-#                           "barricada", "protesta", "saqueo", "saquearon",
-#                           "ebriedad", "ebrio", "ebria", "desórdenes", "incivilidad", "incivilidades"
-# )
-
-# en base a correlaciones
-palabras_delincuencia = c(
-  # robo
-  c("intimidación", "delincuentes", "robos",
-    "antisociales", "encargo", "carabineros", "habitado", "receptación"),
-  # asalto
-  c("asaltantes", "delincuentes", "antisociales", "robo", "violento", 
-    "intimidaron", "vehículo", "arma", "huyeron"),
-  # delincuencia
-  c("narcotráfico", "seguridad", "inseguridad", "organizado", 
-    "policías", "combatir", "crimen", "violencia", "delincuentes"),
-  #delincuente
-  c("robo", "delincuentes", "sujeto", "arma", "asalto", "robar", 
-    "carabineros", "carabinero", "vehículo", "policial"),
-  # portonazo
-  c("vehículo", "delincuentes", "robo", "antisociales", "auto", 
-    "sujetos", "asaltantes", "intimidaron", "automóvil", "violento")
-)
-
-# detectar temas ----
-
-# detectar noticias sobre delincuencia
-conteo_delincuencia <- prensa_palabras_conteo |> 
-  # slice(1:50000) |>
-  mutate(tema_delincuencia = if_else(palabra %in% palabras_delincuencia, T, F)) |> 
-  mutate(tema_delincuencia_n = if_else(tema_delincuencia, n, 0)) |> 
-  group_by(id) |> 
-  summarize(tema_delincuencia_n = sum(tema_delincuencia_n),
-            n = sum(n)) |> 
-  mutate(tema_delincuencia = tema_delincuencia_n/n)
-
-# vector de ids de noticias con más de x% de palabras de delincuencia
-id_noticias_tema_delincuencia <- conteo_delincuencia |> 
-  filter(tema_delincuencia > 0.03) |> 
-  pull(id)
-
-# ver temas en datos ----
-if (!exists("datos_prensa")) datos_prensa <- arrow::read_feather("datos/prensa_datos.feather")
-
-# revisar una noticia por su id 
-datos_prensa |> filter(id == "001b295087391e8d2168252c4e923015") |> glimpse()
+# guardar resultados unidos
+clasificacion <- read_parquet("datos/prensa_llm_clasificar.parquet")
+resumen <- read_parquet("datos/prensa_llm_resumen.parquet")
 
 
-# calcular temas como porcentaje de noticias -----
-
-
+# preparar datos ----
 datos_prensa_filt <- datos_prensa |> 
-  filter(año >= 2018) |> 
-  # filtrar fuentes de noticias que no se extienden hasta 2019
-  # filter(!fuente %in% c("24horas", "chvnoticias", "lacuarta", 
-  #                       "biobio", "cooperativa", "diariofinanciero", "agricultura")) #fuentes sin noticias en años pasados
-  filter(!fuente %in% c("24horas", "agricultura", "biobio", "chvnoticias", "cooperativa", 
-                   "diariofinanciero", "elsiglo", "exante", "lacuarta", "lahora", 
-                   "publimetro", "t13"))
+  filter(año >= 2018)
+# slice_sample(n = 200000)
 
-# obtener cantidad de noticias al día sobre delincuencia
-noticias_delincuencia_conteo <- datos_prensa_filt |> 
-  filter(id %in% id_noticias_tema_delincuencia) |> 
-  count(fecha) 
+datos_prensa_filt_split <- datos_prensa_filt |> 
+  mutate(grupos = (row_number()-1) %/% (n()/8)) |> # n grupos de igual cantidad de filas
+  group_split(grupos)
 
-# obtener cantidad total de noticias al día
-noticias_conteo <- datos_prensa_filt |> 
-  count(fecha) 
 
-# revisar visualmente
-# ts_conteo_noticias |> 
-#   ggplot(aes(fecha, n)) +
-#   geom_col()
+# temas ----
+palabras_delincuencia = c("homicid",
+                          "asesin",
+                          "hurt", "robo\\b",
+                          "asalto|asalta",
+                          "arma.*fuego", "pistola",
+                          "secuestr",
+                          "violaci|violad",
+                          "delito", "delincuen",
+                          "crimen|crimin",
+                          "narco", "droga",
+                          "saqueo|saquea",
+                          "portonazo", "turba")
 
-# unir totales de noticias con noticias del tema, para obtener proporción de noticias sobre el tema
-noticias_prop <- noticias_conteo |> 
-  rename(total = n) |> 
-  left_join(noticias_delincuencia_conteo, by = "fecha") |> #by = c("fecha", "fuente")) |> 
-  filter(!is.na(fecha),
-         fecha >= "2018-01-01") |> 
-  # filter(!fuente %in% c("elciudadano", "radiouchile", "exante", "diariofinanciero", "ciper")) |> #excluir medios que no suelen reportar delincuencia (menos del 1% de sus noticias)
-  mutate(n = if_else(is.na(n), 0, n)) |> 
-  mutate(p = n/total) |> 
-  arrange(desc(fecha)) 
+palabras_delincuencia_extra <- c(palabras_delincuencia,
+                                 "víctim", "delito", "delincuen", "crimen|crimin")
 
-# sumar noticias por mes
-noticias_prop_mes <- noticias_prop |> 
-  mutate(fecha = floor_date(fecha, "month")) |> 
+palabras_homicidios = c("homicid",
+                        "asesin", 
+                        "balead", "acribill")
+
+palabras_homicidios_extra <- c(palabras_homicidios,
+                               "fallec", "muert", "víctim",
+                               "arma.*fuego", "cuchill", "punzante")
+
+
+# procesar ----
+
+datos_detect <- future_map(datos_prensa_filt_split, \(datos_parte) {
+  datos_parte |> 
+    # # clasificación por LLM
+    # mutate(clasificacion = id %in% clasificacion$id,
+    #        clasificacion = ifelse(clasificacion, "policial", "otros")) |>  
+    # # estos datos no están para todas las noticias
+    # detectar tema a partir de palabras presentes 
+    mutate(tema = case_when(
+      str_detect(cuerpo_limpio, str_flatten(palabras_homicidios, collapse = "|")) ~ "homicidios",
+      str_detect(cuerpo_limpio, str_flatten(palabras_delincuencia, collapse = "|")) ~ "delincuencia",
+      .default = "otros")) |> 
+    # cantidad de palabras presentes
+    mutate(n_term = case_when(tema == "homicidios" ~ str_count(cuerpo, str_flatten(palabras_homicidios_extra, collapse = "|")),
+                              tema == "delincuencia" ~ str_count(cuerpo, str_flatten(palabras_delincuencia_extra, collapse = "|"))))
+})
+
+
+# datos_detect |> 
+#   list_rbind() |> 
+#   filter(clasificacion == "policial" & tema == "delincuencia") |> 
+#   slice_sample(n = 100)
+
+# conteo de clasificaciones
+datos_detect |> 
+  list_rbind() |> 
+  count(clasificacion, tema)
+
+# obtener resúmenes de noticias sobre homicidios
+datos_detect |> 
+  list_rbind() |> 
+  # filter(tema == "homicidios") |> 
+  # filter(clasificacion == "policial" & tema == "homicidios") |> 
+  filter(clasificacion == "policial" & tema == "delincuencia") |>
+  filter(n_term >= 3) |> 
+  left_join(resumen, join_by(id)) |> 
+  filter(!is.na(resumen)) |> 
+  slice_sample(n = 8) |> 
+  select(id, resumen)
+
+# revisar texto de noticias
+datos_prensa |> 
+  filter(id == "00ed98e3fb5776d55f6602790cd804b1") |> 
+  pull(cuerpo) |> 
+  str_extract_all(str_flatten(palabras_delincuencia, collapse = "|"))
+
+
+
+# bases de conteo ----
+noticias_delincuencia <- datos_detect |> 
+  list_rbind() |> 
+  # filter(clasificacion == "policial" & tema == "delincuencia") |> 
+  filter(tema == "delincuencia") |> 
+  filter(n_term >= 4) |> 
+  select(fecha, titulo, año, id) |> 
+  left_join(resumen |> select(id, resumen), join_by(id))
+
+noticias_homicidios <- datos_detect |> 
+  list_rbind() |> 
+  # filter(clasificacion == "policial" & tema == "homicidios") |>
+  filter(tema == "homicidios") |>
+  filter(n_term > 3) |> 
+  select(fecha, titulo, año, id) |> 
+  left_join(resumen |> select(id, resumen), join_by(id))
+
+# noticias_homicidios$id
+
+
+# datos de casos ----
+
+### datos homicidios ----
+homicidios_consumados <- readxl::read_xlsx("otros/analisis/tema_delincuencia/BASE-VHC-2018-2024-OFICIAL.xlsx") |> 
+  janitor::clean_names()
+# https://prevenciondehomicidios.cl/#informes
+
+homicidios_consumados_n <- homicidios_consumados |> 
+  mutate(fecha = dmy(paste(15, mes, id_ano))) |> 
   group_by(fecha) |> 
-  summarize(total = sum(total),
-            n = sum(n)) |> 
-  mutate(p = n/total)
-
-noticias_prop_mes_suavizado <- noticias_prop_mes |>   
-  arrange(fecha) |> 
-  mutate(p_s = slide_dbl(p, mean, .before = 3)) #suavizar datos diarios
-
-# revisar visualmente
-# noticias_prop_mes |>
-#   ggplot(aes(fecha)) +
-#   geom_col(aes(y = total)) +
-#   geom_col(aes(y = n), fill = "red2")
-
-# cargar datos de delincuencia
-delincuencia <- arrow::read_parquet("~/Documents/Apps Shiny/delincuencia_chile/app/cead_delincuencia.parquet")
-
-unique(delincuencia$delito) |> sort()
+  summarize(n = n())
 
 
-# contar datos de delincuencia por mes, para todo el país
-delincuencia_total <- delincuencia |> 
+### datos delincuencia ----
+delincuencia_chile <- arrow::read_parquet("otros/analisis/tema_delincuencia/cead_delincuencia_chile.parquet")
+# https://github.com/bastianolea/delincuencia_chile/blob/main/datos_procesados/cead_delincuencia_chile.parquet
+
+delincuencia_chile_n <- delincuencia_chile |> 
   # delitos de mayor connotación sociañ
   filter(delito %in% c("Homicidios", "Hurtos", "Lesiones menos graves, graves o gravísimas",
                        "Violaciones", "Robo con violencia o intimidación", "Robo de objetos de o desde vehículo",
                        "Robo de vehículo motorizado", "Robo en lugar habitado", "Otros robos con fuerza", "Robo por sorpresa")) |>
-  # filter(delito %in% c("Homicidios")) |>
   group_by(fecha) |> 
-  summarize(n = sum(delito_n)) |> 
-  mutate(miles = n/1000)
-
-escalar_max = 0.21 #0.111
-
-# unir noticias de delincuencia con delitos
-datos_consolidados <- bind_rows(
-  noticias_prop_mes_suavizado |> mutate(valor = p_s, tipo = "Noticias"),
-  # delincuencia_total |> mutate(valor = miles/escala_eje_2, tipo = "Delitos")) |> 
-  delincuencia_total |> mutate(valor = scales::rescale(miles, to = c(0, escalar_max)), tipo = "Delitos")) |> #escalado
-  select(fecha, valor, tipo) |> 
-  filter(fecha >= "2019-01-01")
+  summarize(n = sum(delito_n))
 
 
-# grafico de noticias versus delitos ----
-datos_consolidados |> 
-  ggplot(aes(fecha, valor, color = tipo)) +
-  geom_vline(xintercept = c("2020-01-01", "2021-01-01", "2022-01-01", "2023-01-01", "2024-01-01") |> as_date(), alpha = .2, linewidth = .5) +
-  geom_label(data = ~.x |> group_by(tipo) |> filter(fecha == max(fecha)),
-             aes(label = paste(" ", tipo)), hjust = 0, color = "black", label.size = 0, label.padding = unit(.1, "mm"), show.legend = F) +
-  geom_line(linewidth = 1.8, alpha = .7, lineend = "round") +
-  annotate("label", y = 0.018, x = c("2019-07-01", "2020-07-01", "2021-07-01", "2022-07-01", "2023-07-01", "2024-07-01") |> as_date(), 
-           label = 2019:2024, label.size = 0, hjust = 0.5, size = 3.5, color = "grey40") +
-  scale_y_continuous(name = "Noticias sobre delincuencia (porcentaje de noticias al mes)", 
-                     labels = ~scales::percent(.x, accuracy = 1), 
-                     breaks = seq(0.00, 0.24, by = 0.01), #c(0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09), 
-                     # minor_breaks = seq(50, 250, by = 50) |> scales::rescale()/6,
-                     sec.axis = sec_axis(~ ., 
-                                         breaks = seq(50, 250, by = 50) |> scales::rescale(to = c(0, escalar_max)),
-                                         labels = \(labels) labels |> scales::rescale(to = c(min(delincuencia_total$miles), max(delincuencia_total$miles))) |> round(),
-                                         name = "Delitos reportados al mes en todo el país (miles)")) +
-  scale_x_date(date_breaks = "3 months", date_labels = "%m", expand = expansion(c(0, 0.05))) +
-  # scale_color_manual(values = c(color_destacado, color_secundario)) +
-  scale_color_manual(values = c("#D96621", "#179992")) +
-  theme_minimal() +
-  coord_cartesian(clip = "off") + #, ylim = c(.02, .092)) +
-  guides(color = guide_legend(position = "bottom", title = "", nrow = 1, reverse = T)) +
-  theme(#axis.text.x = element_text(angle = -90, vjust = .5),
-    panel.grid.minor.x = element_blank(), 
-    axis.title.x = element_blank(), plot.caption = element_text(lineheight = .5),
-    plot.title.position = "plot",
-    plot.caption.position = "plot", 
-    legend.box.margin = margin(t = -6, b = -2),
-    legend.text = element_text(margin = margin(l = 2, r = 6))) +
-  labs(title = "Cobertura de delincuencia en prensa versus estadísticas de delincuencia",
-       subtitle = "Noticias acerca de delincuencia, comparadas con la cantidad real de delitos reportados en Chile.",
-       caption = "Autoría: Bastián Olea Herrera, data scientist, magíster en Sociología (PUC).\n
-       Fuentes: Estadítsicas delictuales obtenidas desde CEAD (en base a datos reportados por PDI y Carabineros).\n
-       Noticias obtenidas de sitios web de prensa como La Tercera, Emol, CNN, Meganoticias, El Mostrador, ADN y 15 más")
 
-# ggsave(glue::glue("graficos/prensa_delincuencia_vs_reporte4.jpg"), 
-#        width = 10, height = 8)
+# gráficos ----
+
+## noticias ----
+
+### gráfico noticias homicidios ----
+noticias_homicidios_conteo <- noticias_homicidios |> 
+  group_by(fecha) |> 
+  summarize(n = n()) |> 
+  complete(fecha = seq.Date(min(noticias_homicidios$fecha), 
+                            max(noticias_homicidios$fecha), by="days"),
+           fill = list(n = 0)) |> 
+  arrange(fecha) |> 
+  mutate(n2 = slide_dbl(n, .before = 14, mean))
+
+g_noticias_homicidios <- noticias_homicidios_conteo |> 
+  ggplot() +
+  aes(fecha, n2) +
+  geom_line(lwd = .2) +
+  geom_smooth(method = "lm", se = T, color = "black", alpha = 0.15, lwd = .7) +
+  theme_linedraw() +
+  labs(title = "noticias sobre homicidios",
+       subtitle = "detección de conceptos en prensa escrita digital",
+       y = "noticias diarias",
+       caption = "fuente: web scraping de prensa digital") 
+
+g_noticias_homicidios
 
 
-# # library(shades)
-# # c("#317773" |> brightness(0.6) |> saturation(0.85),
-# #   "#cf5a13" |> brightness(0.85) |> saturation(0.85)) |> 
-# #   swatch()
+### gráfico noticias delincuencia ----
+noticias_delincuencia_conteo <- noticias_delincuencia |> 
+  group_by(fecha) |> 
+  summarize(n = n()) |> 
+  complete(fecha = seq.Date(min(noticias_delincuencia$fecha), max(noticias_delincuencia$fecha), by="days"),
+           fill = list(n = 0)) |> 
+  arrange(fecha) |> 
+  mutate(n2 = slide_dbl(n, .before = 14, mean))
+
+g_noticias_delincuencia <- noticias_delincuencia_conteo |> 
+  ggplot() +
+  aes(fecha, n2) +
+  geom_line(lwd = .2) +
+  geom_smooth(method = "lm", se = T, color = "black", alpha = 0.15, lwd = .7) +
+  theme_linedraw() +
+  labs(title = "noticias sobre delincuencia",
+       subtitle = "detección de conceptos en prensa escrita digital",
+       y = "noticias diarias",
+       caption = "fuente: web scraping de prensa digital")
+
+g_noticias_delincuencia
+
+
+## casos ----
+### gráfico casos homicidios ----
+g_casos_homicidios <- homicidios_consumados_n |> 
+  ggplot() +
+  aes(fecha, n) +
+  geom_line(lwd = .3) +
+  geom_smooth(method = "lm", se = T, color = "black", alpha = 0.15, lwd = .7) +
+  theme_linedraw() +
+  labs(y = "víctimas homicidios consumados",
+       title = "casos de homicidios",
+       subtitle = "homicidios consumados con validación interinstitucional",
+       caption = "fuente: observatorio de homicidios, ministerio de sguridad pública")
+
+g_casos_homicidios
+
+
+###  gráfico casos delincuencia ----
+
+g_casos_delincuencia <- delincuencia_chile_n |> 
+  ggplot() +
+  aes(fecha, n) +
+  geom_line(lwd = .3) +
+  geom_smooth(method = "lm", se = T, color = "black", alpha = 0.15, lwd = .7) +
+  theme_linedraw() +
+  labs(y = "casos policiales mensuales",
+       title = "casos de delincuencia",
+       subtitle = "casos policiales de mayor connotación social",
+       caption = "fuente: centro de estudios y análisis del delito") +
+  scale_y_continuous(labels = label_comma(big.mark = "."))
+
+
+
+## unir gráficos ----
+# g_noticias_delincuencia
+# g_casos_delincuencia
 # 
-# 
-# # grafico de noticias, homicidios y tasa de homicidios ----
-# # contar datos de delincuencia por mes, para todo el país
-# delincuencia_homicidios <- delincuencia |> 
-#   filter(delito == "Homicidios") |> 
-#   filter(fecha >= "2019-01-01") |> 
-#   group_by(fecha) |> 
-#   summarize(n = sum(delito_n)) |> 
-#   arrange(fecha) |> 
-#   mutate(n_s = slide_dbl(n, mean, .before = 3))
-# 
-# escala_eje_2 = 0.00158 # escala_eje_2 = 600 #escala para que partan los dos gráficos en el mismo intercepto
-# 
-# # unir noticias de delincuencia con delitos
-# datos_consolidados_homicidios <- bind_rows(
-#   noticias_prop_mes_suavizado |> mutate(valor = p_s, tipo = "Noticias"),
-#   delincuencia_homicidios |> mutate(valor = n_s, tipo = "Delitos")) |> 
-#   select(fecha, valor, tipo)
-# 
-# datos_consolidados_homicidios |> 
-#   ggplot(aes(fecha, valor, color = tipo)) +
-#   geom_vline(xintercept = c("2020-01-01", "2021-01-01", "2022-01-01", "2023-01-01", "2024-01-01") |> as_date(), alpha = .2, linewidth = .5) +
-#   geom_label(data = ~.x |> group_by(tipo) |> filter(fecha == max(fecha)),
-#              aes(label = paste(" ", tipo)), hjust = 0, color = "black", label.size = 0, label.padding = unit(.1, "mm"), show.legend = F) +
-#   geom_line(linewidth = 1.8, alpha = .7, lineend = "round") +
-#   annotate("label", y = 0.008, x = c("2019-07-01", "2020-07-01", "2021-07-01", "2022-07-01", "2023-07-01", "2024-07-01") |> as_date(), 
-#            label = 2019:2024, label.size = 0, hjust = 0.5, size = 3.5, color = "grey40") +
-#   scale_y_continuous(name = "Noticias sobre delincuencia (porcentaje de noticias al mes)", 
-#                      labels = ~scales::percent(.x, accuracy = 1), 
-#                      breaks = c(0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09), 
-#                      minor_breaks = c(50, 100, 150, 200)/escala_eje_2,
-#                      sec.axis = sec_axis(~ ., breaks = c(50, 75, 100, 125, 150, 175, 200)/escala_eje_2, labels = \(labels) round(labels*escala_eje_2, 0), name = "Delitos reportados al mes en todo el país (miles)")) +
-#   scale_x_date(date_breaks = "3 months", date_labels = "%m", expand = expansion(c(0, 0.05))) +
-#   scale_color_manual(values = c("#D96621", "#179992")) +
-#   theme_minimal() +
-#   # coord_cartesian(clip = "off", ylim = c(.01, .115)) +
-#   guides(color = guide_legend(position = "bottom", title = "", nrow = 1, reverse = T)) +
-#   theme(panel.grid.minor.x = element_blank(), 
-#         axis.title.x = element_blank(), plot.caption = element_text(lineheight = .5),
-#         plot.title.position = "plot", plot.caption.position = "plot", 
-#         legend.box.margin = margin(t = -6, b = -2), legend.text = element_text(margin = margin(l = 2, r = 6))) +
-#   labs(title = "Cobertura de delincuencia en prensa versus estadísticas de delincuencia",
-#        subtitle = "Noticias acerca de delincuencia, comparadas con la cantidad real de delitos reportados en Chile.",
-#        caption = "Autoría: Bastián Olea Herrera, data scientist, magíster en Sociología (PUC).\n
-#        Fuentes: Estadítsicas delictuales obtenidas desde CEAD (en base a datos reportados por PDI y Carabineros).\n
-#        Noticias obtenidas de sitios web de prensa como La Tercera, Emol, CNN, Meganoticias, El Mostrador, ADN y 15 más")
-# 
-# # ggsave(glue::glue("graficos/prensa_delincuencia_vs_reporte3b.jpg"), 
-# #        width = 10, height = 8)
-# # 
-# # 
-# # # library(shades)
-# # # c("#317773" |> brightness(0.6) |> saturation(0.85),
-# # #   "#cf5a13" |> brightness(0.85) |> saturation(0.85)) |> 
-# # #   swatch()
-# # 
-# # # cargar datos del censo, para tasas
-# # censo <- arrow::read_parquet("~/Documents/Apps Shiny/delincuencia_chile/app/censo_proyecciones_año.parquet")
-# # 
-# # censo_anual <- censo |> 
-# #   group_by(año) |> 
-# #   summarize(pob = sum(población))
-# # 
-# # delincuencia_homicidios_tasa <- delincuencia_homicidios |> 
-# #   mutate(año = year(fecha)) |> 
-# #   left_join(censo_anual, by = "año") |> 
-# #   mutate(tasa = (n/pob)*100000)
-# # 
-# # escala_eje_2 = 0.05 # escala_eje_2 = 600 #escala para que partan los dos gráficos en el mismo intercepto
-# # 
-# # # unir noticias de delincuencia con delitos
-# # datos_consolidados_homicidios_tasa <- bind_rows(
-# #   noticias_prop_mes_suavizado |> mutate(valor = p_s, tipo = "Noticias"),
-# #   delincuencia_homicidios_tasa |> mutate(valor = tasa+0.048, tipo = "Homicidios (tasa)"),
-# #   delincuencia_homicidios |> mutate(valor = n_s*escala_eje_2, tipo = "Homicidios total")) |> 
-# #   select(fecha, valor, tipo)
-# # 
-# # datos_consolidados_homicidios_tasa |> 
-# #   ggplot(aes(fecha, valor, color = tipo)) +
-# #   geom_vline(xintercept = c("2020-01-01", "2021-01-01", "2022-01-01", "2023-01-01", "2024-01-01") |> as_date(), alpha = .2, linewidth = .5) +
-# #   geom_label(data = ~.x |> group_by(tipo) |> filter(fecha == max(fecha)),
-# #              aes(label = paste(" ", tipo)), hjust = 0, color = "black", label.size = 0, label.padding = unit(.1, "mm"), show.legend = F) +
-# #   geom_line(linewidth = 1.8, alpha = .7, lineend = "round") +
-# #   annotate("label", y = 0.008, x = c("2019-07-01", "2020-07-01", "2021-07-01", "2022-07-01", "2023-07-01", "2024-07-01") |> as_date(), 
-# #            label = 2019:2024, label.size = 0, hjust = 0.5, size = 3.5, color = "grey40") +
-# #   scale_y_continuous(name = "Noticias sobre delincuencia (porcentaje de noticias al mes)", 
-# #                      labels = ~scales::percent(.x, accuracy = 1), 
-# #                      breaks = c(0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09), 
-# #                      minor_breaks = c(50, 100, 150, 200)/escala_eje_2,
-# #                      sec.axis = sec_axis(~ ., breaks = c(50, 75, 100, 125, 150, 175, 200)/escala_eje_2, labels = \(labels) round(labels*escala_eje_2, 0), name = "Delitos reportados al mes en todo el país (miles)")) +
-# #   scale_x_date(date_breaks = "3 months", date_labels = "%m", expand = expansion(c(0, 0.05))) +
-# #   # scale_color_manual(values = c("#D96621", "#179992")) +
-# #   theme_minimal() +
-# #   # coord_cartesian(clip = "off", ylim = c(.01, .115)) +
-# #   guides(color = guide_legend(position = "bottom", title = "", nrow = 1, reverse = T)) +
-# #   theme(panel.grid.minor.x = element_blank(), 
-# #         axis.title.x = element_blank(), plot.caption = element_text(lineheight = .5),
-# #         plot.title.position = "plot", plot.caption.position = "plot", 
-# #         legend.box.margin = margin(t = -6, b = -2), legend.text = element_text(margin = margin(l = 2, r = 6))) +
-# #   labs(title = "Cobertura de delincuencia en prensa versus estadísticas de delincuencia",
-# #        subtitle = "Noticias acerca de delincuencia, comparadas con la cantidad real de delitos reportados en Chile.",
-# #        caption = "Autoría: Bastián Olea Herrera, data scientist, magíster en Sociología (PUC).\n
-# #        Fuentes: Estadítsicas delictuales obtenidas desde CEAD (en base a datos reportados por PDI y Carabineros).\n
-# #        Noticias obtenidas de sitios web de prensa como La Tercera, Emol, CNN, Meganoticias, El Mostrador, ADN y 15 más")
+# g_noticias_homicidios
+# g_casos_homicidios
+
+library(patchwork)
+library(scales)
+
+g_casos_delincuencia + g_noticias_delincuencia &
+  scale_x_date(date_breaks = "years", date_labels = "%Y") &
+  labs(x = NULL)
+
+g_casos_homicidios + g_noticias_homicidios &
+  scale_x_date(date_breaks = "years", date_labels = "%Y") &
+  labs(x = NULL)

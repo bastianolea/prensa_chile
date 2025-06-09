@@ -29,10 +29,13 @@ if (!exists("muestra_llm")) muestra_llm = 3000 # definir cantidad de noticias a 
 estimar_tiempo(muestra_llm, 8.1)
 
 datos_muestra <- datos_prensa |> 
-  filter(año >= 2024) |> 
-  # filter(fecha > (today() - months(4))) |> 
+  filter(año >= 2023) |>
+  # filter(fecha > (today() - months(4))) |>
+  # filter(id %in% noticias_delincuencia$id) |> 
+  select(id, bajada, cuerpo) |> 
   filter(!id %in% anterior$id) |> 
-  slice_sample(n = muestra_llm)
+  # slice_sample(n = muestra_llm)
+  slice(1:muestra_llm)
 
 
 # separar en piezas ----

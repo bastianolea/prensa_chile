@@ -8,7 +8,7 @@ Actualmente, el corpus de noticias obtenido supera las 800.000 noticias individu
 ----
 
 ## Datos
-Los datos obtenidos mediante este repositorio van sumando más de 800 mil noticias. Los datos, por su peso, no están disponibles de forma pública. Sin embargo, [puedes acceder a una muestra de 3.000 noticias del año 2024, seleccionadas al azar, en la carpeta datos de este repositorio.](https://github.com/bastianolea/prensa_chile/tree/main/datos) Esta seleccion de datos contiene texto de titulares, cuerpo de noticia, fuente y fecha.
+Los datos obtenidos mediante este repositorio van sumando más de 800 mil noticias. Los datos, por su peso, no están disponibles de forma pública. Sin embargo, [puedes acceder a una muestra de 10.000 noticias del año 2024, seleccionadas al azar, en la carpeta datos de este repositorio.](https://github.com/bastianolea/prensa_chile/tree/main/datos) Esta seleccion de datos contiene texto de titulares, cuerpo de noticia, fuente y fecha.
 
 ![](otros/graficos/resultados/datos_prensa_scraping_2024-12-31.mov)
 
@@ -24,7 +24,7 @@ Los datos obtenidos mediante este repositorio van sumando más de 800 mil notici
 [Accede a la aplicación en este enlace](https://bastianoleah.shinyapps.io/prensa_chile/)
 
 <a href = "https://bastianoleah.shinyapps.io/prensa_chile/">
-<img src="apps/prensa_chile/pantallazos/analisis_prensa_chile_semanal.jpg" height="900px" />
+<img src="apps/prensa_chile/otros/pantallazos/analisis_prensa_chile_semanal.jpg" height="900px" />
 </a>
 
 

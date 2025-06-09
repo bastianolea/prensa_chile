@@ -37,7 +37,7 @@ estimar_tiempo(muestra_llm, 4.9)
 
 # todas las noticias, partiendo por las más recientes
 datos_muestra <- datos_prensa |>
-  filter(año >= 2024) |> 
+  filter(año >= 2023) |> 
   select(id, bajada, cuerpo) |>
   filter(!id %in% anterior$id) |> 
   slice(1:muestra_llm)
