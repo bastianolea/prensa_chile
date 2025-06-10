@@ -9,20 +9,25 @@ palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
                           "país", "persona", "comunicación", "señor",
                           "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
                           "leer", "artículo", "completo", "articular", "completar", # cooperatva ("leer articulo completo")
-                          "relacionadasdetalle", "null", # emol
                           "publicación", # elmostrador
                           "mercer", #cnnchile y otros
                           "detallar" # meganoticias
 )
 
+palabras_basura = c("right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
+                    "pred", "fs", "us", "april", "flickr", "datawrapper", "data", "fried", "ftx", "medium", "exante", "server", "family", "loc", "lon", "mag", "prof", "lat", "gpt", "banner", "donación",
+                    "style", "relacionadasdetalle", "null",
+                    "containerstyleflexdirection", "firstdivstylemarginbottom", "firstdivstylewidth", "formstyleflexdirection", "formulariostyleflex", "lastdivstylewidth", "submitstylecursor", 
+                    "updatelayout", "function", "formulario", "transmision", "containerstyleflexdirection", "firstdivstylemarginbottom", 
+                    "fontsize", "backgroundcolor", "display", "padding", "width", "lineheight", 
+                    "alignitems", "marginleft", "sansserif", "height", "margintop",
+                    "aton", "emolmlt", "font", "border", "margin", #emol
+                    "rectangle", "container", "img", "display", "sans", "end", "weight", "content", "rem", "flex", "border", "bottom", "margin", "padding", "center", 
+                    "radius", "text", "síguenos", "solid", "items", "dadada", "droidsans", "justify", "serif", "push", "function", "cmd", "div", "googletag", "ad",
+                    "protected", "email")
+
 palabras_eliminar = c(palabras_irrelevantes,
-                      "right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
-                      "pred", "fs", "us", "april", "flickr", "datawrapper", "data", "fried", "ftx", "medium", "exante", "server", "family", "loc", "lon", "mag", "prof", "lat", "gpt", "banner", "donación",
-                      "style", 
-                      "aton", "emolmlt", "font", "border", "margin", #emol
-                      "rectangle", "container", "img", "display", "sans", "end", "weight", "content", "rem", "flex", "border", "bottom", "margin", "padding", "center", 
-                      "radius", "text", "síguenos", "solid", "items", "dadada", "droidsans", "justify", "serif", "push", "function", "cmd", "div", "googletag", "ad",
-                      "protected", "email")
+                      palabras_basura)
 
 
 
@@ -234,9 +239,10 @@ limpiar_texto <- function(x) {
   x |> 
     textclean::strip() |> 
     # tolower() |> 
-    # str_replace_all("[[:punct:]]", " ") |> 
+    # str_remove_all("[[:punct:]]") |>
     # str_replace_all("[0-9]", " ") |> 
     # str_replace_all("\\||\\<|\\>|@|-|—|\\{|\\}|\\[|\\]|\\=|“", " ") |> 
+    str_remove_all(palabras_basura |> unique() |> paste(collapse = "|")) |> 
     str_trim() |> 
     str_squish()
 }
@@ -244,7 +250,7 @@ limpiar_texto <- function(x) {
 
 limpiar_texto_poquito <- function(x) {
   x |> 
-    str_replace_all("dfp:|\\n|\\r", " ") |> 
+    str_remove_all("dfp:|\\n|\\r") |> 
     str_trim() |> 
     str_squish()
 }
