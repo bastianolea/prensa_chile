@@ -11,7 +11,7 @@ library(furrr)
 library(tidytext)
 source("funciones.R")
 
-plan(multisession, workers = 7)
+plan(multisession, workers = 8)
 # options(future.globals.maxSize = 2048*1024^2)
 
 tictoc::tic()
@@ -23,15 +23,13 @@ if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_d
 datos_prensa_split <- datos_prensa |>
   filter(año >= 2018) |>
   select(id, cuerpo_limpio) |> 
-  mutate(grupos = (row_number()-1) %/% (n()/30)) |> # n grupos de igual cantidad de filas
+  mutate(grupos = (row_number()-1) %/% (n()/16)) |> # n grupos de igual cantidad de filas
   group_split(grupos)
 
 
 # tokenización de texto por partes, multiprocesador
-# future_walk(datos_prensa_split, \(parte) {
 prensa_palabras <- future_map(datos_prensa_split, \(parte) {
-  
-  palabras <- parte |> 
+  parte |> 
     select(-grupos) |> 
     unnest_tokens(output = palabra, 
                   input = cuerpo_limpio,
@@ -42,39 +40,41 @@ prensa_palabras <- future_map(datos_prensa_split, \(parte) {
     filter(palabra != "") |> 
     # eliminar palabras irrelevantes
     filter(!palabra %in% palabras_eliminar)
+})
+
+# conteo total de palabras
+message(paste("total de palabras:", map(prensa_palabras, nrow) |> unlist() |> sum() |> format(big.mark = ".", decimal.mark = ",")))
+
+# mínimo de repeticiones y largo de de palabras
+prensa_palabras_filt <- future_map(prensa_palabras, \(parte) {
+    parte |> 
+    add_count(palabra, name = "palabra_freq_total") |> 
+    # excluir palabra si se repite menos de x veces
+      filter(palabra_freq_total > 10) |> 
+    # excluir por longitud
+      filter(nchar(palabra) >= 3, # palabra más corta
+             nchar(palabra) < 23) # palabra más larga del español según rae
+  })
   
-  # descomentar esto para usar paso intermedio que guarda resultados por piezas en el disco duro, para evitar que se caiga el proceso por falta de memoria
-  # # guardar resultados individuales
-  # readr::write_rds(palabras, 
-  #                  file = paste0("datos/preprocesados_palabras/palabras_", parte$grupos[1], ".rds"), compress = "gz")
-  return(palabras)
-}) |> 
+message(paste("total de palabras post filtro:", map(prensa_palabras_filt, nrow) |> unlist() |> sum() |> format(big.mark = ".", decimal.mark = ",")))
+
+prensa_palabras <- prensa_palabras_filt |> 
   list_rbind()
-
-# descomentar esto para usar paso intermedio que guarda resultados por piezas en el disco duro, para evitar que se caiga el proceso por falta de memoria
-# cargar piezas individuales
-# prensa_palabras <- map(fs::dir_ls("datos/preprocesados_palabras/"), readr::read_rds) |> 
-#   list_rbind()
-
-message(paste("total de palabras:", 
-              nrow(prensa_palabras) |> format(big.mark = ".", decimal.mark = ",")))
-
 
 ## guardar ----
 arrow::write_parquet(prensa_palabras, "datos/prensa_palabras.parquet")
 
 # guardar cantidad de palabras
 n_palabras <- prensa_palabras |> 
-  nrow() |> 
+  map(nrow) |> unlist() |> sum() |> 
   signif(digits = 3)
 
 n_palabras |> write("datos/prensa_n_palabras.txt")
 n_palabras |> write("apps/prensa_chile/prensa_n_palabras.txt")
 
 plan(multisession)
-rm(datos_prensa_split
-   # prensa_palabras
-   )
+rm(datos_prensa_split,
+   prensa_palabras_filt)
 invisible(gc())
 
 # beepr::beep()

@@ -14,17 +14,22 @@ palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
                           "detallar" # meganoticias
 )
 
-palabras_basura = c("right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
+palabras_basura = c("aaa", "aba", "right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
                     "pred", "fs", "us", "april", "flickr", "datawrapper", "data", "fried", "ftx", "medium", "exante", "server", "family", "loc", "lon", "mag", "prof", "lat", "gpt", "banner", "donación",
                     "style", "relacionadasdetalle", "null",
-                    "containerstyleflexdirection", "firstdivstylemarginbottom", "firstdivstylewidth", "formstyleflexdirection", "formulariostyleflex", "lastdivstylewidth", "submitstylecursor", 
+                    "containerstyleflexdirection", "firstdivstylemarginbottom", "first", "div", "formstyleflexdirection", "formulario", "style", "flex", "last", "cursor", 
+                    "document", "deventlistenerdomloedevent", "query", "selector", "all", "responsive", "firstchild",
+                    "tablaennotici", "notatablaemol", "public",
+                    "demr", "detalleicon", "important", "notatablaemol", "tablaennotici", "tdnthchildn", "arial",
                     "updatelayout", "function", "formulario", "transmision", "containerstyleflexdirection", "firstdivstylemarginbottom", 
-                    "fontsize", "backgroundcolor", "display", "padding", "width", "lineheight", 
-                    "alignitems", "marginleft", "sansserif", "height", "margintop",
+                    "fontsize", "backgroundcolor", "display", "padding", "width", "lineheight", "ifslength", "kok", "queryselectorall", "queryselectorinputtyp",
+                    "elements", "submit", "www", "ficon",
+                    "alignitems", "margin", "left", "sans", "serif", "height", "margin", "top",
                     "aton", "emolmlt", "font", "border", "margin", #emol
                     "rectangle", "container", "img", "display", "sans", "end", "weight", "content", "rem", "flex", "border", "bottom", "margin", "padding", "center", 
                     "radius", "text", "síguenos", "solid", "items", "dadada", "droidsans", "justify", "serif", "push", "function", "cmd", "div", "googletag", "ad",
-                    "protected", "email")
+                    "protected", "email",
+                    "aach", "aafp", "aafdf") |> unique()
 
 palabras_eliminar = c(palabras_irrelevantes,
                       palabras_basura)
@@ -237,14 +242,15 @@ revisar_url <- function(url) {
 
 limpiar_texto <- function(x) {
   x |> 
+    # es mejor convertir a espacios que eliminar, porque así se separan de la anterior/siguiente palabra
+    str_replace_all("[[:punct:]]", " ") |>
+    str_replace_all("[[:digit:]]", " ") |>
+    str_replace_all("\\||\\<|\\>|@|-|—|\\{|\\}|\\[|\\]|\\=|“", " ") |>
     textclean::strip() |> 
     # tolower() |> 
-    # str_remove_all("[[:punct:]]") |>
-    # str_replace_all("[0-9]", " ") |> 
-    # str_replace_all("\\||\\<|\\>|@|-|—|\\{|\\}|\\[|\\]|\\=|“", " ") |> 
-    str_remove_all(palabras_basura |> unique() |> paste(collapse = "|")) |> 
-    str_trim() |> 
-    str_squish()
+    str_replace_all(palabras_basura |> unique() |> paste(collapse = "|"), " ") |> 
+    str_squish() |> 
+    str_trim()
 }
 
 

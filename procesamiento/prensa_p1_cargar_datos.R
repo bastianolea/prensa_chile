@@ -103,7 +103,7 @@ modulos_limpios <- future_map(modulos_cargados, \(modulo) {
     # noticias con título
     filter(nchar(titulo) > 20) |> 
     # noticias con cuerpo
-    filter(nchar(cuerpo) > 100)
+    filter(nchar(cuerpo) > 400)
   
   if (nrow(datos_2) == 0) return(NULL)
   

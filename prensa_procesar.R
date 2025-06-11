@@ -7,7 +7,7 @@ library(lubridate)
 fecha_limite = floor_date(today(), unit = "week", week_start = 7) # domingo que termina la semana, para prensa semanal
 
 # cantidad de textos a procesar con LLM
-muestra_llm = 4000 # 9 horas con 2 procesos LLM
+muestra_llm = 20000 # 9 horas con 2 procesos LLM
 
 # memoria por thread
 plan(multisession, workers = 8)
@@ -45,7 +45,7 @@ source("procesamiento/prensa_correlacion.R", echo = T)
 # output: datos/prensa_correlacion.parquet, datos/prensa_correlacion_fuente.parquet
 
 # # resumen de noticias usando modelos de lenguaje
-# source("procesamiento/prensa_llm_resumen.R", echo = T)
+source("procesamiento/prensa_llm_resumen.R", echo = T)
 # # output: prensa_llm_resumen.parquet
 
 # # sentimiento de noticias usando modelos de lenguaje
