@@ -53,6 +53,8 @@ prensa_palabras_split <- prensa_palabras |>
   mutate(grupo = (row_number()-1) %/% (n()/16)) |> # n grupos de igual cantidad de filas
   group_split(grupo)
 
+rm(prensa_palabras)
+
 ## raiz ----
 # obtener raíz de palabras
 # el objetivo de esto es que, como un mismo concepto puede tener varias conjugaciones, se obtiene la raíz de cada palabra,
@@ -117,6 +119,7 @@ prensa_palabras_raiz <- future_map(prensa_palabras_split, \(parte) {
   return(resultado)
 })
 
+rm(prensa_palabras_split)
 plan(multisession, workers = 8)
 
 
@@ -132,19 +135,19 @@ prensa_palabras_conteo <- prensa_palabras_raiz |>
 
 
 # guardar ----
-prensa_palabras_raiz <- prensa_palabras_raiz |> list_rbind()
+prensa_palabras_raiz <- list_rbind(prensa_palabras_raiz)
 
 arrow::write_parquet(prensa_palabras_raiz, "datos/prensa_palabras_raiz.parquet")
 arrow::write_parquet(prensa_palabras_conteo, "datos/prensa_palabras_conteo.parquet")
 # arrow::read_parquet("datos/prensa_palabras_conteo.parquet")
 
 # limpieza
-plan(multisession)
 rm(prensa_palabras,
    prensa_palabras_pre,
    prensa_palabras_split)
    # prensa_palabras_raiz
    # prensa_palabras_conteo
+plan(multisession)
 invisible(gc())
 
 tictoc::toc()

@@ -241,6 +241,10 @@ revisar_url <- function(url) {
 
 
 limpiar_texto <- function(x) {
+  
+  palabras_basura <- paste("\\b", palabras_basura, "\\b", sep = "") |> 
+    paste(collapse = "|")
+  
   x |> 
     # es mejor convertir a espacios que eliminar, porque así se separan de la anterior/siguiente palabra
     str_replace_all("[[:punct:]]", " ") |>
@@ -248,7 +252,7 @@ limpiar_texto <- function(x) {
     str_replace_all("\\||\\<|\\>|@|-|—|\\{|\\}|\\[|\\]|\\=|“", " ") |>
     textclean::strip() |> 
     # tolower() |> 
-    str_replace_all(palabras_basura |> unique() |> paste(collapse = "|"), " ") |> 
+    str_replace_all(palabras_basura, " ") |> 
     str_squish() |> 
     str_trim()
 }
@@ -256,7 +260,7 @@ limpiar_texto <- function(x) {
 
 limpiar_texto_poquito <- function(x) {
   x |> 
-    str_remove_all("dfp:|\\n|\\r") |> 
+    str_replace_all("dfp:|\\n|\\r", " ") |> 
     str_trim() |> 
     str_squish()
 }

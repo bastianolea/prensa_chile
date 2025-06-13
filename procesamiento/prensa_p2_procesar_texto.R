@@ -63,10 +63,11 @@ prensa_palabras <- prensa_palabras_filt |>
 
 ## guardar ----
 arrow::write_parquet(prensa_palabras, "datos/prensa_palabras.parquet")
+prensa_palabras <- arrow::read_parquet("datos/prensa_palabras.parquet")
 
 # guardar cantidad de palabras
 n_palabras <- prensa_palabras |> 
-  map(nrow) |> unlist() |> sum() |> 
+  nrow() |> 
   signif(digits = 3)
 
 n_palabras |> write("datos/prensa_n_palabras.txt")
