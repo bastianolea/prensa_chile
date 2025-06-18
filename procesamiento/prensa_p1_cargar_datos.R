@@ -73,7 +73,7 @@ modulos_cargados <- future_map(archivos_modulos, \(archivo_modulo) {
 modulos_cargados <- map(modulos_cargados, \(modulo) {
 
   filas <- nrow(modulo)
-  grupos <- filas %/% 20000 # un grupo cada 10000 observaciones
+  grupos <- filas %/% 100000 # un grupo cada 10000 observaciones
 
   if (filas >= 20000) {
     modulo <- modulo |>

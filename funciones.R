@@ -14,7 +14,9 @@ palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
                           "detallar" # meganoticias
 )
 
-palabras_basura = c("aaa", "aba", "right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
+palabras_basura = c("aaa", "aba", "aaisa", "aap",
+                    "jpg", "like", "new", "child", "https", "length",
+                    "right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
                     "pred", "fs", "us", "april", "flickr", "datawrapper", "data", "fried", "ftx", "medium", "exante", "server", "family", "loc", "lon", "mag", "prof", "lat", "gpt", "banner", "donación",
                     "style", "relacionadasdetalle", "null",
                     "containerstyleflexdirection", "firstdivstylemarginbottom", "first", "div", "formstyleflexdirection", "formulario", "style", "flex", "last", "cursor", 

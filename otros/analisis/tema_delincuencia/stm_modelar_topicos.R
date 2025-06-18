@@ -3,70 +3,64 @@ library(purrr)
 library(furrr)
 library(arrow)
 library(stm)
+library(tidytext)
 library(tictoc)
 
 # cargar datos ----
 if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.parquet")
-if (!exists("prensa_palabras_raiz")) prensa_palabras_raiz <- read_parquet("datos/prensa_palabras_raiz.parquet")
+# if (!exists("prensa_palabras_raiz")) prensa_palabras_raiz <- read_parquet("datos/prensa_palabras_raiz.parquet")
+if (!exists("prensa_palabras_conteo")) prensa_palabras_conteo <- arrow::read_parquet("datos/prensa_palabras_conteo.parquet")
 
 # preparar datos ----
 sample_n = 100000
 
-datos_prensa_filt <- datos_prensa |> 
+# ideas: sacar noticias sobre sismos, incendio y meteorología
+
+datos_prensa <- datos_prensa |> 
   select(id, año) |> 
-  filter(año >= 2018) |> 
+  filter(año >= 2020) |> 
+  filter() |> 
   slice_sample(n = sample_n)
 
-prensa_palabras_raiz_filt <- prensa_palabras_raiz |> 
-  filter(id %in% datos_prensa_filt$id)
+# muestra de los documentos con palabras contadas
+prensa_palabras_conteo <- prensa_palabras_conteo |> 
+  filter(id %in% datos_prensa$id)
 
-plan(multisession, workers = 8)
+rm(datos_prensa)
 
-prensa_palabras_stem <- prensa_palabras_raiz_filt |> 
-  mutate(grupo = (row_number()-1) %/% (n()/16)) |> # n grupos de igual cantidad de filas
-  group_split(grupo) |> 
-  future_map(~summarise(.x, cuerpo_limpio_stem = paste(raiz, collapse = " "), .by = id)) |> 
-  list_rbind()
+# crear document-term matrix desde datos de palabras contadas
+prensa_dtm <- prensa_palabras_conteo |> 
+  tidytext::cast_dtm(id, palabra, n)
 
-# asumiendo que el orden de las palabras es irrelevante
+# convertir a formato de stm
+prensa_corpus <- readCorpus(prensa_dtm, type = "slam")
 
-# rm(datos_prensa)
+rm(prensa_dtm)
 
-# # lematizar palabras del cuerpo o título
-# datos_stem <- datos_prensa_filt |> 
-#   rowwise() |> 
-#   mutate(cuerpo_limpio_stem = corpus::text_tokens(cuerpo_limpio, stemmer = "es") |> unlist() |> paste(collapse = " ")) |> 
-#   ungroup()
-
-# procesamiento de texto necesario para el modelamiento
-# en teoría no es necesario de usar, pero te genera los outputs necesarios para la siguiente función
-processed <- stm::textProcessor(documents = prensa_palabras_stem$cuerpo_limpio_stem,
-                                metadata = prensa_palabras_stem,
-                                lowercase = F, removestopwords = F, removepunctuation = F, removenumbers = F, verbose = F,
-                                stem = FALSE, 
-                                language = "spanish")
-
-out <- stm::prepDocuments(processed$documents, processed$vocab, processed$meta,
-                          upper.thresh = sample_n*0.7,
-                          lower.thresh = sample_n*0.01)
+# preparar documentos
+out <- stm::prepDocuments(prensa_corpus$documents, prensa_corpus$vocab, prensa_corpus$meta,
+                          upper.thresh = sample_n*0.9,
+                          lower.thresh = sample_n*0.005)
 
 
 # buscar K ----
-# tic()
-# findingk_ver2 <- searchK(documents = out$documents,
-#                          vocab = out$vocab,
-#                          K = c(16, 18, 19, 20), # probar cantidades de k
-#                          max.em.its = 100,
-#                          data = out$meta,
-#                          init.type = "Spectral")
-# toc(); beepr::beep() # 3335 segundos
+tic()
+findingk_ver2 <- searchK(documents = out$documents,
+                         vocab = out$vocab,
+                         K = c(17, 18, 19, 20), # probar cantidades de k
+                         data = out$meta, 
+                         cores = 7,
+                         init.type = "Spectral")
+toc(); beepr::beep() # 3335 segundos
+# 15696 segundos con 200000 y 0.9 y 0.005
+# 594 segs con 50000 y 8 cores
+# 2215 s con 100000 y 7 cores
 
-
-# plot(findingk_ver2)
-# maximizar coherencia y helf-out likelihood, minimizar residuales
+plot(findingk_ver2)
+# maximizar coherencia y held-out likelihood, minimizar residuales
 
 # definir k en base a lo anterior
-.k = 18
+.k = 19
 
 
 # calcular modelo ----
@@ -74,7 +68,7 @@ tic()
 modelo_stm <- stm(documents = out$documents, 
                   vocab = out$vocab,
                   K = .k, 
-                  max.em.its = 300,
+                  max.em.its = 300, 
                   data = out$meta,
                   init.type = "Spectral")
 toc() # 425 segundos
@@ -84,9 +78,25 @@ toc() # 425 segundos
 
 labelTopics(modelo_stm)
 
-# topico 18
+# 2 ~ "economía",
+# 3 ~ "delincuencia",
+# 4 ~ "gobierno",
+# 5 ~ "internacional",
+# 6 ~ "parlamento",
+# 11 ~ "justicia",
+# 12 ~ "social",
+# 13 ~ 
+
+# topico 12
+
+# agregar ids de noticias usadas para entrenar
+modelo_stm$id <- unique(prensa_palabras_conteo$id)
+message(paste(length(prensa_palabras_conteo$id), "palabras"))
+message(paste(length(unique(prensa_palabras_conteo$id)), "documentos"))
 
 # guardar ----
-readr::write_rds(modelo_stm, "otros/analisis/tema_delincuencia/modelos/modelo_stm.rds")
+readr::write_rds(modelo_stm, "otros/analisis/tema_delincuencia/modelos/modelo_stm_5.rds")
 
-out$meta
+# out$meta$id
+# names(modelo_stm)
+

@@ -26,12 +26,16 @@ if (!exists("prensa_palabras")) prensa_palabras <- arrow::read_parquet("datos/pr
 # palabras para excluir de la lematización, porque alterar su sufijo cambia el sentido del concepto, o bien, hace que se agrupe con palabras erróneas
 palabras_excluir_stem = c("caso", "casar", "juzgado", "proyecto",
                           "añosa", "años", "salud", "maduro",
-                          "suministro", "calama", "abogado",
+                          "suministro", "calama", "abogado", 
                           "luis", "luisa",
-                          "público", "pública",
+                          "público", "pública", 
+                          "constitución",
                           # sospechas
+                          "salud", "saludable", "partida",
                           "calle", "calles", "sujeto", "sujetos"
 )
+# acá se pueden agregar palabras incorrectas que se ponen como si fueran la versión neutra de una palabra lematizada (por ejemplo, "saludar" como lematización de "salud")
+# luego habría que agregar estas a la agrupación manual de palabras
 # corpus::stem_snowball("calles", algorith = "es")
 
 # calcular ----
@@ -93,20 +97,29 @@ prensa_palabras_raiz <- future_map(prensa_palabras_split, \(parte) {
     mutate(palabra = case_match(palabra,
                                 c("venezolano", "venezolana") ~ "venezuela",
                                 c("inmigrantes", "inmigrante", "migrantes", "migrante", "migrar", "inmigrar", "migración", "inmigración", "migratorio", "migratoria", "emigrar") ~ "migración",
-                                c("delincuencia", "delincuente", "delincuencial", "delinquir", "delictual") ~ "delincuencia",
+                                c("delincuencia", "delincuente", "delincuencial", "delinquir", "delictual", "delito") ~ "delincuencia",
                                 c("seguridad", "inseguridad", "inseguro") ~ "seguridad",
                                 "abogada" ~ "abogado",
-                                "partida" ~ "partido",
+                                # "partida" ~ "partido",
                                 "policial" ~ "policía",
                                 "antisociales" ~ "antisocial",
-                                "saqueo" ~ "saquear",
+                                c("saqueo", "saqueado") ~ "saquear",
                                 "calles" ~ "calle",
                                 "sujetos" ~ "sujeto",
+                                "saludable" ~ "salud",
+                                "saludo" ~ "saludar",
+                                "buses" ~ "bus",
+                                c("constituyente", "constitucional") ~ "constitución",
+                                c("económica", "económico") ~ "economía",
+                                "monetaria" ~ "monetario",
                                 c("unidad", "unido", "unir", "unid") ~ "unidad",
                                 c("municipal", "municipio") ~ "municipalidad",
-                                "alcaldesa" ~ "alcalde",
+                                c("alcadía", "alcaldesa") ~ "alcalde",
+                                c("diputada", "diputado", "diputados", "diputadas", "diputación") ~ "diputado/a",
                                 c("ministro", "ministra", "ministros", "ministras") ~ "ministro/a",
                                 c("presidenta", "presidencial") ~ "presidente",
+                                "gabrielboric" ~ "boric",
+                                "inversión" ~ "invertir",
                                 c("pública", "públicas", "públicos") ~ "público",
                                 .default = palabra)) |> 
     # corregir palabras lematizadas

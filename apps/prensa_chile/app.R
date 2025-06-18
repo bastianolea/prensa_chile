@@ -86,7 +86,7 @@ palabras_posibles <- palabras_semana |>
 
 fuentes <- palabras_semana_fuente$fuente |> unique() |> sort()
 
-topicos <- sentimiento$clasificacion |> unique() |> na.exclude()
+topicos <- sentimiento$clasificacion |> unique() |> na.exclude() |> str_subset("Sin", negate = T)
 
 
 
