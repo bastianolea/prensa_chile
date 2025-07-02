@@ -60,14 +60,14 @@ procesadas <- procesamiento |>
   filter(p > 0.5) |> 
   arrange(desc(p))
 
-procesadas$fuente
+# procesadas$fuente
 
 procesar <- procesamiento |> 
   filter(calculado == "calculado") |> 
   filter(p <= 0.6) |> 
   arrange(desc(p))
 
-procesar$fuente
+# procesar$fuente
 
 
 # guardar ----

@@ -96,14 +96,17 @@ modulos_limpios <- future_map(modulos_cargados, \(modulo) {
   if (nrow(modulo) == 0) return(NULL)
   
   datos_2 <- modulo |>
-    # noticias únicas
-    distinct(url, .keep_all = TRUE) |> 
     # limpiar fuentes
     mutate(fuente = str_remove(fuente, "_pais")) |> 
     # noticias con título
     filter(nchar(titulo) > 20) |> 
     # noticias con cuerpo
-    filter(nchar(cuerpo) > 400)
+    filter(nchar(cuerpo) > 400) |> 
+    # excluir scrapings con errores
+    filter(!str_detect(titulo, "googletag")) |> # el ciudadano
+    filter(!str_detect(cuerpo, "first-child|container\\.style")) |> # el mostrador
+    # noticias únicas
+    distinct(url, .keep_all = TRUE)
   
   if (nrow(datos_2) == 0) return(NULL)
   

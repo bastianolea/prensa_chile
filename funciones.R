@@ -8,14 +8,17 @@ palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
                           "año", "años", "añosa", "añosen",
                           "país", "persona", "comunicación", "señor",
                           "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+                          "youtube",
                           "leer", "artículo", "completo", "articular", "completar", # cooperatva ("leer articulo completo")
                           "publicación", # elmostrador
                           "mercer", #cnnchile y otros
                           "detallar" # meganoticias
 )
 
-palabras_basura = c("aaa", "aba", "aaisa", "aap",
-                    "jpg", "like", "new", "child", "https", "length",
+palabras_basura = c("aaa", "aba", "aaisa", "aap", 
+                    "RelacionadasDetalle",
+                    "TradingView", "Widget BEGIN", "Widget END",
+                    "jpg", "like", "new", "child", "https", "length", "https", "http", "domcontentloaded", "flexdirection", "firstdiv", "pointer", "addeventlistener", "queryselector", "marginbottom", "containers", "lastdiv", "foreach", "innerwidth",
                     "right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
                     "pred", "fs", "us", "april", "flickr", "datawrapper", "data", "fried", "ftx", "medium", "exante", "server", "family", "loc", "lon", "mag", "prof", "lat", "gpt", "banner", "donación",
                     "style", "relacionadasdetalle", "null",
@@ -241,6 +244,13 @@ revisar_url <- function(url) {
 
 
 
+limpiar_texto_poquito <- function(x) {
+  x |> 
+    str_replace_all("dfp:|\\n|\\r", " ") |> 
+    str_trim() |> 
+    str_squish()
+}
+
 
 limpiar_texto <- function(x) {
   
@@ -248,6 +258,13 @@ limpiar_texto <- function(x) {
     paste(collapse = "|")
   
   x |> 
+    # eliminar código
+    str_replace_all("\\{.*\\}", " ") |>
+    # eliminar hashtags
+    str_replace_all("\\#.*\\b", " ") |>
+    # eliminar código ciper
+    str_replace_all("var divElement.*\\);", " ") |> 
+    str_remove_all("\\{\\{.*\\}\\}") |> 
     # es mejor convertir a espacios que eliminar, porque así se separan de la anterior/siguiente palabra
     str_replace_all("[[:punct:]]", " ") |>
     str_replace_all("[[:digit:]]", " ") |>
@@ -259,13 +276,6 @@ limpiar_texto <- function(x) {
     str_trim()
 }
 
-
-limpiar_texto_poquito <- function(x) {
-  x |> 
-    str_replace_all("dfp:|\\n|\\r", " ") |> 
-    str_trim() |> 
-    str_squish()
-}
 
 
 revisar_scraping <- function(data) {

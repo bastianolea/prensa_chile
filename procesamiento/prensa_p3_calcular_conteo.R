@@ -29,7 +29,8 @@ palabras_excluir_stem = c("caso", "casar", "juzgado", "proyecto",
                           "suministro", "calama", "abogado", 
                           "luis", "luisa",
                           "público", "pública", 
-                          "constitución",
+                          "constitución", "tasa",
+                          "comunista", "comunismo",
                           # sospechas
                           "salud", "saludable", "partida",
                           "calle", "calles", "sujeto", "sujetos"
@@ -109,6 +110,7 @@ prensa_palabras_raiz <- future_map(prensa_palabras_split, \(parte) {
                                 "saludable" ~ "salud",
                                 "saludo" ~ "saludar",
                                 "buses" ~ "bus",
+                                c("comunista", "comunistas", "comunismo") ~ "comunista",
                                 c("constituyente", "constitucional") ~ "constitución",
                                 c("económica", "económico") ~ "economía",
                                 "monetaria" ~ "monetario",

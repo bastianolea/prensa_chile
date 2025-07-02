@@ -13,3 +13,5 @@ datos/*
 scraping/datos/*
 scraping/fuentes/*
 !scraping/fuentes/scraping_ejemplo.R
+analisis/modelos/*
+analisis/resultados/*

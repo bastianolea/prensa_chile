@@ -15,7 +15,7 @@ resumen <- read_parquet("datos/prensa_llm_resumen.parquet")
 
 # unir
 datos <- bind_rows(sentimiento |> mutate(tipo = "sentimiento", orden = row_number()),
-                   # clasificacion |> mutate(tipo = "clasificacion", orden = row_number()),
+                   clasificacion |> mutate(tipo = "clasificacion", orden = row_number()),
                    resumen |> mutate(tipo = "resumen", orden = row_number())
                    )
 
@@ -113,8 +113,8 @@ if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_d
 
 # revisar estado de cálculos
 datos_muestra <- datos_prensa |>
-  filter(año >= 2024)
-  # filter(fecha > (today() - months(4)))
+  # filter(año >= 2024)
+  filter(fecha > (today() - months(1)))
 
 estado <- datos_muestra |> 
   mutate(calculado = ifelse(id %in% unique(datos$id), "calculado", "calcular")) |> 
