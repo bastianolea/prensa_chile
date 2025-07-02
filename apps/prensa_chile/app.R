@@ -582,7 +582,7 @@ ui <- page_fluid(
       div(
         h3("Análisis de sentimiento"),
         
-        markdown("Para esta visualización, se utilizó un [modelo extenso de lenguaje (LLM) de inteligencia artificial](https://bastianolea.rbind.io/blog/analisis_sentimiento_llm/) para procesar el contenido de cada noticia, y en base a su texto, asignarle un sentimiento y un tema.
+        markdown("Para esta visualización, se utilizó un [modelo extenso de lenguaje (LLM) de inteligencia artificial](https://bastianolea.rbind.io/blog/analisis_sentimiento_llm/) para procesar el contenido de cada noticia, y en base a su texto, asignarle un sentimiento. Adicionalmente, se entrenó un modelo de _machine learning_ de modelamiento estructural de tópicos (STM) para encontrar los tópicos o temáticas principales de las noticias, y luego se usa ese modelo para predecir a qué tópico pertenece cada noticia.
              Por _sentimiento_ nos referimos a si el contenido semántico del texto describe un suceso positivo, neutro o negativo; por ejemplo, una noticia sobre un suceso trágico será negativa. Por _tema_ nos referimos a la clasificación de los textos noticiosos en distintas categorías temáticas o tópicos, como pueden ser noticias sobre política, economía, policial, etc."),
         
         layout_columns(col_widths = c(4, 4, 4),
@@ -644,7 +644,7 @@ ui <- page_fluid(
         
         # disclaimer ia
         div(style = css(font_size = "70%", margin_top = "6px"),
-            markdown("_Recordar que los modelos de inteligencia artificial pueden cometer errores y clasificar textos de forma incorrecta. Si en este procesamiento de datos no han supervisado, las pruebas manuales que hemos realizado indican que los resultados suelen ser altamente certeros, pero ciertas noticias complejas o ambiguas pueden confundir al modelo._")
+            markdown("_Recordar que los modelos de inteligencia artificial pueden cometer errores y clasificar textos de forma incorrecta. Si bien este es un proceso no supervisado, las pruebas indican que los resultados suelen ser altamente certeros, pero ciertas noticias complejas o ambiguas pueden confundir al modelo._")
         )
       ),
       
