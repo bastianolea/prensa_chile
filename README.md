@@ -56,8 +56,8 @@ Luego del scraping se realiza el procesamiento de los datos. Todos los scripts d
 
 ### Análisis
 - `analisis/prensa_calcular_correlacion.R` para calcular correlación entre palabras dentro de noticias, retornando una base con palabras y sus pares correlacionados.
-- `analisis/prensa_calcular_topicos.R` donde se procesan las noticias para identificar tópicos de forma automática y no supervisada mediante machine learning.
-- `analisis/prensa_detectar_temas.R` donde se evalúa la presencia de términos específicos en cada noticia, y en base al porcentaje de términos coincidentes con respecto a las palabras totales, etiquetar cada noticia con la temática que engloba a los términos; por ejemplo, noticias donde más de 3% de las palabras tienen que ver con robos, asaltos, etc., serán categorizadas como noticias sobre delincuencia.
+- `analisis/prensa_modelar_topicos.R` donde se procesan las noticias para identificar tópicos de forma automática y no supervisada mediante _machine learning_, específicamente usando STM.
+- `analisis/prensa_ajustar_topicos.R` donde se usa el modelo de _machine learning_ entrenado para detectar la presencia de temáticas o tópicos en las noticias nuevas, y si superan un margen de certeza, son clasificadas con la temática.
 - Y más...
 
 
@@ -68,6 +68,9 @@ Luego del scraping se realiza el procesamiento de los datos. Todos los scripts d
 ----
 
 ## Actualizaciones
+
+**1 de junio 2025:**
+- Cambio del procesamiento de tópicos de noticias. Ahora se usa [modelamiento estructural de tópicos](https://github.com/bstewart/stm) (_Structural Topic Model_ o STM), que entrega varios tópicos por noticia con sus probabilidades de pertenencia, de entre aproximadamente 19 tópicos posibles que emergen desde el texto. Antes se realizaba con grandes modelos de lenguaje (LLM) pero entregaba resultados poco certeros. Esta clasificación de noticias se usa para las visualizaciones de análisis de sentimiento por tópicos.
 
 **1 de mayo 2025:**
 - Actualización de datos, corrección de scraping de algunos medios.

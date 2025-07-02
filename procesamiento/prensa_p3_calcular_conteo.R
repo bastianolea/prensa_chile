@@ -24,13 +24,14 @@ if (!exists("prensa_palabras")) prensa_palabras <- arrow::read_parquet("datos/pr
 
 # excluir palabras ----
 # palabras para excluir de la lematización, porque alterar su sufijo cambia el sentido del concepto, o bien, hace que se agrupe con palabras erróneas
-palabras_excluir_stem = c("caso", "casar", "juzgado", "proyecto",
+palabras_excluir_stem = c("jara", "jeanette", "matthei", "evelyn", "josé", "kast", "gonzalo", "winter", "carolina", "tohá", "johannes", "kaiser", "franco", "parisi", "gabriel", "boric",
+                          "caso", "casar", "juzgado", "proyecto",
                           "añosa", "años", "salud", "maduro",
                           "suministro", "calama", "abogado", 
                           "luis", "luisa",
                           "público", "pública", 
                           "constitución", "tasa",
-                          "comunista", "comunismo",
+                          "partido", "comunista", "comunismo",
                           # sospechas
                           "salud", "saludable", "partida",
                           "calle", "calles", "sujeto", "sujetos"

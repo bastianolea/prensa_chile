@@ -4,7 +4,8 @@ source("funciones.R")
 # cargar datos 
 if (!exists("datos_prensa")) datos_prensa <- arrow::read_parquet("datos/prensa_datos.parquet")
 sentimiento <- arrow::read_parquet("datos/prensa_llm_sentimiento.parquet")
-clasificacion <- arrow::read_parquet("datos/prensa_llm_clasificar.parquet")
+# clasificacion <- arrow::read_parquet("datos/prensa_llm_clasificar.parquet")
+clasificacion <- arrow::read_parquet("datos/prensa_stm_clasificar.parquet")
 
 
 # preparar datos ----
@@ -45,29 +46,29 @@ prensa_sentimiento_3 <- prensa_sentimiento_2 |>
 
 
 
-# estado por fuentes ----
-
-# estado de cálculos
-procesamiento <- datos_prensa_b |> 
-  mutate(calculado = ifelse(id %in% sentimiento_b$id & id %in% clasificacion$id, "calculado", "calcular")) |> 
-  count(fuente, calculado) |> 
-  mutate(total = sum(n), .by = fuente) |> 
-  mutate(p = n/sum(n), .by = fuente)
-
-# fuentes con un 60% de sus noticias procesadas
-procesadas <- procesamiento |> 
-  filter(calculado == "calculado") |> 
-  filter(p > 0.5) |> 
-  arrange(desc(p))
-
-# procesadas$fuente
-
-procesar <- procesamiento |> 
-  filter(calculado == "calculado") |> 
-  filter(p <= 0.6) |> 
-  arrange(desc(p))
-
-# procesar$fuente
+# # estado por fuentes ----
+# 
+# # estado de cálculos
+# procesamiento <- datos_prensa_b |> 
+#   mutate(calculado = ifelse(id %in% sentimiento_b$id & id %in% clasificacion$id, "calculado", "calcular")) |> 
+#   count(fuente, calculado) |> 
+#   mutate(total = sum(n), .by = fuente) |> 
+#   mutate(p = n/sum(n), .by = fuente)
+# 
+# # fuentes con un 60% de sus noticias procesadas
+# procesadas <- procesamiento |> 
+#   filter(calculado == "calculado") |> 
+#   filter(p > 0.5) |> 
+#   arrange(desc(p))
+# 
+# # procesadas$fuente
+# 
+# procesar <- procesamiento |> 
+#   filter(calculado == "calculado") |> 
+#   filter(p <= 0.6) |> 
+#   arrange(desc(p))
+# 
+# # procesar$fuente
 
 
 # guardar ----
