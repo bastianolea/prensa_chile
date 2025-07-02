@@ -8,7 +8,7 @@ palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
                           "año", "años", "añosa", "añosen",
                           "país", "persona", "comunicación", "señor",
                           "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-                          "youtube",
+                          "youtube", "aaron",
                           "leer", "artículo", "completo", "articular", "completar", # cooperatva ("leer articulo completo")
                           "publicación", # elmostrador
                           "mercer", #cnnchile y otros

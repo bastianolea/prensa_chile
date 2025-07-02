@@ -7,7 +7,7 @@ library(tictoc)
 
 tic()
 
-modelo_stm <- readr::read_rds("analisis/modelos/modelo_stm_7.rds")
+modelo_stm <- readr::read_rds("analisis/modelos/modelo_stm_8.rds")
 
 # ajustar a datos nuevos ----
 # preparar data en datos nuevos
@@ -15,15 +15,14 @@ modelo_stm <- readr::read_rds("analisis/modelos/modelo_stm_7.rds")
 
 datos_prensa <- read_parquet("datos/prensa_datos.parquet")
 
-# cargar resultados anteriores
-prensa_topicos <- fs::dir_ls("analisis/resultados/partes") |> 
-  map(arrow::read_parquet) |> 
-  list_rbind()
+# # cargar resultados anteriores
+# prensa_topicos <- fs::dir_ls("analisis/resultados/partes") |> 
+#   map(arrow::read_parquet) |> 
+#   list_rbind()
+# si se empieza de cero, omitir
 
-datos_prensa_filt <- datos_prensa |> 
+datos_prensa <- datos_prensa |> 
   filter(año >= 2018) |> 
-  # sacar los usados para entrenar el modelo
-  filter(!id %in% modelo_stm$id) |>
   # sacar los que ya fueron procesados antes
   # filter(!id %in% prensa_topicos$id) |>
   # filtro básico de calidad
@@ -31,48 +30,42 @@ datos_prensa_filt <- datos_prensa |>
   # simplificar
   select(id, titulo, cuerpo_limpio)
 
-prensa_palabras_conteo <- arrow::read_parquet("datos/prensa_palabras_conteo.parquet")
+# prensa_palabras_conteo <- arrow::read_parquet("datos/prensa_palabras_conteo.parquet")
+prensa_palabras_raiz <- read_parquet("datos/prensa_palabras_raiz.parquet")
 
-prensa_palabras_conteo <- prensa_palabras_conteo |> 
-  # sacar los usados para entrenar el modelo
-  filter(!id %in% modelo_stm$id) #|>
-  # sacar los que ya fueron procesados antes
-  # filter(!id %in% prensa_topicos$id)
+prensa_palabras_raiz <- prensa_palabras_raiz |> 
+  filter(id %in% datos_prensa$id) #|>
+# sacar los que ya fueron procesados antes
+# filter(!id %in% prensa_topicos$id)
 
-# crear document-term matrix desde datos de palabras contadas
-prensa_dtm <- prensa_palabras_conteo |> 
-  tidytext::cast_dtm(id, palabra, n)
+rm(datos_prensa)
 
-# convertir a formato de stm
-corpus_nuevo <- readCorpus(prensa_dtm, type = "slam")
+# de el dataset tokenizado, volver a unir por documento
+prensa_palabras_stem <- prensa_palabras_raiz |> 
+  group_by(id) |> 
+  summarise(cuerpo_limpio_stem = paste(raiz, collapse = " "))
 
-# plan(multisession, workers = 7)
-# resultados <- map(datos_prensa_filt, \(datos_parte) {
-#   # datos_parte <- datos_prensa_filt[[1]]
-#   message("iniciando")
-  # procesar columnas de texto, especificar la columna que se va a usar como documentos (variable) y si se van a stem las palabras
-  # datos_parte_stem <- datos_parte |> 
-  # rowwise() |> 
-  # mutate(cuerpo_limpio_stem = corpus::text_tokens(cuerpo_limpio, stemmer = "es") |> unlist() |> paste(collapse = " "))
+rm(prensa_palabras_raiz)
+
+prensa_palabras_stem <- prensa_palabras_stem |> 
+  mutate(grupos = (row_number()-1) %/% (n()/16)) |> # n grupos de igual cantidad de filas
+  group_split(grupos)
+
+walk(prensa_palabras_stem, \(prensa_palabras_stem) {
   
-  # # procesamiento de texto necesario para el modelamiento
-  # corpus_nuevo <- stm::textProcessor(documents = datos_parte$cuerpo_limpio,
-  #                                    metadata = datos_parte,
-  #                                    # opciones
-  #                                    stem = T, lowercase = F, removenumbers = F, removepunctuation = F,
-  #                                    language = "spanish")
+  # procesamiento de texto necesario para el modelamiento
+  corpus_nuevo <- stm::textProcessor(documents = prensa_palabras_stem$cuerpo_limpio_stem,
+                                     metadata = prensa_palabras_stem,
+                                     lowercase = F, removestopwords = F, removepunctuation = F, removenumbers = F, verbose = F,
+                                     stem = FALSE, 
+                                     language = "spanish")
   
-  # 
-  # out <- stm::prepDocuments(corpus_nuevo$documents, corpus_nuevo$vocab, corpus_nuevo$meta,
-  #                           # upper.thresh = nrow(datos_parte)*0.7,
-  #                           lower.thresh = nrow(datos_parte)*0.01)
+  out <- stm::prepDocuments(corpus_nuevo$documents, corpus_nuevo$vocab, corpus_nuevo$meta,
+                            # upper.thresh = nrow(datos_parte)*0.7,
+                            lower.thresh = 5)
   
   # alinear el corpus generado en base al vocabulario del modelo entrenado
   corpus_alineado <- alignCorpus(corpus_nuevo, modelo_stm$vocab)
-  
-  # out <- stm::prepDocuments(corpus_alineado$documents, corpus_alineado$vocab, corpus_alineado$meta,
-  #                           # upper.thresh = nrow(datos_parte)*0.7,
-  #                           lower.thresh = 3)
   
   # ajustar nuevos documentos (argumentos documents, newData) en base a modelo y corpus previamente entrenados (argumentos model, origData)
   documentos_ajustados <- fitNewDocuments(model = modelo_stm, # modelo previamente entrenado
@@ -121,48 +114,28 @@ corpus_nuevo <- readCorpus(prensa_dtm, type = "slam")
   datos_parte_topico <- tibble(corpus_alineado$meta) |> 
     bind_cols(topicos_numero) |> 
     bind_cols(topicos_theta) |> 
-    select(-cuerpo_limpio)
+    select(-cuerpo_limpio_stem)
   
   # datos_2 |> filter(topico_1 == 3) |> select(titulo)
   
-  # # guardar ----
-  # archivo <- paste0("otros/analisis/tema_delincuencia/resultados/partes/ajustado_", Sys.Date(), "_", sample(10000:99999, 1), ".parquet")
-  # message(paste("guardando", archivo))
-  # 
-  # arrow::write_parquet(datos_parte_topico |> select(-titulo, -cuerpo_limpio), 
-  #                      archivo)
-  message("ok")
-#   return(datos_parte_topico)
-# }) |> 
-#   list_rbind()
-
-# resultados |> 
-#   select(-titulo)
-# 
-resultados
-
-
-
-
-
-# guardar ----
-# arrow::write_parquet(resultados_recod |> select(-titulo),
-#                      "datos/prensa_topicos.parquet")
-
-# guardar pieza ----
-arrow::write_parquet(resultados, 
-                     paste("analisis/tema_delincuencia/resultados/partes/stm_ajustados_", today(), "_", sample(1000:9999, 1), ".parquet", sep = "")
-)
-
-
-# datos_prensa_topicos
+  # guardar pieza ----
+  archivo <- paste0("analisis/resultados/partes/ajustado_", 
+                    Sys.Date(), "_", 
+                    first(prensa_palabras_stem$grupos), 
+                    sample(100:999, 1), ".parquet")
+  message(paste("guardando", archivo))
+  
+  arrow::write_parquet(datos_parte_topico,
+                       archivo)
+  message("ok ", first(prensa_palabras_stem$grupos))
+})
 
 toc()
 
 
 # unir todos ----
 
-partes <- fs::dir_ls("analisis/tema_delincuencia/resultados/partes/")
+partes <- fs::dir_ls("analisis/resultados/partes/")
 
 ajustados <- map(partes, read_parquet) |> list_rbind()
 
@@ -193,14 +166,14 @@ ajustados_recod <- ajustados |>
                             "17" ~ "internacional",
                             "18" ~ "otros3", # 3
                             "19" ~ "economía"  # 2
-                            ),
+                ),
                 .names = "{.col}_t"))
 
 ajustados_recod |> 
   filter(topico_1_t == "otros3") |> 
   select(titulo) |> 
   print(n=30)
-  
+
 ajustados_recod |> 
   filter(topico_1_t == "otros3") |> 
   # select(titulo)
