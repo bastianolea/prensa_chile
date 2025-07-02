@@ -29,9 +29,10 @@ palabras_excluir_stem = c("jara", "jeanette", "matthei", "evelyn", "josé", "kas
                           "añosa", "años", "salud", "maduro",
                           "suministro", "calama", "abogado", 
                           "luis", "luisa",
-                          "público", "pública", 
+                          "público", "pública",
                           "constitución", "tasa",
-                          "partido", "comunista", "comunismo",
+                          "partido", "comunista", "comunismo", 
+                          "comuna", "comunas", "comunal",
                           # sospechas
                           "salud", "saludable", "partida",
                           "calle", "calles", "sujeto", "sujetos"
@@ -96,6 +97,7 @@ prensa_palabras_raiz <- future_map(prensa_palabras_split, \(parte) {
     ungroup() |> 
     select(-contains("orden"), raiz) |> 
     # agrupar manualmente palabras (conjugaciones, palabras no lematizadas) para que coincidan en una sola
+    # sirve para hacer que coincidan las palabras que no coinciden por lematización (por ejemplo, "venezolana" lematizada no se agrupa con venezuela, así que se agrega acá)
     mutate(palabra = case_match(palabra,
                                 c("venezolano", "venezolana") ~ "venezuela",
                                 c("inmigrantes", "inmigrante", "migrantes", "migrante", "migrar", "inmigrar", "migración", "inmigración", "migratorio", "migratoria", "emigrar") ~ "migración",
@@ -112,9 +114,12 @@ prensa_palabras_raiz <- future_map(prensa_palabras_split, \(parte) {
                                 "saludo" ~ "saludar",
                                 "buses" ~ "bus",
                                 c("comunista", "comunistas", "comunismo") ~ "comunista",
+                                c("comuna", "comunas", "comunal") ~ "comunas",
                                 c("constituyente", "constitucional") ~ "constitución",
+                                c("candidato", "candidata", "candidatura") ~ "candidatura",
                                 c("económica", "económico") ~ "economía",
                                 "monetaria" ~ "monetario",
+                                c("previsión", "previsiones", "previsional") ~ "previsión",
                                 c("unidad", "unido", "unir", "unid") ~ "unidad",
                                 c("municipal", "municipio") ~ "municipalidad",
                                 c("alcadía", "alcaldesa") ~ "alcalde",
@@ -125,7 +130,7 @@ prensa_palabras_raiz <- future_map(prensa_palabras_split, \(parte) {
                                 "inversión" ~ "invertir",
                                 c("pública", "públicas", "públicos") ~ "público",
                                 .default = palabra)) |> 
-    # corregir palabras lematizadas
+    # corregir palabras lematizadas incorrectamente, porque da prioridad a conceptos poco recurrentes
     mutate(palabra = case_match(palabra,
                                 "pensionar" ~ "pensiones",
                                 "reformar" ~ "reforma",
