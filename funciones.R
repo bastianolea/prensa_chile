@@ -12,7 +12,8 @@ palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
                           "leer", "artículo", "completo", "articular", "completar", # cooperatva ("leer articulo completo")
                           "publicación", # elmostrador
                           "mercer", #cnnchile y otros
-                          "detallar" # meganoticias
+                          "detallar", # meganoticias
+                          "cabe", "pese", "abc", "abcdin"
 )
 
 palabras_basura = c("aaa", "aba", "aaisa", "aap", 

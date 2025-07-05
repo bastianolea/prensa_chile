@@ -5,6 +5,7 @@ library(arrow) |> suppressPackageStartupMessages()
 
 library(ggplot2)
 library(scales)
+library(wordcloud2)
 library(forcats)
 library(stringr)
 library(lubridate) |> suppressPackageStartupMessages()
@@ -71,6 +72,7 @@ palabras_semana_fuente <- read_parquet("palabras_semana_fuente.parquet")
 correlacion <- read_parquet("prensa_correlacion.parquet")
 correlacion_fuente <- read_parquet("prensa_correlacion_fuente.parquet")
 sentimiento <- read_parquet("prensa_sentimiento.parquet")
+palabras_semana_topico <- read_parquet("palabras_semana_topico.parquet")
 
 n_noticias <- readLines("prensa_n_noticias.txt") |> as.numeric() |> format(big.mark = ".", decimal.mark = ",")
 n_palabras <- readLines("prensa_n_palabras.txt") |> as.numeric()
@@ -86,9 +88,15 @@ palabras_posibles <- palabras_semana |>
 
 fuentes <- palabras_semana_fuente$fuente |> unique() |> sort()
 
-topicos <- sentimiento$clasificacion |> unique() |> na.exclude() |> str_subset("Sin", negate = T)
+topicos <- sentimiento$clasificacion |> unique() |> na.exclude() |> str_subset("Sin", negate = T) |> sort()
 
-
+lista_semanas <- palabras_semana |> 
+  distinct(fecha, semana) |> 
+  arrange(desc(fecha)) |> 
+  mutate(fecha_t = redactar_fecha(fecha),
+         fecha_t = paste("Semana del", fecha_t)) |> 
+  select(fecha_t, fecha) |> 
+  tibble::deframe()
 
 # ui ----
 ui <- page_fluid(
@@ -342,340 +350,439 @@ ui <- page_fluid(
       ),
       
       
-      # barras semana fuente ----
+      # nube palabras semana ----
       fluidRow(
         column(12,
                br(),
                hr(),
-               h3("Palabras más mencionadas en medios, semanalmente"),
+               h3("Nube de palabras, por semana"),
                
-               markdown("Gráfico que expresa, por cada semana, las palabras más repetidas en el texto de las noticias. Las barras más largas representan palabras más frecuentes. Cada barra se forma por la proporción de las menciones de la palabra que correspondena a medios de comunicación específicos. Por ejemplo, si una barra muestra un color prevalente en ella, significa que el medio de comunicación correspondiente a ese color usó más frecuentemente el termino que los demás.")
-        )
-      ),
-      fluidRow(
-        column(4,  
-               style = css(max_width = "600px"),
-               sliderInput("semanas_fuentes",
-                           "Rango de semanas",
-                           min = 1, max = 4*2,
-                           value = 4,
-                           width = "100%"),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Personalice el rango de tiempo que abarcará la visualización. Por defecto, si el rango es muy amplio, se cambia a barras.")
-               )
-        ),
-        
-        column(4,  
-               style = css(max_width = "600px"),
-               sliderInput("semana_fuentes_fuentes",
-                           "Cantidad de medios",
-                           min = 3, max = 10,
-                           value = 5,
-                           width = "100%"),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Cantidad de medios comunicacionales a identificar. Se mostrarán los nombres de las n fuentes con mayor cantidad de palabras. El resto se agrupará en como ”Otros”.")
-               )
-        ),
-        
-        column(4,  
-               style = css(max_width = "600px"),
-               sliderInput("semana_fuentes_palabras_n",
-                           "Cantidad de palabras",
-                           min = 5, max = 20,
-                           value = 15,
-                           width = "100%"),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Cantidad de palabras a mostrar por semana. Aumentar este valor aumenta la cantidad de barras, y podría permitir ver conceptos menos comunes.")
-               )
-        )
-      ),
-      fluidRow(
-        column(12,
-               div(style = css(overflow_x = "scroll"),
-                   div(style = css(min_width = "900px"),
-                       plotOutput("g_semana_fuente", height = "640px", width = "100%") |> withSpinner()
-                   ))
+               markdown("Seleccione una semana para obtener una nube de las palabras más frecuentes durante la semana. El tamaño de las palabras tiene relación con la frecuencia de cada palabra."),
         )
       ),
       
-      
-      # puntos fuente palabras ----
-      fluidRow(
-        column(12,
-               br(),
-               hr(),
-               h3("Cantidad menciones de un concepto específico"),
-               h5("Concepto:", em(textOutput("texto_selector_palabras_fuente", inline = TRUE))),
-               
-               markdown("Frecuencia total de menciones de una palabra, por semana, y separado por medios de comunicación. Seleccione un concepto, palabra, o nombre para comparar las menciones del concepto elegido entre los distintos medios de comunicación escritos. De este modo, es posible identificar si hay ciertos medios que mencionan más determinados conceptos, o medios que los evitan; o bien, la popularidad de un concepto a través del tiempo, comparada a entre distintos medios.")
-        )
-      ),
-      fluidRow(
-        column(3, style = css(max_width = "600px"),
-               selectizeInput("selector_palabras_fuente",
-                              "Seleccione el concepto a comparar",
-                              choices = NULL, #c("hermosilla", "macaya", "corrupción", "delincuencia", palabras_posibles),
-                              # choices = NULL,
-                              # selected = "hermosilla",
-                              multiple = FALSE,
-                              width = "100%",
-                              options = list(search = TRUE,
-                                             create = TRUE, placeholder = "")),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Elija una palabra de la lista para usarla en el gráfico. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
-               )
-        ),
-        
-        column(3,  
-               style = css(max_width = "600px"),
-               sliderInput("semanas_fuentes_palabras",
-                           "Rango de semanas",
-                           min = 1, max = 4*2,
-                           value = 4,
-                           width = "100%"),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Personalice el rango de tiempo que abarcará la visualización. Por defecto, si el rango es muy amplio, se cambia a barras.")
-               )
-        ),
-        
-        column(3,  
-               style = css(max_width = "600px"),
-               sliderInput("semana_fuentes_palabras_fuentes",
-                           "Cantidad de medios",
-                           min = 3, max = 15,
-                           value = 10,
-                           width = "100%"),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Cantidad de medios comunicacionales a identificar. Se mostrarán los nombres de las n fuentes con mayor cantidad de palabras. El resto se agrupará en ”Otros”.")
-               )
-        ),
-        column(3, style = css(max_width = "600px"),
-               selectizeInput("destacar_medio",
-                              "Destacar un medio",
-                              choices = c("Ninguno", fuentes),
-                              selected = "Ninguno",
-                              multiple = FALSE,
-                              width = "100%",
-                              options = list(search = TRUE,
-                                             create = TRUE, placeholder = "")),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Seleccione un medio de comunicación para destacarlo en el gráfico por sobre el resto de los medios disponibles.")
-               )
-        )
-      ),
-      fluidRow(
-        column(12,
-               div(style = css(overflow_x = "scroll"),
-                   div(style = css(min_width = "900px"),
-                       plotOutput("g_semana_fuente_palabra", height = "480px", width = "100%") |> withSpinner()
-                   ))
-        )
-      ),
-      
-      
-      
-      # correlación ----
-      
-      ## correlación general ----
-      fluidRow(
-        column(12,
-               br(),
-               hr(),
-               h3("Correlación entre términos"),
-               
-               markdown("En este gráfico podemos elegir un concepto y obtener las palabras que son mencionadas más frecuentemente junto a ese concepto dentro de cada noticia. Por ejemplo, si una noticia habla del _presidente,_ es muy probable que también diga _Boric_ por sobre otras palabras. En este sentido, la correlación es una relación recíproca entre términos; es decir, términos que co-ocurren frecuentemente dentro de las noticias.")
-        )
-      ),
-      fluidRow(
-        column(6, #style = css(max_width = "600px"),
-               selectizeInput("cor_total_palabra",
-                              "Concepto principal",
-                              choices = NULL, 
-                              width = "100%",
-                              options = list(search = TRUE, create = TRUE, placeholder = "")),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Elija una palabra de la lista para calcular la correlación de otras palabras con ella. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
-               ),
-        ),
-        
-        column(6, #style = css(max_width = "600px"),
-               sliderInput("cor_total_palabra_n",
-                           "Cantidad de palabras",
-                           min = 3, max = 10,
-                           value = 5,
-                           width = "100%"),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Cantidad de palabras correlacionadas a mostrar. Aumentar este valor aumenta la cantidad de círculos, mostrando conceptos menos correlacionados.")
-               )
-        )
-      ),
-      
-      fluidRow(
-        column(12,
-               div(style = css(overflow_x = "scroll"),
-                   div(style = css(min_width = "600px"),
-                       plotOutput("g_cor_total", height = "260px", width = "100%") |> withSpinner()
-                   ))
-        )
-        
-      ),
-      
-      
-      ## correlación por fuentes ----
-      fluidRow(
-        column(12,
-               br(),
-               hr(),
-               h3("Correlación de palabras por medios de comunicación"),
-               
-               markdown("Al igua que el gráfico anterior, en éste se expresan las palabras más correlacionadas al concepto elegido, pero desagregado por medio de comunicación. De este modo es posible comparar las palabras que más co-ocurren con el término elegido a través de los distintos medios de prensa escrita, evidenciando posibles diferencias en la forma de tratar las temáticas noticiosas.")
-        )
-      ),
-      fluidRow(
-        column(4, style = css(max_width = "600px"),
-               selectizeInput("cor_fuente_palabra",
-                              "Concepto principal",
-                              choices = NULL, 
-                              width = "100%",
-                              options = list(search = TRUE, create = TRUE, placeholder = "")),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Elija una palabra de la lista para calcular la correlación de otras palabras con ella. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
-               ),
-        ),
-        
-        column(4,  
-               style = css(max_width = "600px"),
-               sliderInput("cor_fuente_palabra_n",
-                           "Cantidad de palabras",
-                           min = 3, max = 10,
-                           value = 5,
-                           width = "100%"),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Cantidad de palabras correlacionadas máximas a mostrar. Aumentar este valor aumenta la cantidad de círculos, mostrando conceptos menos correlacionados.")
-               )
-        ),
-        
-        column(4,  
-               style = css(max_width = "600px"),
-               sliderInput("cor_fuente_fuente_n",
-                           "Cantidad de medios",
-                           min = 2, max = 8,
-                           value = 5,
-                           width = "100%"),
-               div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Cantidad de medios de comunicación a mostrar. Los medios se ordenan de mayor a menor de acuerdo al nivel de correlación de sus palabras.")
-               )
-        )
-      ),
-      fluidRow(
-        column(12,
-               div(style = css(overflow_x = "scroll"),
-                   div(style = css(min_width = "600px"),
-                       uiOutput("ui_g_cor_fuente") |> withSpinner(proxy.height = 300)
-                   ))
-        )
-      ),
-      
-      hr(),
-      
-      # sentimiento ----
       div(
-        h3("Análisis de sentimiento"),
         
-        markdown("Para esta visualización, se utilizó un [modelo extenso de lenguaje (LLM) de inteligencia artificial](https://bastianolea.rbind.io/blog/analisis_sentimiento_llm/) para procesar el contenido de cada noticia, y en base a su texto, asignarle un sentimiento. Adicionalmente, se entrenó un modelo de _machine learning_ de modelamiento estructural de tópicos (STM) para encontrar los tópicos o temáticas principales de las noticias, y luego se usa ese modelo para predecir a qué tópico pertenece cada noticia.
-             Por _sentimiento_ nos referimos a si el contenido semántico del texto describe un suceso positivo, neutro o negativo; por ejemplo, una noticia sobre un suceso trágico será negativa. Por _tema_ nos referimos a la clasificación de los textos noticiosos en distintas categorías temáticas o tópicos, como pueden ser noticias sobre política, economía, policial, etc."),
-        
-        layout_columns(col_widths = c(4, 4, 4),
-                       div(
-                         pickerInput("sentimiento_tema",
-                                     "Seleccionar temas",
-                                     choices = c("Todos", topicos),
-                                     selected = "Todos",
-                                     multiple = FALSE,
-                                     width = "100%",
-                                     options = pickerOptions(maxOptions = 1,
-                                                             maxOptionsText = "Máximo 1",
-                                                             noneSelectedText = "Todos")
-                         ),
-                         div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                             em("Visualice noticias sin distinguir entre sus temáticas, o seleccione temáticas para filtrar los resultados sólo considerando noticias clasificadas en temas específicos.")
-                         )
-                       ),
-                       div(
-                         pickerInput("sentimiento_fuente",
-                                     "Seleccionar medios",
-                                     choices = c(fuentes),
-                                     selected = NULL,
-                                     multiple = TRUE,
-                                     width = "100%",
-                                     options = pickerOptions(maxOptions = 3,
-                                                             maxOptionsText = "Máximo 3",
-                                                             noneSelectedText = "Todos")
-                         ),
-                         div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                             em("Visualice todas las noticias, o seleccione algunos medios de comunicación para filtrar y separar la visualización. Des-seleccione los medios para volver a ver los resultados de todas las noticias.")
-                         )
-                       ),
-                       div(
-                         sliderInput("sentimiento_semanas",
-                                     "Rango de semanas",
-                                     min = 4*1, max = 4*4,
-                                     value = 4*2,
-                                     width = "100%"),
-                         div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                             em("Rango de tiempo que abarcará la visualización.")
-                         )
-                       )
+        div(style = "max-width: 50%;",
+          selectizeInput("selector_semanas_nube",
+                         "Seleccione una semana",
+                         choices = lista_semanas,
+                         multiple = FALSE,
+                         # width = "100%",),
+          ),
+          div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+              em("La fecha indicada corresponde al primer día de la semana, y elegir dicha semana incluirá las palabras de noticias publicadas durante la semana completa.")
+          )
         ),
         
-        # interpretación
-        div(
-          markdown("Las barras indican el promedio de sentimiento semanal de las noticias: si se acerca a la parte superior significa que la mayoría de las noticias fueron positivas, y si se acerca a la inferior, que fueron negativas. Si la barra está cerca a la línea central, significa que las noticias fueron en promedio neutras (ni buenas ni malas), o bien, que hubo un balance entre noticias positivas y negativas.")
-        ),
+        tags$style(type='text/css', '.wcLabel {display:none;}'), # disable hover
         
-        # gráfico
-        div(
-          div(style = css(overflow_x = "scroll"),
-              div(style = css(min_width = "600px"),
-                  plotOutput("g_sentimiento", height = "480px", width = "100%") |> withSpinner()
-              ))
-        ),
-        
-        
-        # disclaimer ia
-        div(style = css(font_size = "70%", margin_top = "6px"),
-            markdown("_Recordar que los modelos de inteligencia artificial pueden cometer errores y clasificar textos de forma incorrecta. Si bien este es un proceso no supervisado, las pruebas indican que los resultados suelen ser altamente certeros, pero ciertas noticias complejas o ambiguas pueden confundir al modelo._")
+        div(style = "pointer-events: none !important; margin-bottom: -20px;",
+            wordcloud2Output("nube_palabras_semana")
         )
-      ),
-      
-      
-      
-      # firma ----
-      fluidRow(
-        column(12, style = css(padding = "28px", font_size = "70%", font_family = tipografia$serif),
-               hr(),
-               
-               markdown("Desarrollado por [Bastián Olea Herrera.](https://bastianolea.rbind.io) usando el lenguaje de programación R. Puedes [hacerme llegar](https://bastianolea.rbind.io/contact/) cualquier duda, consulta, sugerencia o comentario."),
-               
-               markdown("Puedes explorar mis otras [aplicaciones interactivas sobre datos sociales en mi portafolio.](https://bastianolea.github.io/shiny_apps/)"),
-               
-               markdown("Código de fuente de esta app y del procesamiento de los datos [disponible en GitHub.](https://github.com/bastianolea/prensa_chile)"),
-               
-               # cafecito ----
-               div(style = css(overflow_x = "scroll"),
-                   div(style = css(width = "350px", margin = "auto", padding = "0px"),
-                       
-                       tags$style(HTML(".cafecito:hover {opacity: 70%; transition: 0.3s; color: black !important;} .cafecito a:hover {color: black}")),
-                       
-                       div(class = "cafecito",
-                           style = paste("width: 100%; background-color: #FFDD04; transform:scale(0.5); border: 1.2px", color_detalle, "solid; border-radius: 13px;"),
-                           tags$body(HTML('<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="bastimapache" data-color="#FFDD00" data-emoji=""  data-font="Bree" data-text="Regálame un cafecito" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>'))
-                       )
+  ),
+  
+  
+  # barras semana fuente ----
+  fluidRow(
+    column(12,
+           br(),
+           hr(),
+           h3("Palabras más mencionadas en medios, semanalmente"),
+           
+           markdown("Gráfico que expresa, por cada semana, las palabras más repetidas en el texto de las noticias. Las barras más largas representan palabras más frecuentes. Cada barra se forma por la proporción de las menciones de la palabra que correspondena a medios de comunicación específicos. Por ejemplo, si una barra muestra un color prevalente en ella, significa que el medio de comunicación correspondiente a ese color usó más frecuentemente el termino que los demás.")
+    )
+  ),
+  fluidRow(
+    column(4,  
+           style = css(max_width = "600px"),
+           sliderInput("semanas_fuentes",
+                       "Rango de semanas",
+                       min = 1, max = 4*2,
+                       value = 4,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Personalice el rango de tiempo que abarcará la visualización. Por defecto, si el rango es muy amplio, se cambia a barras.")
+           )
+    ),
+    
+    column(4,  
+           style = css(max_width = "600px"),
+           sliderInput("semana_fuentes_fuentes",
+                       "Cantidad de medios",
+                       min = 3, max = 10,
+                       value = 5,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Cantidad de medios comunicacionales a identificar. Se mostrarán los nombres de las n fuentes con mayor cantidad de palabras. El resto se agrupará en como ”Otros”.")
+           )
+    ),
+    
+    column(4,  
+           style = css(max_width = "600px"),
+           sliderInput("semana_fuentes_palabras_n",
+                       "Cantidad de palabras",
+                       min = 5, max = 20,
+                       value = 15,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Cantidad de palabras a mostrar por semana. Aumentar este valor aumenta la cantidad de barras, y podría permitir ver conceptos menos comunes.")
+           )
+    )
+  ),
+  fluidRow(
+    column(12,
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(min_width = "900px"),
+                   plotOutput("g_semana_fuente", height = "640px", width = "100%") |> withSpinner()
+               ))
+    )
+  ),
+  
+  
+  # puntos fuente palabras ----
+  fluidRow(
+    column(12,
+           br(),
+           hr(),
+           h3("Cantidad menciones de un concepto específico"),
+           h5("Concepto:", em(textOutput("texto_selector_palabras_fuente", inline = TRUE))),
+           
+           markdown("Frecuencia total de menciones de una palabra, por semana, y separado por medios de comunicación. Seleccione un concepto, palabra, o nombre para comparar las menciones del concepto elegido entre los distintos medios de comunicación escritos. De este modo, es posible identificar si hay ciertos medios que mencionan más determinados conceptos, o medios que los evitan; o bien, la popularidad de un concepto a través del tiempo, comparada a entre distintos medios.")
+    )
+  ),
+  fluidRow(
+    column(3, style = css(max_width = "600px"),
+           selectizeInput("selector_palabras_fuente",
+                          "Seleccione el concepto a comparar",
+                          choices = NULL, #c("hermosilla", "macaya", "corrupción", "delincuencia", palabras_posibles),
+                          # choices = NULL,
+                          # selected = "hermosilla",
+                          multiple = FALSE,
+                          width = "100%",
+                          options = list(search = TRUE,
+                                         create = TRUE, placeholder = "")),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Elija una palabra de la lista para usarla en el gráfico. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
+           )
+    ),
+    
+    column(3,  
+           style = css(max_width = "600px"),
+           sliderInput("semanas_fuentes_palabras",
+                       "Rango de semanas",
+                       min = 1, max = 4*2,
+                       value = 4,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Personalice el rango de tiempo que abarcará la visualización. Por defecto, si el rango es muy amplio, se cambia a barras.")
+           )
+    ),
+    
+    column(3,  
+           style = css(max_width = "600px"),
+           sliderInput("semana_fuentes_palabras_fuentes",
+                       "Cantidad de medios",
+                       min = 3, max = 15,
+                       value = 10,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Cantidad de medios comunicacionales a identificar. Se mostrarán los nombres de las n fuentes con mayor cantidad de palabras. El resto se agrupará en ”Otros”.")
+           )
+    ),
+    column(3, style = css(max_width = "600px"),
+           selectizeInput("destacar_medio",
+                          "Destacar un medio",
+                          choices = c("Ninguno", fuentes),
+                          selected = "Ninguno",
+                          multiple = FALSE,
+                          width = "100%",
+                          options = list(search = TRUE,
+                                         create = TRUE, placeholder = "")),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Seleccione un medio de comunicación para destacarlo en el gráfico por sobre el resto de los medios disponibles.")
+           )
+    )
+  ),
+  fluidRow(
+    column(12,
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(min_width = "900px"),
+                   plotOutput("g_semana_fuente_palabra", height = "480px", width = "100%") |> withSpinner()
+               ))
+    )
+  ),
+  
+  
+  
+  # correlación ----
+  
+  ## correlación general ----
+  fluidRow(
+    column(12,
+           br(),
+           hr(),
+           h3("Correlación entre términos"),
+           
+           markdown("En este gráfico podemos elegir un concepto y obtener las palabras que son mencionadas más frecuentemente junto a ese concepto dentro de cada noticia. Por ejemplo, si una noticia habla del _presidente,_ es muy probable que también diga _Boric_ por sobre otras palabras. En este sentido, la correlación es una relación recíproca entre términos; es decir, términos que co-ocurren frecuentemente dentro de las noticias.")
+    )
+  ),
+  fluidRow(
+    column(6, #style = css(max_width = "600px"),
+           selectizeInput("cor_total_palabra",
+                          "Concepto principal",
+                          choices = NULL, 
+                          width = "100%",
+                          options = list(search = TRUE, create = TRUE, placeholder = "")),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Elija una palabra de la lista para calcular la correlación de otras palabras con ella. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
+           ),
+    ),
+    
+    column(6, #style = css(max_width = "600px"),
+           sliderInput("cor_total_palabra_n",
+                       "Cantidad de palabras",
+                       min = 3, max = 10,
+                       value = 5,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Cantidad de palabras correlacionadas a mostrar. Aumentar este valor aumenta la cantidad de círculos, mostrando conceptos menos correlacionados.")
+           )
+    )
+  ),
+  
+  fluidRow(
+    column(12,
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(min_width = "600px"),
+                   plotOutput("g_cor_total", height = "260px", width = "100%") |> withSpinner()
+               ))
+    )
+    
+  ),
+  
+  
+  ## correlación por fuentes ----
+  fluidRow(
+    column(12,
+           br(),
+           hr(),
+           h3("Correlación de palabras por medios de comunicación"),
+           
+           markdown("Al igua que el gráfico anterior, en éste se expresan las palabras más correlacionadas al concepto elegido, pero desagregado por medio de comunicación. De este modo es posible comparar las palabras que más co-ocurren con el término elegido a través de los distintos medios de prensa escrita, evidenciando posibles diferencias en la forma de tratar las temáticas noticiosas.")
+    )
+  ),
+  fluidRow(
+    column(4, style = css(max_width = "600px"),
+           selectizeInput("cor_fuente_palabra",
+                          "Concepto principal",
+                          choices = NULL, 
+                          width = "100%",
+                          options = list(search = TRUE, create = TRUE, placeholder = "")),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Elija una palabra de la lista para calcular la correlación de otras palabras con ella. La lista está ordenada por frecuencia de palabras. Puede escribir para buscar o incluir otras palabras.")
+           ),
+    ),
+    
+    column(4,  
+           style = css(max_width = "600px"),
+           sliderInput("cor_fuente_palabra_n",
+                       "Cantidad de palabras",
+                       min = 3, max = 10,
+                       value = 5,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Cantidad de palabras correlacionadas máximas a mostrar. Aumentar este valor aumenta la cantidad de círculos, mostrando conceptos menos correlacionados.")
+           )
+    ),
+    
+    column(4,  
+           style = css(max_width = "600px"),
+           sliderInput("cor_fuente_fuente_n",
+                       "Cantidad de medios",
+                       min = 2, max = 8,
+                       value = 5,
+                       width = "100%"),
+           div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               em("Cantidad de medios de comunicación a mostrar. Los medios se ordenan de mayor a menor de acuerdo al nivel de correlación de sus palabras.")
+           )
+    )
+  ),
+  fluidRow(
+    column(12,
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(min_width = "600px"),
+                   uiOutput("ui_g_cor_fuente") |> withSpinner(proxy.height = 300)
+               ))
+    )
+  ),
+  
+  hr(),
+  
+  # sentimiento ----
+  div(
+    h3("Análisis de sentimiento"),
+    
+    markdown("Para esta visualización, se utilizó un [modelo extenso de lenguaje (LLM) de inteligencia artificial](https://bastianolea.rbind.io/blog/analisis_sentimiento_llm/) para procesar el contenido de cada noticia, y en base a su texto, asignarle un sentimiento. Adicionalmente, se entrenó un modelo de _machine learning_ de modelamiento estructural de tópicos (STM) para encontrar los tópicos o temáticas principales de las noticias, y luego se usa ese modelo para predecir a qué tópico pertenece cada noticia.
+             Por _sentimiento_ nos referimos a si el contenido semántico del texto describe un suceso positivo, neutro o negativo; por ejemplo, una noticia sobre un suceso trágico será negativa. Por _tema_ nos referimos a la clasificación de los textos noticiosos en distintas categorías temáticas o tópicos, como pueden ser noticias sobre política, economía, policial, etc."),
+    
+    layout_columns(col_widths = c(4, 4, 4),
+                   div(
+                     pickerInput("sentimiento_tema",
+                                 "Seleccionar temas",
+                                 choices = c("Todos", topicos),
+                                 selected = "Todos",
+                                 multiple = FALSE,
+                                 width = "100%",
+                                 options = pickerOptions(maxOptions = 1,
+                                                         maxOptionsText = "Máximo 1",
+                                                         noneSelectedText = "Todos")
+                     ),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("Visualice noticias sin distinguir entre sus temáticas, o seleccione temáticas para filtrar los resultados sólo considerando noticias clasificadas en temas específicos.")
+                     )
+                   ),
+                   div(
+                     pickerInput("sentimiento_fuente",
+                                 "Seleccionar medios",
+                                 choices = c(fuentes),
+                                 selected = NULL,
+                                 multiple = TRUE,
+                                 width = "100%",
+                                 options = pickerOptions(maxOptions = 3,
+                                                         maxOptionsText = "Máximo 3",
+                                                         noneSelectedText = "Todos")
+                     ),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("Visualice todas las noticias, o seleccione algunos medios de comunicación para filtrar y separar la visualización. Des-seleccione los medios para volver a ver los resultados de todas las noticias.")
+                     )
+                   ),
+                   div(
+                     sliderInput("sentimiento_semanas",
+                                 "Rango de semanas",
+                                 min = 4*1, max = 4*4,
+                                 value = 4*2,
+                                 width = "100%"),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("Rango de tiempo que abarcará la visualización.")
+                     )
+                   )
+    ),
+    
+    # interpretación
+    div(
+      markdown("Las barras indican el promedio de sentimiento semanal de las noticias: si se acerca a la parte superior significa que la mayoría de las noticias fueron positivas, y si se acerca a la inferior, que fueron negativas. Si la barra está cerca a la línea central, significa que las noticias fueron en promedio neutras (ni buenas ni malas), o bien, que hubo un balance entre noticias positivas y negativas.")
+    ),
+    
+    # gráfico
+    div(
+      div(style = css(overflow_x = "scroll"),
+          div(style = css(min_width = "600px"),
+              plotOutput("g_sentimiento", height = "480px", width = "100%") |> withSpinner()
+          ))
+    ),
+    
+    
+    # disclaimer ia
+    div(style = css(font_size = "70%", margin_top = "6px"),
+        markdown("_Recordar que los modelos de inteligencia artificial pueden cometer errores y clasificar textos de forma incorrecta. Si bien este es un proceso no supervisado, las pruebas indican que los resultados suelen ser altamente certeros, pero ciertas noticias complejas o ambiguas pueden confundir al modelo._")
+    )
+  ),
+  
+  ## nube sentimiento topicos ----
+  fluidRow(
+    column(12,
+           br(),
+           hr(),
+           h3("Nube de palabras semanales por tema y sentimiento"),
+           
+           markdown("Seleccione una semana para obtener una nube de las palabras más frecuentes durante la semana. El tamaño de las palabras tiene relación con la frecuencia de cada palabra."),
+    )
+  ),
+  
+  div(
+    layout_columns(col_widths = c(4, 4, 4),
+                   div(
+                     selectizeInput("selector_semanas_topico_nube",
+                                    "Seleccione una semana",
+                                    choices = lista_semanas,
+                                    multiple = FALSE,
+                                    width = "100%"),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("La fecha indicada corresponde al primer día de la semana, y elegir dicha semana incluirá las palabras de noticias publicadas durante la semana completa.")
+                     )
+                   ),
+                   div(
+                     pickerInput("sentimiento_tema_nube",
+                                 "Seleccionar temas",
+                                 choices = topicos,
+                                 selected = topicos,
+                                 multiple = TRUE,
+                                 width = "100%",
+                                 options = pickerOptions(actionsBox = TRUE,
+                                                         selectAllText = "Todos", 
+                                                         deselectAllText = "Ninguno",
+                                                         noneSelectedText = "Ninguno")
+                     ),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("Visualice noticias sin distinguir entre sus temáticas, o seleccione temáticas para filtrar los resultados sólo considerando noticias clasificadas en temas específicos.")
+                     )
+                   ),
+                   div(
+                     pickerInput("sentimiento_sentimiento_nube",
+                                 "Seleccionar sentimiento",
+                                 choices = c("positivo" = 1,
+                                             "neutro" = 0,
+                                             "negativo" = -1),
+                                 selected = c("positivo" = 1,
+                                              "neutro" = 0,
+                                              "negativo" = -1),
+                                 multiple = TRUE,
+                                 width = "100%",
+                                 options = pickerOptions(actionsBox = TRUE,
+                                                         selectAllText = "Todos", 
+                                                         deselectAllText = "Ninguno",
+                                                         noneSelectedText = "Ninguno")
+                     ),
+                     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+                         em("Filtre las noticias de acuerdo al sentimiento general detectado en el cuerpo de la misma, ya sea positivo, neutro, negativo, o alguna combinación entre ellos.")
+                     )
+                   )
+    )
+  ),
+  
+  tags$style(type='text/css', '.wcLabel {display:none;}'), # disable hover
+  div(style = "pointer-events: none !important; margin-bottom: -20px;",
+      wordcloud2Output("nube_palabras_sentimiento_topicos")
+  ),
+  
+  
+  # firma ----
+  fluidRow(
+    column(12, style = css(padding = "28px", font_size = "70%", font_family = tipografia$serif),
+           hr(),
+           
+           markdown("Desarrollado por [Bastián Olea Herrera.](https://bastianolea.rbind.io) usando el lenguaje de programación R. Puedes [hacerme llegar](https://bastianolea.rbind.io/contact/) cualquier duda, consulta, sugerencia o comentario."),
+           
+           markdown("Puedes explorar mis otras [aplicaciones interactivas sobre datos sociales en mi portafolio.](https://bastianolea.github.io/shiny_apps/)"),
+           
+           markdown("Código de fuente de esta app y del procesamiento de los datos [disponible en GitHub.](https://github.com/bastianolea/prensa_chile)"),
+           
+           # cafecito ----
+           div(style = css(overflow_x = "scroll"),
+               div(style = css(width = "350px", margin = "auto", padding = "0px"),
+                   
+                   tags$style(HTML(".cafecito:hover {opacity: 70%; transition: 0.3s; color: black !important;} .cafecito a:hover {color: black}")),
+                   
+                   div(class = "cafecito",
+                       style = paste("width: 100%; background-color: #FFDD04; transform:scale(0.5); border: 1.2px", color_detalle, "solid; border-radius: 13px;"),
+                       tags$body(HTML('<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="bastimapache" data-color="#FFDD00" data-emoji=""  data-font="Bree" data-text="Regálame un cafecito" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>'))
                    )
                )
-        )
-      )
+           )
+    )
   )
+)
 )
 
 # —----
@@ -1333,6 +1440,31 @@ server <- function(input, output, session) {
   }, res = resolucion)
   
   
+  ## nube palabras semana ----
+  output$nube_palabras_semana <- renderWordcloud2({
+    
+    palabras_semana |> 
+      # filter(semana == max(semana)) |> 
+      filter(fecha == input$selector_semanas_nube) |> 
+      group_by(palabra) |> 
+      summarize(n = sum(n)) |> 
+      select(palabra, n) |> 
+      slice_max(n, n = 200) |> 
+      arrange(desc(n)) |> 
+      rename(word = palabra, freq = n) |> 
+      print() |> 
+      wordcloud2(color = c(color_texto),
+                 backgroundColor = color_fondo,
+                 fontWeight = "normal",
+                 fontFamily = "Lato",
+                 rotateRatio = 0.1,
+                 gridSize = 8,
+                 size = 0.2,
+                 minSize = 12,
+                 hoverFunction = NULL
+      )
+  })
+  
   ## barras semana fuente ----
   output$g_semana_fuente <- renderPlot({
     req(datos_semana_fuente_4())
@@ -1661,6 +1793,44 @@ server <- function(input, output, session) {
     
     return(plot)
   }, res = resolucion)
+  
+  
+  
+  
+  ## nube palabras sentimiento ----
+  palabras_semana_topico_filt <- reactive({
+    palabras_semana_topico |> 
+      # filter(sentimiento %in% c(-1, 0, 1)) |> 
+      filter(sentimiento %in% input$sentimiento_sentimiento_nube) |> 
+      filter(clasificacion %in% input$sentimiento_tema_nube)
+  })
+  
+  output$nube_palabras_sentimiento_topicos <- renderWordcloud2({
+    
+    palabras_semana_topico_filt() |> 
+      # filter(semana == max(semana)) |> 
+      filter(fecha == input$selector_semanas_topico_nube) |> 
+      group_by(palabra) |> 
+      summarize(n = sum(n)) |> 
+      select(palabra, n) |> 
+      slice_max(n, n = 200) |> 
+      arrange(desc(n)) |> 
+      rename(word = palabra, freq = n) |> 
+      print() |> 
+      wordcloud2(color = c(color_texto),
+                 backgroundColor = color_fondo,
+                 fontWeight = "normal",
+                 fontFamily = "Lato",
+                 rotateRatio = 0.1,
+                 gridSize = 8,
+                 size = 0.2,
+                 minSize = 12,
+                 hoverFunction = NULL
+      )
+  })
+  
+  
+  
 }
 
 # Run the application 
