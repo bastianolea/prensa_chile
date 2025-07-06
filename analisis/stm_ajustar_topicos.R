@@ -36,29 +36,30 @@ datos_prensa <- datos_prensa |>
 
 # datos ----
 # prensa_palabras_conteo <- arrow::read_parquet("datos/prensa_palabras_conteo.parquet")
+# cargar base de conteo de palabras lematizadas 
 prensa_palabras_raiz <- read_parquet("datos/prensa_palabras_raiz.parquet")
 
-prensa_palabras_raiz <- prensa_palabras_raiz |> 
-  filter(id %in% datos_prensa$id) #|>
 # sacar los que ya fueron procesados antes
-# filter(!id %in% prensa_topicos$id)
+prensa_palabras_raiz <- prensa_palabras_raiz |> 
+  filter(id %in% datos_prensa$id) 
 
 # rm(datos_prensa)
 
-# de el dataset tokenizado, volver a unir por documento
+# desde el dataset tokenizado, volver a unir por documento
 prensa_palabras_stem <- prensa_palabras_raiz |> 
   group_by(id) |> 
   summarise(cuerpo_limpio_stem = paste(raiz, collapse = " "))
 
-rm(prensa_palabras_raiz)
-
 
 # procesar ----
 prensa_palabras_stem <- prensa_palabras_stem |> 
-  mutate(grupos = (row_number()-1) %/% (n()/16)) |> # n grupos de igual cantidad de filas
+  mutate(grupos = (row_number()-1) %/% (n()/4)) |> # n grupos de igual cantidad de filas
   group_split(grupos)
 
-walk(prensa_palabras_stem, \(prensa_palabras_stem) {
+
+
+# por cada parte del dataset, ajustar documentos a tópicos del modelo
+resultados <- map(prensa_palabras_stem, \(prensa_palabras_stem) {
   
   # procesamiento de texto necesario para el modelamiento
   corpus_nuevo <- stm::textProcessor(documents = prensa_palabras_stem$cuerpo_limpio_stem,
@@ -123,28 +124,38 @@ walk(prensa_palabras_stem, \(prensa_palabras_stem) {
     bind_cols(topicos_theta) |> 
     select(-cuerpo_limpio_stem)
   
-  # datos_2 |> filter(topico_1 == 3) |> select(titulo)
   
-  # guardar pieza ----
-  archivo <- paste0("analisis/resultados/partes/ajustado_", 
-                    Sys.Date(), "_", 
-                    first(prensa_palabras_stem$grupos), "_",
-                    sample(100:999, 1), ".parquet")
-  message(paste("guardando", archivo))
-  
-  arrow::write_parquet(datos_parte_topico,
-                       archivo)
   message("ok ", first(prensa_palabras_stem$grupos))
+  
+  return(datos_parte_topico)
+})
+
+resultados
+
+
+# guardar piezas ----
+map(resultados, \(datos_parte_topico) {
+  
+  archivo <- paste0("analisis/resultados/partes/ajustado_", 
+                  Sys.Date(), "_", 
+                  first(datos_parte_topico$grupos), "_",
+                  sample(100:999, 1), ".parquet")
+message(paste("guardando", archivo))
+
+arrow::write_parquet(datos_parte_topico,
+                     archivo)
 })
 
 toc()
 
+# datos_2 |> filter(topico_1 == 3) |> select(titulo)
+
 
 # unir todos ----
 
-partes <- fs::dir_ls("analisis/resultados/partes/")
+rutas_partes <- fs::dir_ls("analisis/resultados/partes/")
 
-ajustados <- map(partes, read_parquet) |> list_rbind()
+ajustados <- map(rutas_partes, read_parquet) |> list_rbind()
 
 
 # recodificar ----
@@ -205,13 +216,13 @@ ajustados_recod <- ajustados |>
 #   filter(id  == "bcf4db5211d6627de8012f1c0f35b75c") |> 
 #   pull(cuerpo, url)
 
-
-datos_prensa_topicos <- datos_prensa |>
-  # sólo clasificados
-  filter(id %in% ajustados_recod$id) |>
-  # agregar tópicos
-  left_join(ajustados_recod,
-            join_by(id))
+# 
+# datos_prensa_topicos <- datos_prensa |>
+#   # sólo clasificados
+#   filter(id %in% ajustados_recod$id) |>
+#   # agregar tópicos
+#   left_join(ajustados_recod,
+#             join_by(id))
 
 
 # # buscar
@@ -229,7 +240,7 @@ datos_prensa_topicos <- datos_prensa |>
 #   print(n=100)
 
 # márgen mínimo de certeza, o si no se pasa a otros
-clasificacion <- datos_prensa_topicos |> 
+clasificacion <- ajustados_recod |> 
   select(id, topico_1_t, topico_theta_1) |> 
   mutate(topico_1_t = if_else(topico_theta_1 < 0.3, "otros", topico_1_t)) |> 
   select(id, clasificacion = topico_1_t)

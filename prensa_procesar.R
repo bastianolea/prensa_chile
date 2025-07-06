@@ -1,13 +1,9 @@
 # ejecutar todos los pasos de procesamiento, post scraping (prensa_obtener_datos.R)
 library(future)
 library(lubridate)
+source("funciones.R")
 
 # setup ----
-# fecha límite para app de datos semanales
-fecha_limite = floor_date(today(), unit = "week", week_start = 7) # domingo que termina la semana, para prensa semanal
-
-# cantidad de textos a procesar con LLM
-muestra_llm = 5000
 
 # memoria por thread
 plan(multisession, workers = 8)
@@ -44,21 +40,6 @@ source("procesamiento/prensa_semanal_fuente.R", echo = T)
 source("procesamiento/prensa_correlacion.R", echo = T)
 # output: datos/prensa_correlacion.parquet, datos/prensa_correlacion_fuente.parquet
 
-# ajustar documentos nuevos al modelo de tópicos
-# source("analisis/stm_ajustar_topicos.R", echo = T)
-
-# sentimiento de noticias usando modelos de lenguaje
-source("procesamiento/prensa_llm_sentimiento.R", echo = T)
-# output: prensa_llm_sentimiento.parquet
-
-# resumen de noticias usando modelos de lenguaje
-source("procesamiento/prensa_llm_resumen.R", echo = T)
-# output: prensa_llm_resumen.parquet
- 
-# # tópico de noticias usando modelos de lenguaje
-# source("procesamiento/prensa_llm_clasificar.R", echo = T)
-# # output: prensa_llm_clasificar.parquet
-
 # datos para análisis de sentimiento
 source("procesamiento/prensa_semanal_sentimiento.R", echo = T)
 
@@ -70,4 +51,3 @@ tiempo = final - inicio
 print(round(tiempo, 1))
 
 beep()
-# 30 min sin LLM

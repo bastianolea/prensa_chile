@@ -16,7 +16,7 @@ palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
                           "cabe", "pese", "abc", "abcdin"
 )
 
-palabras_basura = c("aaa", "aba", "aaisa", "aap", 
+palabras_basura = c("aaa", "aba", "aaisa", "aap", "aas",
                     "RelacionadasDetalle",
                     "TradingView", "Widget BEGIN", "Widget END",
                     "jpg", "like", "new", "child", "https", "length", "https", "http", "domcontentloaded", "flexdirection", "firstdiv", "pointer", "addeventlistener", "queryselector", "marginbottom", "containers", "lastdiv", "foreach", "innerwidth",
@@ -418,4 +418,9 @@ mensaje_segundos <- function(palabras, tiempo) {
   
   message("    ",  segundos, " segundos, ",
           palabras_segundos, " palabras/seg.")
+}
+
+
+fecha_limite <- function() {
+  floor_date(today(), unit = "week", week_start = 7) # domingo que termina la semana, para prensa semanal
 }

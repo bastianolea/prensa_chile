@@ -30,7 +30,7 @@ prensa_palabras_conteo_3 <- prensa_palabras_conteo_2 |>
   # rango de fechas 
   # filter(fecha >= today() - months(4)) |> 
   filter(fecha >= today() %m-% months(4)) |> 
-  filter(fecha <= fecha_limite) |> # fecha límite, para no incluir días de la semana siguiente
+  filter(fecha <= fecha_limite()) |> # fecha límite, para no incluir días de la semana siguiente
   mutate(semana = week(fecha),
          fecha = floor_date(fecha, unit = "week", week_start = 1),
          # para primera semana del año

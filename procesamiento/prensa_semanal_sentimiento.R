@@ -38,7 +38,7 @@ prensa_sentimiento_2 <- datos_prensa_b |>
 prensa_sentimiento_3 <- prensa_sentimiento_2 |> 
   # rango de fechas 
   filter(fecha >= today() - months(4)) |> 
-  filter(fecha <= fecha_limite) |> # fecha límite, para no incluir días de la semana siguiente
+  filter(fecha <= fecha_limite()) |> # fecha límite, para no incluir días de la semana siguiente
   mutate(fecha = floor_date(fecha, unit = "week", week_start = 1),
          semana = week(fecha)) |> 
   filter(!is.na(sentimiento)) |> 
@@ -103,10 +103,9 @@ prensa_conteo_2 <- prensa_palabras_conteo |>
   left_join(datos_prensa |> select(id, fecha),
             by = "id")
 
-
 # fechas ----
 prensa_conteo_3 <- prensa_conteo_2 |> 
-  filter(fecha <= fecha_limite) |> # fecha límite, para no incluir días de la semana siguiente
+  filter(fecha <= fecha_limite()) |> # fecha límite, para no incluir días de la semana siguiente
   mutate(fecha = floor_date(fecha, unit = "week", week_start = 1),
          semana = week(fecha))
 
@@ -124,20 +123,20 @@ palabras_semana_topico <- prensa_conteo_4 |>
   summarize(n = sum(n),
             fecha = min(fecha), .groups = "drop") |> 
   # mínimo
-  filter(n > 2) |> 
+  # filter(n > 2) |> 
   arrange(fecha, desc(n))
 
-palabras_semana_topico
+# palabras_semana_topico
 
-# probar
-palabras_semana_topico |> 
-  filter(clasificacion == "política",
-         sentimiento == -1)
+# # probar
+# palabras_semana_topico |> 
+#   filter(clasificacion == "política",
+#          sentimiento == -1)
 
 # reducir
 palabras_semana_topico_2 <- palabras_semana_topico |> 
   group_by(semana, fecha, sentimiento, clasificacion) |> 
-  slice_max(n, n = 300)
+  slice_max(n, n = 400)
 
 palabras_semana_topico_2
 
