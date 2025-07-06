@@ -3,14 +3,14 @@
 
 Proyecto de ciencia de datos desarrollado en R para analizar texto de noticias chilenas. Comprende módulos para realizar web scraping de sitios web de prensa para obtener el texto de sus noticias, procesos para transformar ese texto en palabras (tokens), y procesos para analizar dicho corpus de palabras usando distintas técnicas estadísticas.
 
-Actualmente, el corpus de noticias obtenido supera las 800.000 noticias individuales, las cuales suman un total de 140 millones (!) de palabras, abarcando más de 33 fuentes periodísticas distintas.
+Actualmente, el corpus de noticias obtenido supera las 700.000 noticias individuales, las cuales suman un total de 170 millones (!) de palabras, abarcando más de 33 fuentes periodísticas distintas.
 
 ----
 
 ## Datos
-Los datos obtenidos mediante este repositorio van sumando más de 800 mil noticias. Los datos, por su peso, no están disponibles de forma pública. Sin embargo, [puedes acceder a una muestra de 10.000 noticias del año 2024, seleccionadas al azar, en la carpeta datos de este repositorio.](https://github.com/bastianolea/prensa_chile/tree/main/datos) Esta seleccion de datos contiene texto de titulares, cuerpo de noticia, fuente y fecha.
+Los datos obtenidos mediante este repositorio van sumando más de 700 mil noticias. Los datos, por su peso, no están disponibles de forma pública. Sin embargo, [puedes acceder a una muestra de 10.000 noticias del año 2024, seleccionadas al azar, en la carpeta datos de este repositorio.](https://github.com/bastianolea/prensa_chile/tree/main/datos) Esta seleccion de datos contiene texto de titulares, cuerpo de noticia, fuente y fecha.
 
-![](otros/graficos/resultados/datos_prensa_scraping_2024-12-31.mov)
+![](otros/graficos/resultados/datos_prensa_scraping_2025-07-05.mov)
 
 
 ----
@@ -63,13 +63,16 @@ Luego del scraping se realiza el procesamiento de los datos. Todos los scripts d
 
 ----
 
-![](otros/graficos/resultados/datos_prensa_scraping_2024-12-31.png)
+![](otros/graficos/resultados/datos_prensa_scraping_2025-07-05.png)
 
 ----
 
 ## Actualizaciones
 
-**1 de junio 2025:**
+**5 de julio 2025:**
+- Agregadas visualización de nubes de palabras en la app, mostrando términos más frecuentes por semana, y términos más frecuentes por semana filtrados por tópico y por sentimiento.
+
+**1 de julio 2025:**
 - Cambio del procesamiento de tópicos de noticias. Ahora se usa [modelamiento estructural de tópicos](https://github.com/bstewart/stm) (_Structural Topic Model_ o STM), que entrega varios tópicos por noticia con sus probabilidades de pertenencia, de entre aproximadamente 19 tópicos posibles que emergen desde el texto. Antes se realizaba con grandes modelos de lenguaje (LLM) pero entregaba resultados poco certeros. Esta clasificación de noticias se usa para las visualizaciones de análisis de sentimiento por tópicos.
 
 **1 de mayo 2025:**
