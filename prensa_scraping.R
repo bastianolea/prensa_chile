@@ -19,8 +19,6 @@ source("funciones.R")
 # realizar scraping ----
 notificacion("Scraping de prensa", "Iniciando scripts…")
 
-scraping_prensa("scraping_latercera.r") #hist
-
 scraping_prensa("scraping_meganoticias.r") #hist
 
 scraping_prensa("scraping_eldinamo.r") #hist
@@ -28,8 +26,6 @@ scraping_prensa("scraping_eldinamo.r") #hist
 scraping_prensa("scraping_lanacion.r") #hist
 
 scraping_prensa("scraping_publimetro.r") #hist
-
-scraping_prensa("scraping_theclinic.r") #hist
 
 scraping_prensa("scraping_elciudadano.r") #hist
 
@@ -39,10 +35,6 @@ scraping_prensa("scraping_24horas.r") #hist
 
 scraping_prensa("scraping_cnnchile.r") #hist
 
-scraping_prensa("scraping_exante.r") #hist
-
-scraping_prensa("scraping_izquierdadiario.R") #hist
-
 scraping_prensa("scraping_elsiglo.r") #hist
 
 scraping_prensa("scraping_ciper.r") #hist
@@ -50,10 +42,6 @@ scraping_prensa("scraping_ciper.r") #hist
 scraping_prensa("scraping_agricultura.r") #hist
 
 scraping_prensa("scraping_redgol.r") #hist
-
-scraping_prensa("scraping_eldesconcierto.r") #hist
-
-scraping_prensa("scraping_quintopoder.r") #hist
 
 scraping_prensa("scraping_emol.r") #hist en otro script
 
@@ -73,12 +61,25 @@ scraping_prensa("scraping_biobio.r")
 
 scraping_prensa("scraping_lahora.r")
 
-scraping_prensa("scraping_adnradio.r")
+scraping_prensa("scraping_adnradio.r") # no está obteniendo nada
 
-scraping_prensa("scraping_lasegunda.r") #sólo obtiene titulares, fecha y palabras clave
+scraping_prensa("scraping_lasegunda.r") # sólo obtiene titulares, fecha y palabras clave
 
-# scraping_prensa("scraping_cooperativa_h.r") #este es sólo histórico
+# scraping_prensa("scraping_cooperativa_h.r") # este es sólo histórico
 
+# chromote:
+# deben ser secuenciales, porque se usa un mismo proceso de chrome headless para ejecutarse
+scraping_prensa("scraping_latercera.r", ejecucion = "secuencial") #hist
+
+scraping_prensa("scraping_exante.r", ejecucion = "secuencial") #hist
+
+scraping_prensa("scraping_theclinic.r", ejecucion = "secuencial") #hist
+
+scraping_prensa("scraping_eldesconcierto.r", ejecucion = "secuencial") #hist
+
+scraping_prensa("scraping_quintopoder.r", ejecucion = "secuencial") #hist
+
+scraping_prensa("scraping_izquierdadiario.R", ejecucion = "secuencial") #hist
 
 # revisión ----
 # Sys.sleep(30)

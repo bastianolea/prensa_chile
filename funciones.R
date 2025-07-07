@@ -62,11 +62,17 @@ ejecutar <- function(script = "modulos/cron_elsiglo.r",
 
 
 scraping_prensa <- function(script = "cron_radiopaulina.r",
-                            ruta = "scraping/fuentes/") {
+                            ruta = "scraping/fuentes/", 
+                            ejecucion = "asinc") {
   message(glue::glue("iniciando {script} - {format(now(), '%d/%m/%y %H:%M:%S')}"))
   
+  if (ejecucion == "asinc") {
   ### en subproceso (sesión) interactivo (RStudio Background Job, compatible con cualquier sistema operativo)
   rstudioapi::jobRunScript(paste0(ruta, script), workingDir = getwd())
+    
+  } else if (ejecucion == "secuencial") {
+    source(paste0(ruta, script))  
+  }
   
   ###
   # # en subproceso (callr) no interactivo

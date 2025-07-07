@@ -56,13 +56,13 @@ datos_prensa_grafico_conteo |>
         legend.margin = margin(t=15), 
         panel.spacing.x = unit(4, "mm"))
 
-ggsave(glue::glue("graficos/resultados/datos_prensa_scraping_{today()}.png"), 
+ggsave(glue::glue("otros/graficos/resultados/datos_prensa_scraping_{today()}.png"), 
        width = 11, height = 8, bg = "white")
 
 
 # noticias mensuales, por fuentes y por año ----
 datos_prensa_grafico |> 
-  filter(año == 2024) |> 
+  filter(año == 2025) |> 
   ggplot(aes(fecha, fill = fuente)) +
   geom_bar() +
   scale_x_date(date_breaks = "months", date_labels = "%m", expand = c(0, 0), minor_breaks = NULL) +
@@ -77,8 +77,8 @@ datos_prensa_grafico |>
   labs(title = "Noticias mensuales, por fuente, 2024",
        caption = "Fuente: elaboración propia. Bastián Olea Herrera")
 
-ggsave(glue::glue("graficos/resultados/datos_prensa_fuentes_2024_{today()}.png"), 
-       width = 11, height = 8, bg = "white")
+ggsave(glue::glue("otros/graficos/resultados/datos_prensa_fuentes_2025_{today()}.png"), 
+       width = 11, height = 9, bg = "white")
 
 
 # datos_prensa_grafico |> 
