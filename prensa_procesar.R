@@ -3,6 +3,9 @@ library(future)
 library(lubridate)
 source("funciones.R")
 
+# revisar que esté conectado el disco externo
+stopifnot("disco externo desconectado" = file.exists("/Volumes/Externo/R/prensa/"))
+
 # setup ----
 
 # memoria por thread

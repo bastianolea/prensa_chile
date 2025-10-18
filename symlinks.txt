@@ -1,0 +1,10 @@
+# symlinks
+
+ln -s /Volumes/Externo/R/prensa/datos/ ~/R/prensa
+
+ln -s /Volumes/Externo/R/prensa/analisis/ ~/R/prensa
+
+ln -s /Volumes/Externo/R/prensa/scraping/datos/ ~/R/prensa/scraping/
+  
+  
+  

@@ -2,6 +2,7 @@ library(dplyr)
 library(purrr)
 library(furrr)
 library(stringr)
+library(ellmer)
 library(mall)
 library(lubridate)
 library(arrow)
@@ -15,7 +16,10 @@ plan(multisession, workers = 7)
 # configurar LLM
 # llm_use("ollama", "deepseek-r1:8b", .cache = "", temperature = 0)
 llm_use("ollama", "llama3.1:8b", .cache = "", temperature = 0)
-# llm_use("ollama", "llama3.2:3b", .cache = "", temperature = 0)
+
+# chat <- chat_github(model = "o3-mini")
+# chat$chat("hola")
+# mall::llm_use(chat)
 
 # cargar datos ----
 if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.parquet")
@@ -39,8 +43,9 @@ estimar_tiempo(muestra_llm, 4.9)
 datos_muestra <- datos_prensa |>
   filter(año >= 2023) |> 
   select(id, bajada, cuerpo) |>
-  filter(!id %in% anterior$id) |> 
+  filter(!id %in% anterior$id) |>
   slice(1:muestra_llm)
+  # slice(1:100)
 
 rm(datos_prensa)
 

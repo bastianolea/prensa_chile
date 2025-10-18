@@ -15,6 +15,9 @@ library(lubridate) |> suppressPackageStartupMessages()
 
 source("funciones.R")
 
+# revisar que esté conectado el disco externo
+stopifnot("disco externo desconectado" = file.exists("/Volumes/Externo/R/prensa/"))
+
 
 # realizar scraping ----
 notificacion("Scraping de prensa", "Iniciando scripts…")

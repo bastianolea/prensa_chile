@@ -3,8 +3,11 @@ library(future)
 library(lubridate)
 source("funciones.R")
 
+# revisar que esté conectado el disco externo
+stopifnot("disco externo desconectado" = file.exists("/Volumes/Externo/R/prensa/"))
+
 # cantidad de textos a procesar con LLM
-muestra_llm = 5000
+muestra_llm = 4000
 
 # memoria por thread
 plan(multisession, workers = 8)

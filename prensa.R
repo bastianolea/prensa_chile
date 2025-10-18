@@ -2,6 +2,7 @@
 
 # scraping
 source("prensa_scraping.R")
+# arreglar adn y el dinamo
 
 # procesar 
 source("prensa_procesar.R")

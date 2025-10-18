@@ -74,7 +74,7 @@ correlacion_fuente <- read_parquet("prensa_correlacion_fuente.parquet")
 sentimiento <- read_parquet("prensa_sentimiento.parquet")
 palabras_semana_topico <- read_parquet("palabras_semana_topico.parquet")
 
-n_noticias <- readLines("prensa_n_noticias.txt") |> as.numeric() |> format(big.mark = ".", decimal.mark = ",")
+n_noticias <- readLines("prensa_n_noticias.txt") |> as.numeric() |> format(scientific = FALSE, big.mark = ".", decimal.mark = ",")
 n_palabras <- readLines("prensa_n_palabras.txt") |> as.numeric()
 
 

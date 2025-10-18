@@ -17,7 +17,7 @@ palabras_irrelevantes = c("chile", "publicar", "comunidad", "personas",
 )
 
 palabras_basura = c("aaa", "aba", "aaisa", "aap", "aas",
-                    "RelacionadasDetalle",
+                    "RelacionadasDetalle", "sd", "hd",
                     "TradingView", "Widget BEGIN", "Widget END",
                     "jpg", "like", "new", "child", "https", "length", "https", "http", "domcontentloaded", "flexdirection", "firstdiv", "pointer", "addeventlistener", "queryselector", "marginbottom", "containers", "lastdiv", "foreach", "innerwidth",
                     "right", "left", "top", "align", "gnews", "px", "twitter", "com", "pic", "font", "height", "width",
