@@ -7,7 +7,7 @@ source("funciones.R")
 stopifnot("disco externo desconectado" = file.exists("/Volumes/Externo/R/prensa/"))
 
 # cantidad de textos a procesar con LLM
-muestra_llm = 4000
+muestra_llm = 2000
 
 # memoria por thread
 plan(multisession, workers = 8)

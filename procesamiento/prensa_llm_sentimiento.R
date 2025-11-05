@@ -28,7 +28,7 @@ if (!exists("datos_prensa")) datos_prensa <- read_parquet("datos/prensa_datos.pa
 anterior <- read_parquet("datos/prensa_llm_sentimiento.parquet")
 
 # extraer muestra
-if (!exists("muestra_llm")) muestra_llm = 2600 # definir cantidad de noticias a procesar
+if (!exists("muestra_llm")) muestra_llm = 2000 # definir cantidad de noticias a procesar
 
 # estimar tiempo
 estimar_tiempo(muestra_llm, 4.9)

@@ -219,6 +219,7 @@ datos_prensa <- modulos_limpios_fechas |>
 arrow::write_parquet(datos_prensa, "datos/prensa_datos.parquet")
 
 
+# otros ----
 
 # guardar cantidad de noticias
 options(scipen=9999)
@@ -236,6 +237,14 @@ n_noticias |> write("apps/prensa_chile/prensa_n_noticias.txt")
 # 
 # datos_prensa |>
 #   filter(fecha < "2000-01-01")
+
+
+# guardar lista de enlaces 
+datos_prensa |> 
+  pull(url) |> 
+  unique() |> 
+  readr::write_rds("otros/urls.rds", compress = "none")
+
 
 plan(multisession)
 remove(modulos_cargados, 

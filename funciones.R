@@ -430,3 +430,21 @@ mensaje_segundos <- function(palabras, tiempo) {
 fecha_limite <- function() {
   floor_date(today(), unit = "week", week_start = 7) # domingo que termina la semana, para prensa semanal
 }
+
+
+
+# para no scrapear si ya se obtuvo
+revisar_scrapeado <- function(enlace) {
+  
+  # datos generados en p1
+  scrapeados <- readRDS("otros/urls.rds")
+  
+  # comparar
+  veredicto <- enlace %in% scrapeados
+  
+  if (veredicto) {
+    message("url repetida")
+  }
+  
+  return(veredicto)
+}

@@ -1,6 +1,7 @@
 .Rproj.user
 .Rhistory
 .Rdata
+.Renviron
 .rds
 .feather
 .parquet
@@ -15,3 +16,4 @@ scraping/fuentes/*
 !scraping/fuentes/scraping_ejemplo.R
 analisis/modelos/*
 analisis/resultados/*
+otros/urls.rds
