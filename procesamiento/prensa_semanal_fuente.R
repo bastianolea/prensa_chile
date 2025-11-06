@@ -74,7 +74,7 @@ palabras_semana_fuente_2 <- palabras_semana_fuente |>
 #   filter(palabra == "migración")
 
 # guardar ----
-arrow::write_parquet(palabras_semana_fuente_2,"apps/prensa_chile/palabras_semana_fuente.parquet")
+arrow::write_parquet(palabras_semana_fuente_2,"datos/app/palabras_semana_fuente.parquet")
 # palabras_semana_fuente <- arrow::read_parquet("apps/prensa_chile/palabras_semana_fuente.parquet")
 
 plan(multisession)

@@ -40,7 +40,7 @@ dbWriteTable(conn = db_con,
 
 
 
-correlacion <- read_parquet("apps/prensa_chile/prensa_correlacion.parquet")
+correlacion <- read_parquet("datos/prensa_correlacion.parquet")
 
 dbWriteTable(conn = db_con, 
              name = "correlacion",
@@ -50,7 +50,7 @@ dbWriteTable(conn = db_con,
 
 
 
-correlacion_fuente <- read_parquet("apps/prensa_chile/prensa_correlacion_fuente.parquet")
+correlacion_fuente <- read_parquet("datos/prensa_correlacion_fuente.parquet")
 
 dbWriteTable(conn = db_con, 
              name = "correlacion_fuente",
@@ -77,6 +77,22 @@ dbWriteTable(conn = db_con,
              palabras_semana_topico, 
              indexes = list(c("semana", "fecha", "clasificacion")),
              overwrite = TRUE)
+
+
+# otros
+n_noticias <- readLines("datos/prensa_n_noticias.txt") |> 
+  as.numeric() |> 
+  format(scientific = FALSE, big.mark = ".", decimal.mark = ",")
+
+n_palabras <- readLines("datos/prensa_n_palabras.txt") |> 
+  as.numeric()
+
+dbWriteTable(conn = db_con, 
+             name = "prensa_otros",
+             tibble(n_noticias = n_noticias,
+                    n_palabras = n_palabras), 
+             overwrite = TRUE)
+
 
 
 # probar ----

@@ -66,33 +66,59 @@ options(shiny.useragg = TRUE)
 resolucion = 110
 
 
-# cargar datos ----
-palabras_semana <- read_parquet("palabras_semana.parquet")
-palabras_semana_fuente <- read_parquet("palabras_semana_fuente.parquet")
-correlacion <- read_parquet("prensa_correlacion.parquet")
-correlacion_fuente <- read_parquet("prensa_correlacion_fuente.parquet")
-sentimiento <- read_parquet("prensa_sentimiento.parquet")
-palabras_semana_topico <- read_parquet("palabras_semana_topico.parquet")
+# datos ----
 
-n_noticias <- readLines("prensa_n_noticias.txt") |> as.numeric() |> format(scientific = FALSE, big.mark = ".", decimal.mark = ",")
-n_palabras <- readLines("prensa_n_palabras.txt") |> as.numeric()
+# cargar desde base de datos supabase
+readRenviron(".Renviron")
 
+db_con <- DBI::dbConnect(
+  RPostgres::Postgres(),
+  dbname = "postgres",
+  host = Sys.getenv("DB_HOST"),
+  port = Sys.getenv("DB_PORT"),
+  user = Sys.getenv("DB_USER"),
+  password = Sys.getenv("DB_PASS")
+)
+
+palabras_semana <- tbl(db_con, "palabras_semana")
+palabras_semana_fuente <- tbl(db_con, "palabras_semana_fuente")
+correlacion <- tbl(db_con, "correlacion")
+correlacion_fuente <- tbl(db_con, "correlacion_fuente")
+sentimiento <- tbl(db_con, "sentimiento")
+palabras_semana_topico <- tbl(db_con, "palabras_semana_topico")
+
+
+# cargar desde parquet
+
+# palabras_semana <- read_parquet("palabras_semana.parquet")
+# palabras_semana_fuente <- read_parquet("palabras_semana_fuente.parquet")
+# correlacion <- read_parquet("prensa_correlacion.parquet")
+# correlacion_fuente <- read_parquet("prensa_correlacion_fuente.parquet")
+# sentimiento <- read_parquet("prensa_sentimiento.parquet")
+# palabras_semana_topico <- read_parquet("palabras_semana_topico.parquet")
+
+# otros
+# n_noticias <- readLines("prensa_n_noticias.txt") |> as.numeric() |> format(scientific = FALSE, big.mark = ".", decimal.mark = ",")
+# n_palabras <- readLines("prensa_n_palabras.txt") |> as.numeric()
+prensa_otros <- tbl(db_con, "prensa_otros") |> collect()
 
 # vectores ----
 palabras_posibles <- palabras_semana |> 
   group_by(palabra) |> 
   summarize(n = sum(n)) |> 
+  collect() |> 
   arrange(desc(n)) |> 
   filter(n > 100) |> 
   pull(palabra)
 
-fuentes <- palabras_semana_fuente$fuente |> unique() |> sort()
+fuentes <- palabras_semana_fuente |> pull(fuente) |> unique() |> sort()
 
-topicos <- sentimiento$clasificacion |> unique() |> na.exclude() |> str_subset("Sin", negate = T) |> sort()
+topicos <- sentimiento |> pull(clasificacion) |> unique() |> na.exclude() |> str_subset("Sin", negate = T) |> sort()
 
 lista_semanas <- palabras_semana |> 
   distinct(fecha, semana) |> 
   arrange(desc(fecha)) |> 
+  collect() |> 
   mutate(fecha_t = redactar_fecha(fecha),
          fecha_t = paste("Semana del", fecha_t)) |> 
   select(fecha_t, fecha) |> 
@@ -175,8 +201,8 @@ ui <- page_fluid(
       # texto introducción
       div(
         markdown(
-          paste0("Proyecto de _análisis de texto_ de noticias publicadas por medios de comunicación digitales de Chile. Actualmente, el material obtenido supera las **", n_noticias, " noticias** individuales, 
-                    las cuales suman un total de **", n_palabras/1000000, " millones de palabras**, abarcando más de 20 fuentes periodísticas distintas.")),
+          paste0("Proyecto de _análisis de texto_ de noticias publicadas por medios de comunicación digitales de Chile. Actualmente, el material obtenido supera las **", prensa_otros$n_noticias, " noticias** individuales, 
+                    las cuales suman un total de **", prensa_otros$n_palabras/1000000, " millones de palabras**, abarcando más de 20 fuentes periodísticas distintas.")),
         markdown("Un sistema automatizado obtiene y procesa grandes cantidades de datos de noticias diariamente, creando una base de datos de noticias con su texto (título, cuerpo, bajada) y metadatos (fecha, fuente, dirección web). A partir de esta información es posible realizar distintos análisis sobre el texto. Este visualizador permite describir _sobre qué_ hablan las noticias en determinadas fechas, en intervalos de semanas, y fuentes periodísticas."),
         markdown("Para más información técnica sobre este proyecto, [visite el repositorio](https://github.com/bastianolea/prensa_chile)."),
         hr()
@@ -306,7 +332,7 @@ ui <- page_fluid(
                               "Conceptos que desea incluir",
                               choices = NULL, #c("corrupción", "delincuencia", palabras_posibles),
                               # choices = NULL,
-                              selected = c("delincuencia", "corrupción", "hermosilla", "enel"),
+                              selected = c("delincuencia", "corrupción", "gobierno"),
                               multiple = TRUE,
                               width = "100%",
                               options = list(search = TRUE,
@@ -822,12 +848,12 @@ server <- function(input, output, session) {
   #                        choices = c(rev(selector_semanas_palabras())),
   #                        server = TRUE)
   # )
-  conceptos_interes <- c("delincuencia", "corrupción", "Hermosilla", "Boric",
-                         "Tohá", "Matthei", "Winter", "Jara")
+  conceptos_interes <- c("delincuencia", "corrupción", "Boric",
+                         "Jara", "Matthei", "Kaiser", "Kast")
   
   updateSelectizeInput(session, 'selector_palabras', 
                        choices = c(conceptos_interes, palabras_posibles),
-                       selected = c("delincuencia", "corrupción", "Hermosilla", "Boric"),
+                       selected = c("delincuencia", "corrupción", "Boric", "Jara"),
                        server = TRUE)
   
   updateSelectizeInput(session, 'selector_palabras_fuente', 
@@ -839,12 +865,12 @@ server <- function(input, output, session) {
   
   updateSelectizeInput(session, 'cor_total_palabra', 
                        choices = c(conceptos_interes, palabras_posibles),
-                       selected = "Hermosilla",
+                       selected = "delincuencia",
                        server = TRUE)
   
   updateSelectizeInput(session, 'cor_fuente_palabra', 
                        choices = c(conceptos_interes, palabras_posibles),
-                       selected = "Hermosilla",
+                       selected = "Boric",
                        server = TRUE)
   
   
@@ -899,6 +925,7 @@ server <- function(input, output, session) {
       filter(!palabra %in% input$palabras_excluir) |> 
       # ordenar palabras por frecuencia
       ungroup() |> 
+      collect() |> 
       mutate(palabra = fct_reorder(palabra, freq_total_palabra)) |> 
       # etiquetas hacia la izquierda
       mutate(inv = ifelse(semana == min(semana) | n < mean(n)*0.8, TRUE, FALSE))
@@ -939,11 +966,14 @@ server <- function(input, output, session) {
   datos_conteo_semanas_palabras_2 <- reactive({
     req(input$selector_palabras != "")
     
+    selector_palabras_lower <- tolower(input$selector_palabras)
+    
     datos_conteo_semanas_palabras_1() |> 
-      filter(palabra %in% tolower(input$selector_palabras)) |> 
+      filter(palabra %in% selector_palabras_lower) |> 
       group_by(palabra) |> 
       mutate(freq_total_palabra = sum(n)) |> 
       ungroup() |> 
+      collect() |> 
       mutate(palabra = fct_reorder(palabra, freq_total_palabra, .desc = T)) |> 
       # otros datos
       group_by(semana) |> 
@@ -997,6 +1027,7 @@ server <- function(input, output, session) {
   datos_semana_fuente_3 <- reactive({
     # browser()
     datos_semana_fuente_2() |> 
+      collect() |> 
       # agrupar fuentes chicas
       mutate(fuente = fct_reorder(fuente, n_total_fuente, .desc = FALSE)) |>
       mutate(fuente = fct_lump(fuente, w = n_total_fuente, n = input$semana_fuentes_fuentes, ties.method = "first", 
@@ -1005,77 +1036,6 @@ server <- function(input, output, session) {
       summarize(n = sum(n), .groups = "drop")
   })
   
-  # 
-  # datos_semana_fuente_4 <- reactive({
-  #   browser()
-  #   
-  #   datos_1 <- datos_semana_fuente_3() |> 
-  #     # filter(semana == 4) |> 
-  #     group_by(semana, fecha_texto, palabra) |> 
-  #     summarize(fuente = list(c(fuente, n)),
-  #               n_semana = sum(n)) |> 
-  #     group_by(semana) |> 
-  #     arrange(semana, desc(n_semana)) |> 
-  #     mutate(rank = row_number(desc(n_semana))) |> 
-  #     filter(rank <= input$semana_fuentes_palabras_n)
-  #     
-  #   # 
-  #   # datos_1 <- datos_semana_fuente_3() |> 
-  #   #   # maximo palabras por semana
-  #   #   group_by(semana, palabra) |> 
-  #   #   mutate(n_semana = sum(n)) |>
-  #   #   arrange(semana, desc(n_semana)) |> 
-  #   #   group_by(semana) |>
-  #   #   mutate(rank = dense_rank(desc(n_semana))) |> 
-  #   #   ungroup() |> 
-  #   #   # mutate(rank2 = row_number(desc(n_semana))) |>
-  #   #   filter(rank <= input$semana_fuentes_palabras_n) |> # cantidad de palabras por semana
-  #   #   # distinct(semana, rank) |> 
-  #   #   # add_count(semana) |> print(n=Inf)
-  #   #   arrange(semana, rank)
-  #   
-  #  
-  #   # el filtro tiene que ser contando 15 palabras por cada semana, 
-  #   # indiferente a si la palabra sale en multiples fuentes
-  #   
-  #   # palabras <- datos_1 |> 
-  #   #   arrange(semana, rank) |> 
-  #   #   distinct(semana, palabra, rank) |> 
-  #   #   rename(palabra_rank = palabra) |> 
-  #   #   select(-rank) |> 
-  #   #   tidyr::nest(palabra_rank = palabra_rank)
-  #   
-  #   # palabras <- datos_1 |> 
-  #   #   arrange(semana, rank) |> 
-  #   #   distinct(semana, palabra, rank) |> 
-  #   #   rename(palabra_rank = palabra) |> 
-  #   #   select(-rank) |> 
-  #   #   group_by(semana) |> 
-  #   #   summarize(palabra_rank = list(palabra_rank))
-  #   
-  #   # palabras <-  tibble(semana = 4, 
-  #   #        palabra_rank = list("presidente"))
-  #   
-  #   datos_2 <- datos_1 |> 
-  #     # ordenar palabras
-  #     group_by(semana, rank) |> 
-  #     mutate(n_palabra_semana = sum(n_semana)) |> 
-  #     group_by(semana) |> 
-  #     mutate(palabra = tidytext::reorder_within(palabra,
-  #                                               # semana,
-  #                                               n_palabra_semana,
-  #                                               semana)) |> 
-  #     ungroup()
-  #   
-  #   # datos_2
-  #   # datos_2 |> 
-  #   #   print(n=100)
-  #   
-  #   datos_3 <- datos_2 |> 
-  #     tidyr::unnest_longer(fuente)
-  #   
-  #   datos_3
-  # })
   
   datos_semana_fuente_4 <- reactive({
     # browser()
@@ -1111,6 +1071,7 @@ server <- function(input, output, session) {
       # ordenar palabras
       group_by(fecha_texto, palabra) |> 
       mutate(n_palabra_semana = sum(n)) |> 
+      collect() |> 
       group_by(fecha_texto) |> 
       mutate(palabra = tidytext::reorder_within(palabra, n_palabra_semana, fecha_texto)) |> 
       ungroup()
@@ -1147,7 +1108,8 @@ server <- function(input, output, session) {
       # # ranking de fuentes con mayor cantidad de palabras
       group_by(fuente) |>
       mutate(n_total_fuente = sum(n)) |>
-      ungroup() 
+      ungroup() |> 
+      collect()
   })
   
   datos_semana_fuente_palabra_3 <- reactive({
@@ -1164,6 +1126,7 @@ server <- function(input, output, session) {
       # ordenar palabras
       group_by(fecha_texto, fuente) |> 
       mutate(n_palabra_fuente = sum(n)) |> 
+      collect() |> 
       group_by(fecha_texto) |> 
       mutate(fuente2 = tidytext::reorder_within(fuente, n_palabra_fuente, fecha_texto)) |> 
       ungroup()
@@ -1190,6 +1153,7 @@ server <- function(input, output, session) {
     
     cor_filt <- correlacion |>
       rename(palabra1 = item1, palabra2 = item2, correlacion = correlation) |> 
+      collect() |> 
       filter(palabra1 == tolower(input$cor_total_palabra))
     
     return(cor_filt)
@@ -1210,7 +1174,7 @@ server <- function(input, output, session) {
   ### correlación fuentes ----
   cor_fuente_dato_1 <- reactive({
     req(input$cor_fuente_palabra != "")
-    
+    # browser()
     correlacion_fuente |>
       rename(palabra1 = item1, palabra2 = item2, correlacion = correlation) |> 
       filter(palabra1 == tolower(input$cor_fuente_palabra))
@@ -1234,6 +1198,7 @@ server <- function(input, output, session) {
       group_by(fuente) |> 
       mutate(cor_total = sum(correlacion)) |> 
       ungroup() |> 
+      collect() |> 
       mutate(rank_fuente = dense_rank(desc(cor_total))) |>
       filter(rank_fuente <= input$cor_fuente_fuente_n)
   })
@@ -1248,7 +1213,8 @@ server <- function(input, output, session) {
     sentimiento |>
       filter(fecha >= fecha_min,
              fecha <= fecha_max) |>
-      recodificar_fuentes()
+      recodificar_fuentes() |> 
+      collect()
   })
   
   
@@ -1462,7 +1428,7 @@ server <- function(input, output, session) {
       slice_max(n, n = 300) |> 
       arrange(desc(n)) |> 
       rename(word = palabra, freq = n) |> 
-      print() |> 
+      # print() |> 
       wordcloud2(color = c(color_texto),
                  backgroundColor = color_fondo,
                  fontWeight = "normal",
@@ -1574,7 +1540,7 @@ server <- function(input, output, session) {
   ## correlación ----
   ### correlación general ----
   output$g_cor_total <- renderPlot({
-    
+    # browser()
     dato <- cor_total_dato_2() |> 
       mutate(tamaño = rescale(correlacion, to = c(1.2, 2), 
                               from = range(min(correlacion), .7)),
@@ -1826,7 +1792,7 @@ server <- function(input, output, session) {
       slice_max(n, n = 300) |> 
       arrange(desc(n)) |> 
       rename(word = palabra, freq = n) |> 
-      print() |> 
+      # print() |> 
       wordcloud2(color = c(color_texto),
                  backgroundColor = color_fondo,
                  fontWeight = "normal",

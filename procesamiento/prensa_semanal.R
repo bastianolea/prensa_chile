@@ -63,7 +63,7 @@ palabras_semana_2 <- palabras_semana |>
 
 # guardar ----
 arrow::write_parquet(palabras_semana_2, 
-                     "apps/prensa_chile/palabras_semana.parquet")
+                     "datos/app/palabras_semana.parquet")
 
 rm(palabras_semana,
    palabras_semana_2,

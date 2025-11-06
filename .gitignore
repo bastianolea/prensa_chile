@@ -17,3 +17,4 @@ scraping/fuentes/*
 analisis/modelos/*
 analisis/resultados/*
 otros/urls.rds
+apps/prensa_chile/.Renviron

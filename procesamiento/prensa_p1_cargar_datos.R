@@ -228,7 +228,7 @@ n_noticias <- datos_prensa |>
   signif(digits = 3) 
 
 n_noticias |> write("datos/prensa_n_noticias.txt")
-n_noticias |> write("apps/prensa_chile/prensa_n_noticias.txt")
+# n_noticias |> write("apps/prensa_chile/prensa_n_noticias.txt")
 
 # list("n_fuentes" = length(unique(datos_prensa$fuente)),
 #      "max_fecha" = max(datos_prensa$fecha, na.rm = T),

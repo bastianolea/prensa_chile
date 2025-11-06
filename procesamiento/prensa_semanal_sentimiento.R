@@ -73,10 +73,10 @@ procesamiento <- datos_prensa_b |>
 
 # guardar ----
 arrow::write_parquet(prensa_sentimiento_3, 
-                     "apps/prensa_chile/prensa_sentimiento.parquet")
+                     "datos/app/prensa_sentimiento.parquet")
 
-readr::write_rds(procesamiento,
-                 "apps/prensa_chile/prensa_sentimiento_status.rds")
+# readr::write_rds(procesamiento,
+                 # "apps/prensa_chile/prensa_sentimiento_status.rds")
 
 
 
@@ -141,4 +141,4 @@ palabras_semana_topico_2 <- palabras_semana_topico |>
 palabras_semana_topico_2
 
 arrow::write_parquet(palabras_semana_topico_2, 
-                     "apps/prensa_chile/palabras_semana_topico.parquet")
+                     "datos/app/palabras_semana_topico.parquet")

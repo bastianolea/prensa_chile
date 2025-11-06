@@ -36,8 +36,8 @@ tictoc::toc()
 
 ## guardar ----
 arrow::write_parquet(correlacion, "datos/prensa_correlacion.parquet")
-file.copy(from = "datos/prensa_correlacion.parquet", 
-          "apps/prensa_chile/prensa_correlacion.parquet", overwrite = TRUE)
+# file.copy(from = "datos/prensa_correlacion.parquet", 
+          # "apps/prensa_chile/prensa_correlacion.parquet", overwrite = TRUE)
 # correlacion <- arrow::read_parquet("datos/prensa_correlacion.parquet")
 
 rm(correlacion)
@@ -95,8 +95,8 @@ message("correlación por fuentes: total de palabras únicas: ", unique(correlac
 
 ## guardar ----
 arrow::write_parquet(correlacion_fuente, "datos/prensa_correlacion_fuente.parquet")
-file.copy(from = "datos/prensa_correlacion_fuente.parquet", 
-          "apps/prensa_chile/prensa_correlacion_fuente.parquet", overwrite = TRUE)
+# file.copy(from = "datos/prensa_correlacion_fuente.parquet",
+#           "apps/prensa_chile/prensa_correlacion_fuente.parquet", overwrite = TRUE)
 
 rm(correlacion,
    correlacion_fuente,
