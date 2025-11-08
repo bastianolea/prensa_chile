@@ -73,6 +73,9 @@ Luego del scraping se realiza el procesamiento de los datos. Todos los scripts d
 
 ## Actualizaciones
 
+**8 de noviembre 2025**:
+- Ahora los datos se alojan en [una base de datos supabase gratuita](https://bastianolea.rbind.io/blog/db_supabase/), en vez de depender de archivos `.parquet`. Esto facilita mucho actualizar la aplicación (no necesito volver a compilar la app cada vez que cambian los datos), y también debería disminuir la demanda de memoria de la aplicación (menos caídas, yey!). En teoría también puede servir para permitir a otra gente acceso a los datos más sencillo que enviarle archivos de varios gigas de peso.
+
 **5 de julio 2025:**
 - Agregadas visualización de nubes de palabras en la app, mostrando términos más frecuentes por semana, y términos más frecuentes por semana filtrados por tópico y por sentimiento.
 
