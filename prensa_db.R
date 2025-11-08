@@ -20,7 +20,7 @@ db_con <- dbConnect(
 library(arrow)
 
 
-palabras_semana <- arrow::read_parquet("apps/prensa_chile/palabras_semana.parquet")
+palabras_semana <- arrow::read_parquet("datos/app/palabras_semana.parquet")
 
 dbWriteTable(conn = db_con, 
              name = "palabras_semana",
@@ -30,7 +30,7 @@ dbWriteTable(conn = db_con,
 
 
 
-palabras_semana_fuente <- read_parquet("apps/prensa_chile/palabras_semana_fuente.parquet")
+palabras_semana_fuente <- read_parquet("datos/app/palabras_semana_fuente.parquet")
 
 dbWriteTable(conn = db_con, 
              name = "palabras_semana_fuente",
@@ -60,7 +60,7 @@ dbWriteTable(conn = db_con,
 
 
 
-sentimiento <- read_parquet("apps/prensa_chile/prensa_sentimiento.parquet")
+sentimiento <- read_parquet("datos/app/prensa_sentimiento.parquet")
 
 dbWriteTable(conn = db_con, 
              name = "sentimiento",
@@ -70,7 +70,7 @@ dbWriteTable(conn = db_con,
 
 
 
-palabras_semana_topico <- read_parquet("apps/prensa_chile/palabras_semana_topico.parquet")
+palabras_semana_topico <- read_parquet("datos/app/palabras_semana_topico.parquet")
 
 dbWriteTable(conn = db_con, 
              name = "palabras_semana_topico",
@@ -90,7 +90,8 @@ n_palabras <- readLines("datos/prensa_n_palabras.txt") |>
 dbWriteTable(conn = db_con, 
              name = "prensa_otros",
              tibble(n_noticias = n_noticias,
-                    n_palabras = n_palabras), 
+                    n_palabras = n_palabras,
+                    fecha = lubridate::today()), 
              overwrite = TRUE)
 
 

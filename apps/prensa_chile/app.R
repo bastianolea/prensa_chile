@@ -77,7 +77,8 @@ db_con <- DBI::dbConnect(
   host = Sys.getenv("DB_HOST"),
   port = Sys.getenv("DB_PORT"),
   user = Sys.getenv("DB_USER"),
-  password = Sys.getenv("DB_PASS")
+  password = Sys.getenv("DB_PASS"),
+  # pool_mode = "session"
 )
 
 palabras_semana <- tbl(db_con, "palabras_semana")
@@ -879,8 +880,11 @@ server <- function(input, output, session) {
   
   output$ultimos_datos_fecha <- renderText({
     
-    format(file.info("palabras_semana.parquet")$mtime,
-           "%d/%m/%Y")
+    # format(file.info("palabras_semana.parquet")$mtime,
+    #        "%d/%m/%Y")
+    
+    prensa_otros$fecha |> 
+      format("%d/%m/%Y")
   })
   
   # cálculos ----

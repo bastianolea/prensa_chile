@@ -9,3 +9,6 @@ source("prensa_procesar.R")
 
 # procesamientos más largos
 source("prensa_postprocesar.R")
+
+# actualizar base de datos
+source("prensa_db.R")
