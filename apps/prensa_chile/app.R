@@ -81,12 +81,6 @@ db_con <- DBI::dbConnect(
   # pool_mode = "session"
 )
 
-palabras_semana <- tbl(db_con, "palabras_semana")
-palabras_semana_fuente <- tbl(db_con, "palabras_semana_fuente")
-correlacion <- tbl(db_con, "correlacion")
-correlacion_fuente <- tbl(db_con, "correlacion_fuente")
-sentimiento <- tbl(db_con, "sentimiento")
-palabras_semana_topico <- tbl(db_con, "palabras_semana_topico")
 
 
 # cargar desde parquet
@@ -104,26 +98,37 @@ palabras_semana_topico <- tbl(db_con, "palabras_semana_topico")
 prensa_otros <- tbl(db_con, "prensa_otros") |> collect()
 
 # vectores ----
-palabras_posibles <- palabras_semana |> 
-  group_by(palabra) |> 
-  summarize(n = sum(n)) |> 
+# palabras_posibles <- palabras_semana |> 
+#   group_by(palabra) |> 
+#   summarize(n = sum(n)) |> 
+#   collect() |> 
+#   arrange(desc(n)) |> 
+#   filter(n > 100) |> 
+#   pull(palabra)
+# 
+# fuentes <- palabras_semana_fuente |> pull(fuente) |> unique() |> sort()
+# 
+# topicos <- sentimiento |> pull(clasificacion) |> unique() |> na.exclude() |> str_subset("Sin", negate = T) |> sort()
+# 
+# lista_semanas <- palabras_semana |> 
+#   distinct(fecha, semana) |> 
+#   arrange(desc(fecha)) |> 
+#   collect() |> 
+#   mutate(fecha_t = redactar_fecha(fecha),
+#          fecha_t = paste("Semana del", fecha_t)) |> 
+#   select(fecha_t, fecha) |> 
+#   tibble::deframe()
+
+palabras_posibles <- tbl(db_con, "palabras_posibles") |> collect() |> pull()
+
+fuentes <- tbl(db_con, "fuentes") |> collect() |> pull()
+
+topicos <- tbl(db_con, "topicos") |> collect() |> pull()
+
+lista_semanas <- tbl(db_con, "lista_semanas") |> 
   collect() |> 
-  arrange(desc(n)) |> 
-  filter(n > 100) |> 
-  pull(palabra)
-
-fuentes <- palabras_semana_fuente |> pull(fuente) |> unique() |> sort()
-
-topicos <- sentimiento |> pull(clasificacion) |> unique() |> na.exclude() |> str_subset("Sin", negate = T) |> sort()
-
-lista_semanas <- palabras_semana |> 
-  distinct(fecha, semana) |> 
-  arrange(desc(fecha)) |> 
-  collect() |> 
-  mutate(fecha_t = redactar_fecha(fecha),
-         fecha_t = paste("Semana del", fecha_t)) |> 
-  select(fecha_t, fecha) |> 
   tibble::deframe()
+
 
 # ui ----
 ui <- page_fluid(
@@ -162,6 +167,7 @@ ui <- page_fluid(
   ),
   
   shinyjs::useShinyjs(),
+  js_get_vertical_position(),
   
   ## css ----
   tags$style(
@@ -807,7 +813,7 @@ ui <- page_fluid(
                
                # cafecito ----
                div(style = css(overflow_x = "scroll"),
-                   div(style = css(width = "350px", margin = "auto", padding = "0px"),
+                   div(style = css(width = "360px", margin = "auto", padding = "0px"),
                        
                        tags$style(HTML(".cafecito:hover {opacity: 70%; transition: 0.3s; color: black !important;} .cafecito a:hover {color: black}")),
                        
@@ -827,15 +833,45 @@ ui <- page_fluid(
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   
-  # interacciones ----
+  # datos ----
+  db_palabras_semana <- reactive({
+    message("obteniendo db_palabras_semana")
+    tbl(db_con, "palabras_semana")
+  })
   
+  db_palabras_semana_fuente <- reactive({
+    message("obteniendo db_palabras_semana_fuente")
+    tbl(db_con, "palabras_semana_fuente")
+  })
+  
+  db_correlacion <- reactive({
+    message("obteniendo db_correlacion")
+    tbl(db_con, "correlacion")
+  })
+  
+  db_correlacion_fuente <- reactive({
+    message("obteniendo db_correlacion_fuente")
+    tbl(db_con, "correlacion_fuente")
+  })
+  
+  db_sentimiento <- reactive({
+    message("obteniendo db_sentimiento")
+    tbl(db_con, "sentimiento")
+  })
+  
+  db_palabras_semana_topico <- reactive({
+    message("obteniendo db_palabras_semana_topico")
+    tbl(db_con, "palabras_semana_topico")
+  })
+  
+  
+  # interacciones ----
   observeEvent(input$mostrar_opciones, {
     shinyjs::toggle("opciones_avanzadas")
   })
   
   
   # selectores ----
-  
   observe(
     updateSelectizeInput(session, 'destacar_palabra', 
                          # choices = c("Ninguna", palabras_posibles),
@@ -875,6 +911,39 @@ server <- function(input, output, session) {
                        server = TRUE)
   
   
+  # scroll ----
+  posicion_scroll <- reactive(input$posicion_y) |> bindEvent(input$posicion_y)
+  
+  # obtener input de desplazamiento y revisarlo para que sea válido
+  vertical <- reactive({
+    if (length(input$posicion_y) > 0) {
+      return(input$posicion_y[1])
+    } else {
+      return(0)
+    }
+  })
+  
+  # hacer que el input solo se actualice 500 milisegundos después de terminar el scrolling
+  vertical_position <- vertical |> debounce(200)
+  
+  observe({
+    message("vertical scroll position debounced: ", vertical_position())
+  })
+  
+  #si el scrolling supera este valor (pixeles de desplazamiento vertical), entonces se cargarán los gráficos grandes
+  scroll <- reactiveValues(abajo = FALSE, inicio = FALSE)
+  
+  observeEvent(vertical_position(), {
+    if (vertical_position() > 800) {
+      scroll$inicio <- TRUE
+    }
+    
+    # if (vertical_position() > 1800) {
+    #   scroll$abajo <- TRUE
+    # }
+  })
+  
+  
   # —----
   
   
@@ -894,7 +963,7 @@ server <- function(input, output, session) {
   ## líneas semanas ----
   datos_conteo_semanas_1 <- reactive({
     message("datos líneas semanas 1")
-    palabras_semana |> 
+    db_palabras_semana() |> 
       # límite de fecha
       filter(fecha >= today() - weeks(input$semanas)) |>
       # dejar solo top palabras semana por porcentaje de semana
@@ -924,7 +993,7 @@ server <- function(input, output, session) {
   datos_conteo_semanas_3 <- reactive({
     req(datos_conteo_semanas_2())
     message("datos líneas semanas 3")
-    # browser()
+    
     datos_conteo_semanas_2() |> 
       filter(!palabra %in% input$palabras_excluir) |> 
       # ordenar palabras por frecuencia
@@ -963,7 +1032,7 @@ server <- function(input, output, session) {
   
   ## palabras semana ----
   datos_conteo_semanas_palabras_1 <- reactive({
-    palabras_semana |> 
+    db_palabras_semana() |> 
       filter(fecha > today() - weeks(input$semanas_palabras))
   })
   
@@ -973,7 +1042,7 @@ server <- function(input, output, session) {
     selector_palabras_lower <- tolower(input$selector_palabras)
     
     datos_conteo_semanas_palabras_1() |> 
-      filter(palabra %in% selector_palabras_lower) |> 
+      filter(palabra %in% selector_palabras_lower) |>
       group_by(palabra) |> 
       mutate(freq_total_palabra = sum(n)) |> 
       ungroup() |> 
@@ -1023,45 +1092,62 @@ server <- function(input, output, session) {
     # palabras_semana_fuente |> 
     #   distinct(semana, fecha, fecha_texto)
     
-    palabras_semana_fuente |> 
+    db_palabras_semana_fuente() |> 
       filter(fecha >= fecha_min,
              fecha <= fecha_max)
   })
   
+  
+  datos_semana_fuente_top_fuentes <- reactive({
+    datos_semana_fuente_2() |> 
+      distinct(fuente, n_total_fuente) |> 
+      arrange(desc(n_total_fuente)) |> 
+      collect()
+  })
+  
   datos_semana_fuente_3 <- reactive({
     # browser()
+    
+    top_fuentes <- datos_semana_fuente_top_fuentes() |> 
+      slice_max(n_total_fuente,
+                n = input$semana_fuentes_fuentes,
+                with_ties = FALSE) |> 
+      pull(1)
+    
     datos_semana_fuente_2() |> 
-      collect() |> 
-      # agrupar fuentes chicas
-      mutate(fuente = fct_reorder(fuente, n_total_fuente, .desc = FALSE)) |>
-      mutate(fuente = fct_lump(fuente, w = n_total_fuente, n = input$semana_fuentes_fuentes, ties.method = "first", 
-                               other_level = "Otros")) |>
+      # mutate(fuente = fct_lump(fuente, w = n_total_fuente, n = input$semana_fuentes_fuentes, ties.method = "first", 
+      #                          other_level = "Otros")) |>
+      mutate(fuente = case_when(fuente %in% top_fuentes ~ fuente,
+                                .default = "Otros")) |> 
       group_by(fuente, semana, fecha, fecha_texto, palabra) |>
       summarize(n = sum(n), .groups = "drop")
   })
   
   
   datos_semana_fuente_4 <- reactive({
-    # browser()
     
     datos1 <- datos_semana_fuente_3() |> 
       # maximo palabras por semana
       group_by(semana, palabra) |> 
       mutate(n_semana = sum(n)) |>
       group_by(semana) |>
-      mutate(rank = dense_rank(desc(n_semana)))
+      mutate(rank = dense_rank(desc(n_semana))) |> 
+      ungroup()
+    
+    cantidad <- input$semana_fuentes_palabras_n
     
     ranking <- datos1 |> 
-      filter(rank <= input$semana_fuentes_palabras_n) |> 
+      filter(rank <= cantidad) |> 
       group_by(palabra) |> 
       summarize(n = sum(n)) |> 
       arrange(desc(n)) |> 
-      mutate(rank = 1:n()) |> 
-      filter(rank <= input$semana_fuentes_palabras_n) # cantidad de palabras por semana
+      # mutate(rank = 1:n()) |> 
+      # filter(rank <= cantidad) |>  # cantidad de palabras por semana
+      slice_max(n, n = cantidad) |> 
+      collect()
     
     # browser()
-    
-    datos1 |> 
+    datos2 <- datos1 |> 
       filter(palabra %in% ranking$palabra) |> 
       # print(n=100)
       # están malas las semanas
@@ -1069,17 +1155,29 @@ server <- function(input, output, session) {
       # ungroup() |> 
       # distinct(semana, fecha, fecha_texto)
       summarize(n = sum(n),
-                fecha = min(fecha), 
-                fecha_texto = first(fecha_texto)) |> 
+                fecha = min(fecha)) |> 
       # distinct(semana, fecha, rank, fuente, .keep_all = TRUE) |>
       # ordenar palabras
       group_by(fecha_texto, palabra) |> 
       mutate(n_palabra_semana = sum(n)) |> 
-      collect() |> 
+      # para ordenar
+      group_by(fuente) |> 
+      mutate(n_total_fuente = sum(n)) |> 
+      ungroup() |> 
+      collect()
+    
+    datos3 <- datos2 |> 
       group_by(fecha_texto) |> 
       mutate(palabra = tidytext::reorder_within(palabra, n_palabra_semana, fecha_texto)) |> 
-      ungroup()
-  })
+      ungroup() |> 
+      # ordenar fuente
+      mutate(fuente = fct_reorder(fuente, n_total_fuente, .desc = T),
+             fuente = fct_relevel(fuente, "Otros", after = 0))
+    
+    return(datos3)
+  }) #|> 
+    # bindCache(prensa_otros$fecha,
+              # input$semana_fuentes_palabras_n)
   
   
   
@@ -1088,7 +1186,7 @@ server <- function(input, output, session) {
   datos_semana_fuente_palabra_1 <- reactive({
     req(input$selector_palabras_fuente != "")
     
-    palabras_semana_fuente |>
+    db_palabras_semana_fuente() |>
       filter(palabra == tolower(input$selector_palabras_fuente))
   })
   
@@ -1137,6 +1235,8 @@ server <- function(input, output, session) {
   })
   
   datos_semana_fuente_palabra_4 <- reactive({
+    req(scroll$inicio)
+    
     if (input$destacar_medio == "Ninguno") {
       datos_semana_fuente_palabra_3() |> 
         mutate(destacado = "Ninguno")
@@ -1155,33 +1255,43 @@ server <- function(input, output, session) {
   cor_total_dato_1 <- reactive({
     req(input$cor_total_palabra != "")
     
-    cor_filt <- correlacion |>
-      rename(palabra1 = item1, palabra2 = item2, correlacion = correlation) |> 
-      collect() |> 
-      filter(palabra1 == tolower(input$cor_total_palabra))
+    cor_total_palabra_lower <- tolower(input$cor_total_palabra)
     
-    return(cor_filt)
+    db_correlacion() |>
+      rename(palabra1 = item1, palabra2 = item2, correlacion = correlation) |> 
+      filter(palabra1 == cor_total_palabra_lower)
   })
   
   cor_total_dato_2 <- reactive({
-    req(cor_total_dato_1() |> nrow() > 1)
-    
-    .palabras_excluir = c("luis")
-    
     cor_total_dato_1() |> 
-      filter(!palabra2 %in% .palabras_excluir) |>
+      # filter(!palabra2 %in% .palabras_excluir) |>
       ungroup() |> 
       slice_max(correlacion, n = input$cor_total_palabra_n)
+  })
+  
+  cor_total_dato_3 <- reactive({
+    cor_total_dato_2() |> 
+      collect() |> 
+      mutate(tamaño = rescale(correlacion, to = c(1.2, 2), 
+                              from = range(min(correlacion), .7)),
+             tamaño = ifelse(tamaño > 2, 2, tamaño) # from = range(correlacion, na.rm = TRUE, finite = TRUE))
+      ) |> 
+      mutate(orden = dense_rank(desc(correlacion))) |>
+      # mutate(orden = row_number(desc(correlacion))) |> 
+      distinct(orden, .keep_all = TRUE) |> 
+      mutate(palabra2 = forcats::fct_reorder(palabra2, correlacion, .desc = TRUE))
   })
   
   
   ### correlación fuentes ----
   cor_fuente_dato_1 <- reactive({
     req(input$cor_fuente_palabra != "")
-    # browser()
-    correlacion_fuente |>
+    
+    cor_fuente_palabra_lower <- tolower(input$cor_fuente_palabra)
+    
+    db_correlacion_fuente() |>
       rename(palabra1 = item1, palabra2 = item2, correlacion = correlation) |> 
-      filter(palabra1 == tolower(input$cor_fuente_palabra))
+      filter(palabra1 == cor_fuente_palabra_lower)
   })
   
   cor_fuente_dato_2 <- reactive({
@@ -1214,7 +1324,7 @@ server <- function(input, output, session) {
     fecha_min = today() - semanas_atras
     fecha_max = today()
     
-    sentimiento |>
+    db_sentimiento() |>
       filter(fecha >= fecha_min,
              fecha <= fecha_max) |>
       recodificar_fuentes() |> 
@@ -1227,14 +1337,31 @@ server <- function(input, output, session) {
   # la idea es que los datos pasen ya procesados acá y esta sección sólo se enfoque en las visualizaciones
   
   ## líneas semanas ----
-  output$g_semanas <- renderPlot({
-    req(length(input$destacar_palabra) > 0)
+  
+  datos_conteo_semanas_5 <- reactive({
+    req(input$destacar_palabra)
     req(input$destacar_palabra != "")
-    req(datos_conteo_semanas_4())
-    # browser()
-    message("gráfico líneas semanas")
     
-    datos <- datos_conteo_semanas_4()
+    if (input$destacar_palabra != "Ninguna") {
+      # crea una variable dicotómica con la palabra destacada
+      datos3 <- datos_conteo_semanas_4() |> 
+        mutate(destacar = ifelse(palabra == tolower(input$destacar_palabra), 
+                                 tolower(input$destacar_palabra), "otras"),
+               destacar = fct_relevel(destacar, "otras", after = 0))
+    } else {
+      datos3 <- datos_conteo_semanas_4()
+    }
+    
+    return(datos3)
+  })
+  
+  
+  
+  output$g_semanas <- renderPlot({
+    req(selector_semanas_palabras())
+    req(datos_conteo_semanas_5())
+    
+    message("gráfico líneas semanas")
     
     # opciones gráfico
     .dodge = 3
@@ -1245,18 +1372,8 @@ server <- function(input, output, session) {
     variable <- ifelse(input$destacar_palabra != "Ninguna",
                        "destacar", "palabra")
     
-    if (input$destacar_palabra != "Ninguna") {
-      # crea una variable dicotómica con la palabra destacada
-      datos3 <- datos |> 
-        mutate(destacar = ifelse(palabra == tolower(input$destacar_palabra), 
-                                 tolower(input$destacar_palabra), "otras"),
-               destacar = fct_relevel(destacar, "otras", after = 0))
-    } else {
-      datos3 <- datos
-    }
-    
     #gráfico 
-    plot <- datos3 |> #datos_conteo_semanas() |> 
+    plot <- datos_conteo_semanas_5() |> #datos_conteo_semanas() |> 
       # ggplot(aes(fecha, n)) +
       ggplot(aes(fecha, n)) +
       geom_step(aes(color = !!sym(variable), group = palabra),
@@ -1317,7 +1434,16 @@ server <- function(input, output, session) {
     
     return(plot)
     
-  }, res = resolucion)
+  }, res = resolucion) #|> 
+    # bindCache(prensa_otros$fecha, 
+    #           input$semanas,
+    #           input$frecuencia_min,
+    #           input$palabras_semana_max,
+    #           input$palabras_excluir,
+    #           input$palabras_semanas_tipo,
+    #           input$destacar_palabra,
+    #           input$angulo,
+    #           input$palabras_semanas_tipo)
   
   
   ## palabras semana ----
@@ -1422,8 +1548,9 @@ server <- function(input, output, session) {
   
   ## nube palabras semana ----
   output$nube_palabras_semana <- renderWordcloud2({
+    # req(scroll$inicio)
     
-    palabras_semana |> 
+    db_palabras_semana() |> 
       # filter(semana == max(semana)) |> 
       filter(fecha == input$selector_semanas_nube) |> 
       group_by(palabra) |> 
@@ -1448,10 +1575,7 @@ server <- function(input, output, session) {
   ## barras semana fuente ----
   output$g_semana_fuente <- renderPlot({
     req(datos_semana_fuente_4())
-    # browser()
-    # dev.new()
-    # datos_semana_fuente_4() |> 
-    #   distinct(semana, fecha, fecha_texto)
+    req(scroll$inicio)
     
     plot <- datos_semana_fuente_4() |>
       ggplot(aes(x = n, y = palabra, fill = fuente)) +
@@ -1499,7 +1623,8 @@ server <- function(input, output, session) {
   
   output$g_semana_fuente_palabra <- renderPlot({
     req(datos_semana_fuente_palabra_4())
-    # browser()
+    req(scroll$inicio)
+    
     plot <- datos_semana_fuente_palabra_4() |> 
       ggplot(aes(x = n, y = fuente2,
                  color = destacado)) +
@@ -1544,18 +1669,10 @@ server <- function(input, output, session) {
   ## correlación ----
   ### correlación general ----
   output$g_cor_total <- renderPlot({
-    # browser()
-    dato <- cor_total_dato_2() |> 
-      mutate(tamaño = rescale(correlacion, to = c(1.2, 2), 
-                              from = range(min(correlacion), .7)),
-             tamaño = ifelse(tamaño > 2, 2, tamaño) # from = range(correlacion, na.rm = TRUE, finite = TRUE))
-      ) |> 
-      mutate(orden = dense_rank(desc(correlacion))) |>
-      # mutate(orden = row_number(desc(correlacion))) |> 
-      distinct(orden, .keep_all = TRUE) |> 
-      mutate(palabra2 = forcats::fct_reorder(palabra2, correlacion, .desc = TRUE))
+    req(scroll$inicio)
+    message("gráfico g_cor_total")
     
-    plot <- dato |> 
+    plot <- cor_total_dato_3() |> 
       ggplot(aes(x = 1, y = 1, 
                  fill = correlacion, color = correlacion)) +
       ggforce::geom_circle(aes(x0 = 1, y0 = 1, r = 2), alpha = .2, linewidth = .1) +
@@ -1582,7 +1699,8 @@ server <- function(input, output, session) {
   ### correlación fuentes ----
   output$g_cor_fuente <- renderPlot({
     req(cor_fuente_dato_3())
-    message("gráfico correlación fuentes")
+    req(scroll$inicio)
+    message("gráfico g_cor_fuente")
     
     dato <- cor_fuente_dato_3() |> 
       mutate(tamaño = rescale(correlacion, to = c(1.2, 2), 
@@ -1635,20 +1753,20 @@ server <- function(input, output, session) {
   # sentimiento ----
   output$g_sentimiento <- renderPlot({
     # browser()
+    req(scroll$inicio)
     
-    sentimiento <- sentimiento_semanas()
     
     if (is.null(input$sentimiento_fuente) & input$sentimiento_tema == "Todos") {
       # sin fuente ni tema
       
-      sentimiento_2 <- sentimiento |>
+      sentimiento_2 <- sentimiento_semanas() |>
         group_by(semana, fecha) |>
         sentimiento_calcular()
       
     } else if (!is.null(input$sentimiento_fuente) & input$sentimiento_tema == "Todos") {
       # sólo fuente
       # browser()
-      sentimiento_2 <- sentimiento |>
+      sentimiento_2 <- sentimiento_semanas() |>
         filter(fuente %in% input$sentimiento_fuente) |> 
         group_by(fuente, semana, fecha) |>
         sentimiento_calcular()
@@ -1658,7 +1776,7 @@ server <- function(input, output, session) {
     } else if (is.null(input$sentimiento_fuente) & input$sentimiento_tema != "Todos") {
       # sólo tema
       
-      sentimiento_2 <- sentimiento |>
+      sentimiento_2 <- sentimiento_semanas() |>
         filter(clasificacion == input$sentimiento_tema) |>
         group_by(clasificacion, semana, fecha) |>
         sentimiento_calcular()
@@ -1668,7 +1786,7 @@ server <- function(input, output, session) {
     } else if (!is.null(input$sentimiento_fuente) & input$sentimiento_tema != "Todos") {
       # fuente y tema
       
-      sentimiento_2 <- sentimiento |>
+      sentimiento_2 <- sentimiento_semanas() |>
         filter(clasificacion %in% input$sentimiento_tema) |>
         filter(fuente %in% input$sentimiento_fuente) |> 
         group_by(fuente, clasificacion, semana, fecha) |>
@@ -1779,13 +1897,16 @@ server <- function(input, output, session) {
   
   ## nube palabras sentimiento ----
   palabras_semana_topico_filt <- reactive({
-    palabras_semana_topico |> 
+    
+    db_palabras_semana_topico() |> 
       # filter(sentimiento %in% c(-1, 0, 1)) |> 
       filter(sentimiento %in% input$sentimiento_sentimiento_nube) |> 
       filter(clasificacion %in% input$sentimiento_tema_nube)
   })
   
   output$nube_palabras_sentimiento_topicos <- renderWordcloud2({
+    req(scroll$inicio)
+    message("nube palabras_sentimiento_topicos")
     
     palabras_semana_topico_filt() |> 
       # filter(semana == max(semana)) |> 

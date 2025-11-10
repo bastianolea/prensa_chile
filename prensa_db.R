@@ -1,3 +1,4 @@
+source("funciones.R")
 
 # usethis::edit_r_environ(scope = "project")
 # agregar a .gitignore
@@ -79,7 +80,7 @@ dbWriteTable(conn = db_con,
              overwrite = TRUE)
 
 
-# otros
+# otros ----
 n_noticias <- readLines("datos/prensa_n_noticias.txt") |> 
   as.numeric() |> 
   format(scientific = FALSE, big.mark = ".", decimal.mark = ",")
@@ -87,12 +88,70 @@ n_noticias <- readLines("datos/prensa_n_noticias.txt") |>
 n_palabras <- readLines("datos/prensa_n_palabras.txt") |> 
   as.numeric()
 
+# crear tabla 
+prensa_otros <- tibble(n_noticias = n_noticias,
+                       n_palabras = n_palabras,
+                       fecha = lubridate::today()
+                       )
+
+# guardar 
 dbWriteTable(conn = db_con, 
              name = "prensa_otros",
-             tibble(n_noticias = n_noticias,
-                    n_palabras = n_palabras,
-                    fecha = lubridate::today()), 
+             prensa_otros, 
              overwrite = TRUE)
+
+
+
+# otros preprocesar ----
+# procesar datos extra
+palabras_posibles <- palabras_semana |> 
+  group_by(palabra) |> 
+  summarize(n = sum(n)) |> 
+  collect() |> 
+  arrange(desc(n)) |> 
+  filter(n > 100) |> 
+  pull(palabra)
+
+dbWriteTable(conn = db_con, 
+             name = "palabras_posibles",
+             tibble(palabras_posibles), 
+             overwrite = TRUE)
+
+
+fuentes <- palabras_semana_fuente |> pull(fuente) |> unique() |> sort()
+
+dbWriteTable(conn = db_con, 
+             name = "fuentes",
+             tibble(fuentes), 
+             overwrite = TRUE)
+
+
+topicos <- sentimiento |> 
+  pull(clasificacion) |> unique() |> 
+  na.exclude() |> 
+  stringr::str_subset("Sin", negate = T) |> 
+  sort()
+
+dbWriteTable(conn = db_con, 
+             name = "topicos",
+             tibble(topicos), 
+             overwrite = TRUE)
+
+
+lista_semanas <- palabras_semana |> 
+  distinct(fecha, semana) |> 
+  arrange(desc(fecha)) |> 
+  collect() |> 
+  mutate(fecha_t = redactar_fecha(fecha),
+         fecha_t = paste("Semana del", fecha_t)) |> 
+  select(fecha_t, fecha) #|>
+  # tibble::deframe()
+
+dbWriteTable(conn = db_con, 
+             name = "lista_semanas",
+             lista_semanas, 
+             overwrite = TRUE)
+
 
 
 

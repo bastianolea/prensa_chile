@@ -66,3 +66,17 @@ sentimiento_calcular <- function(data) {
     mutate(p_negativas = n_negativo/n,
            p_positivas = n_positivo/n)
 }
+
+
+js_get_vertical_position <- function() {
+  # get vertical scroll position using javascript
+  tags$head(
+    tags$script("
+    var posicion_y = [0]; 
+      $(document).on('scroll', function() {
+        posicion_y[0] = window.pageYOffset;
+        Shiny.onInputChange('posicion_y', posicion_y);
+      });
+      ")
+  ) 
+}

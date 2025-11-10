@@ -328,7 +328,7 @@ recodificar_fuentes <- function(data) {
 }
 
 redactar_fecha <- function(x) { 
-  mes = month(x)
+  mes = lubridate::month(x)
   mes_t = recode(mes, 
                  "1" = "enero",
                  "2" = "febrero",
@@ -343,7 +343,7 @@ redactar_fecha <- function(x) {
                  "11" = "noviembre",
                  "12" = "diciembre")
   
-  fecha_etiqueta = paste(day(x), "de", mes_t)
+  fecha_etiqueta = paste(lubridate::day(x), "de", mes_t)
   return(fecha_etiqueta)
 }
 
