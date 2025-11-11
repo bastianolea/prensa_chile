@@ -56,6 +56,7 @@ Luego del scraping se realiza el procesamiento de los datos. Todos los scripts d
 - `procesamiento/prensa_p3_calcular_conteo.R` carga la base de datos por palabras, y cuenta la frecuencia de palabras por noticia de forma paralela, para obtener `datos/prensa_palabras_conteo.parquet`, una base similar a la anterior, pero cuyas palabras son únicas por cada noticia, y contiene la frecuencia de cada término por noticia. El conteo de palabras se realiza primero agrupando las palabras según su raíz (por ejemplo, "notici" es la raíz de "noticia"), de modo que palabras que comparten una misma raíz son contadas como una misma palabra (noticia, noticias, noticiario, noticioso), y luego se aplica un algoritmo que reconstruye la palabra completa a partir de la raíz, privilegiando la elección de verbos singulares, en infinitivo, y frecuentes.
 - `procesamiento/prensa_p4_calcular_correlacion.R` calcula la correlación entre términos, indicando qué términos aparecen cercanos a otros a partir del conteo de palabras por noticia. Calcula tanto la correlación de las palabras en general, como la correlación de las palabras por cada fuente.
 - Los scripts `apps/prensa_semanal/prensa_semanal.R` y `apps/prensa_semanal/prensa_semanal_fuente.R` realizan cálculos sobre los datos que producen dataframes usados por la aplicación de visualización de datos, de modo que la aplicación en sí misma realice la menor cantidad de cálculos en tiempo real.
+- Finalmente los datos se suben a una [base de datos PostgreSQL gratuita](https://bastianolea.rbind.io/blog/db_supabase/) alojada en Supabase.
 
 
 ### Análisis
@@ -73,8 +74,11 @@ Luego del scraping se realiza el procesamiento de los datos. Todos los scripts d
 
 ## Actualizaciones
 
+**10 de noviembre 2025**:
+- Optimización de tiempos de carga de la app aprovechando PostreSQL y [algunos trucos de Shiny.](https://bastianolea.rbind.io/tags/shiny/)
+
 **8 de noviembre 2025**:
-- Ahora los datos se alojan en [una base de datos supabase gratuita](https://bastianolea.rbind.io/blog/db_supabase/), en vez de depender de archivos `.parquet`. Esto facilita mucho actualizar la aplicación (no necesito volver a compilar la app cada vez que cambian los datos), y también debería disminuir la demanda de memoria de la aplicación (menos caídas, yey!). En teoría también puede servir para permitir a otra gente acceso a los datos más sencillo que enviarle archivos de varios gigas de peso.
+- Ahora los datos se alojan en [una base de datos PostgreSQL Supabase gratuita](https://bastianolea.rbind.io/blog/db_supabase/), en vez de depender de archivos `.parquet`. Esto facilita mucho actualizar la aplicación (no necesito volver a compilar la app cada vez que cambian los datos), y también debería disminuir la demanda de memoria de la aplicación (menos caídas, yey!). En teoría también puede servir para permitir a otra gente acceso a los datos más sencillo que enviarle archivos de varios gigas de peso.
 
 **5 de julio 2025:**
 - Agregadas visualización de nubes de palabras en la app, mostrando términos más frecuentes por semana, y términos más frecuentes por semana filtrados por tópico y por sentimiento.
