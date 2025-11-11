@@ -81,44 +81,11 @@ db_con <- DBI::dbConnect(
   # pool_mode = "session"
 )
 
+# los datos centrales se cargan en server()
 
-
-# cargar desde parquet
-
-# palabras_semana <- read_parquet("palabras_semana.parquet")
-# palabras_semana_fuente <- read_parquet("palabras_semana_fuente.parquet")
-# correlacion <- read_parquet("prensa_correlacion.parquet")
-# correlacion_fuente <- read_parquet("prensa_correlacion_fuente.parquet")
-# sentimiento <- read_parquet("prensa_sentimiento.parquet")
-# palabras_semana_topico <- read_parquet("palabras_semana_topico.parquet")
-
-# otros
-# n_noticias <- readLines("prensa_n_noticias.txt") |> as.numeric() |> format(scientific = FALSE, big.mark = ".", decimal.mark = ",")
-# n_palabras <- readLines("prensa_n_palabras.txt") |> as.numeric()
 prensa_otros <- tbl(db_con, "prensa_otros") |> collect()
 
-# vectores ----
-# palabras_posibles <- palabras_semana |> 
-#   group_by(palabra) |> 
-#   summarize(n = sum(n)) |> 
-#   collect() |> 
-#   arrange(desc(n)) |> 
-#   filter(n > 100) |> 
-#   pull(palabra)
-# 
-# fuentes <- palabras_semana_fuente |> pull(fuente) |> unique() |> sort()
-# 
-# topicos <- sentimiento |> pull(clasificacion) |> unique() |> na.exclude() |> str_subset("Sin", negate = T) |> sort()
-# 
-# lista_semanas <- palabras_semana |> 
-#   distinct(fecha, semana) |> 
-#   arrange(desc(fecha)) |> 
-#   collect() |> 
-#   mutate(fecha_t = redactar_fecha(fecha),
-#          fecha_t = paste("Semana del", fecha_t)) |> 
-#   select(fecha_t, fecha) |> 
-#   tibble::deframe()
-
+# vectores
 palabras_posibles <- tbl(db_con, "palabras_posibles") |> collect() |> pull()
 
 fuentes <- tbl(db_con, "fuentes") |> collect() |> pull()
@@ -183,7 +150,7 @@ ui <- page_fluid(
   
   # —----
   
-  div(style = css(max_width = "1200px", margin = "auto"),
+  div(style = css(max_width = "800px", margin = "auto"),
       
       # header ----
       div(style = css(margin_top = "12px", margin_bottom = "12px"),
@@ -276,48 +243,48 @@ ui <- page_fluid(
                    em("Medida de posición vertical de las palabras. Se calculan después de eliminar palabras vacías y poco frecuentes, por lo que representan medidas meramente comparativas de la prevalencia de términos semanales.")
                ),
                
-               
-               div(id = "opciones_avanzadas",
-                   
-                   selectizeInput("palabras_excluir",
-                                  "Excluir palabras",
-                                  choices = NULL,
-                                  multiple = TRUE,  width = "100%",
-                                  options = list(create = TRUE,
-                                                 placeholder = "")),
-                   div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                       em("Palabras a remover del gráfico. Deben separarse con comas y escribirse tal como aparecen.")
-                   ),
-                   
-                   sliderInput("palabras_semana_max",
-                               "Máximo de palabras por semana",
-                               min = 4, max = 20,
-                               value = 10,
-                               step = 1, width = "100%",),
-                   div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                       em("Cantidad máxima de palabras por cada semana; limita la cantidad de palabras por semana dejando sólo las x mayores; por defecto son 10.")
-                   ),
-                   
-                   selectInput("texto_tamaño",
-                               "Tamaño del texto",
-                               choices = c("Normal" = 2.3, "Mediano" = 2.8, "Grande" = 3.2),
-                               selected = c("Mediano" = 2.8), width = "100%",
-                   ),
-                   
-                   sliderInput("angulo",
-                               "Ángulo de etiquetas",
-                               min = 0, max = 60,
-                               value = 40,
-                               step = 10, width = "100%",),
-                   div(style = css(font_family = "Libre Baskervill Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                       em("Ángulo del texto de las etiquetas; alterarlo puede hacer que aparezcan más etiquetas de palabras, dado que las que se sobreponen son ocultadas.")
-                   )
-               ) |> shinyjs::hidden(),
-               
-               div(
-                 style = css(opacity = "30%"),
-                 actionButton("mostrar_opciones", "Opciones avanzadas")
-               )
+               # 
+               # div(id = "opciones_avanzadas",
+               #     
+               #     selectizeInput("palabras_excluir",
+               #                    "Excluir palabras",
+               #                    choices = NULL,
+               #                    multiple = TRUE,  width = "100%",
+               #                    options = list(create = TRUE,
+               #                                   placeholder = "")),
+               #     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               #         em("Palabras a remover del gráfico. Deben separarse con comas y escribirse tal como aparecen.")
+               #     ),
+               #     
+               #     sliderInput("palabras_semana_max",
+               #                 "Máximo de palabras por semana",
+               #                 min = 4, max = 20,
+               #                 value = 10,
+               #                 step = 1, width = "100%",),
+               #     div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               #         em("Cantidad máxima de palabras por cada semana; limita la cantidad de palabras por semana dejando sólo las x mayores; por defecto son 10.")
+               #     ),
+               #     
+               #     selectInput("texto_tamaño",
+               #                 "Tamaño del texto",
+               #                 choices = c("Normal" = 2.3, "Mediano" = 2.8, "Grande" = 3.2),
+               #                 selected = c("Mediano" = 2.8), width = "100%",
+               #     ),
+               #     
+               #     sliderInput("angulo",
+               #                 "Ángulo de etiquetas",
+               #                 min = 0, max = 60,
+               #                 value = 40,
+               #                 step = 10, width = "100%",),
+               #     div(style = css(font_family = "Libre Baskervill Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
+               #         em("Ángulo del texto de las etiquetas; alterarlo puede hacer que aparezcan más etiquetas de palabras, dado que las que se sobreponen son ocultadas.")
+               #     )
+               # ) |> shinyjs::hidden(),
+               # 
+               # div(
+               #   style = css(opacity = "30%"),
+               #   actionButton("mostrar_opciones", "Opciones avanzadas")
+               # )
                
         )
       ),
@@ -449,10 +416,10 @@ ui <- page_fluid(
                sliderInput("semana_fuentes_fuentes",
                            "Cantidad de medios",
                            min = 3, max = 10,
-                           value = 5,
+                           value = 4,
                            width = "100%"),
                div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
-                   em("Cantidad de medios comunicacionales a identificar. Se mostrarán los nombres de las n fuentes con mayor cantidad de palabras. El resto se agrupará en como ”Otros”.")
+                   em("Cantidad de medios comunicacionales a identificar. Se mostrarán los nombres de las n fuentes con mayor cantidad de palabras.")
                )
         ),
         
@@ -461,7 +428,7 @@ ui <- page_fluid(
                sliderInput("semana_fuentes_palabras_n",
                            "Cantidad de palabras",
                            min = 5, max = 20,
-                           value = 15,
+                           value = 13,
                            width = "100%"),
                div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                    em("Cantidad de palabras a mostrar por semana. Aumentar este valor aumenta la cantidad de barras, y podría permitir ver conceptos menos comunes.")
@@ -698,8 +665,8 @@ ui <- page_fluid(
                        div(
                          sliderInput("sentimiento_semanas",
                                      "Rango de semanas",
-                                     min = 4*1, max = 4*4,
-                                     value = 4*2,
+                                     min = 4, max = 12,
+                                     value = 6,
                                      width = "100%"),
                          div(style = css(font_family = "Libre Baskerville Italic", font_size = "70%", margin_top = "-8px", margin_bottom = "16px"),
                              em("Rango de tiempo que abarcará la visualización.")
@@ -912,8 +879,6 @@ server <- function(input, output, session) {
   
   
   # scroll ----
-  posicion_scroll <- reactive(input$posicion_y) |> bindEvent(input$posicion_y)
-  
   # obtener input de desplazamiento y revisarlo para que sea válido
   vertical <- reactive({
     if (length(input$posicion_y) > 0) {
@@ -923,25 +888,27 @@ server <- function(input, output, session) {
     }
   })
   
-  # hacer que el input solo se actualice 500 milisegundos después de terminar el scrolling
+  # hacer que el input solo se actualice 200 milisegundos después de terminar el scroll
   vertical_position <- vertical |> debounce(200)
   
-  observe({
-    message("vertical scroll position debounced: ", vertical_position())
-  })
+  observe(message("vertical scroll position debounced: ", vertical_position()))
   
-  #si el scrolling supera este valor (pixeles de desplazamiento vertical), entonces se cargarán los gráficos grandes
-  scroll <- reactiveValues(abajo = FALSE, inicio = FALSE)
+  # crear variable reactiva que almacene etapa de scroll
+  scroll <- reactiveValues(inicio = FALSE, abajo = FALSE)
+  # una o más etapas de scroll
   
-  observeEvent(vertical_position(), {
-    if (vertical_position() > 800) {
-      scroll$inicio <- TRUE
-    }
-    
-    # if (vertical_position() > 1800) {
-    #   scroll$abajo <- TRUE
-    # }
-  })
+  # si el scroll supera este valor (pixeles de desplazamiento vertical), entonces será TRUE
+  observeEvent(
+    vertical_position(), {
+      if (vertical_position() > 600) {
+        scroll$inicio <- TRUE
+      }
+      
+      if (vertical_position() > 1800) {
+        scroll$abajo <- TRUE
+      }
+    })
+  # consultar si es TRUE/FALSE con scroll$inicio
   
   
   # —----
@@ -971,7 +938,7 @@ server <- function(input, output, session) {
   })
   
   datos_conteo_semanas_2 <- reactive({
-    req(datos_conteo_semanas_1())
+    # req(datos_conteo_semanas_1())
     message("datos líneas semanas 2")
     # # dejar solo top palabras total (maximo de palabras visibles)
     # mutate(palabra_lump = fct_lump(palabra, w = freq_total_palabra, 
@@ -987,15 +954,16 @@ server <- function(input, output, session) {
       filter(semana_n > 2) |> 
       # dejar solo top 10 palabras por semana
       group_by(semana) |>
-      slice_max(n, n = input$palabras_semana_max)
+      slice_max(n, n = 10)
+    # slice_max(n, n = input$palabras_semana_max)
   })
   
   datos_conteo_semanas_3 <- reactive({
-    req(datos_conteo_semanas_2())
+    # req(datos_conteo_semanas_2())
     message("datos líneas semanas 3")
     
     datos_conteo_semanas_2() |> 
-      filter(!palabra %in% input$palabras_excluir) |> 
+      # filter(!palabra %in% input$palabras_excluir) |> 
       # ordenar palabras por frecuencia
       ungroup() |> 
       collect() |> 
@@ -1005,7 +973,7 @@ server <- function(input, output, session) {
   })
   
   datos_conteo_semanas_4 <- reactive({
-    req(datos_conteo_semanas_3())
+    # req(datos_conteo_semanas_3())
     message("datos líneas semanas 4")
     
     if (input$palabras_semanas_tipo == "Porcentaje") {
@@ -1073,6 +1041,8 @@ server <- function(input, output, session) {
   # })
   
   datos_semana_fuente_2 <- reactive({
+    req(scroll$inicio)
+    message("datos_semana_fuente_2()")
     # retorna vector con numero de las semanas a mostrar
     # .semanas = (week(today())-(input$semanas_fuentes-1)):week(today())
     
@@ -1081,7 +1051,7 @@ server <- function(input, output, session) {
     # # entonces sería como desde semana 50 a semana 1
     # # también la resta está mal hecha en consideración de semanas entre dos años
     # # tampoco viene con fecha, habría que filtrar por fecha
-    semanas_atras = weeks(input$semanas_fuentes+1)
+    semanas_atras = weeks(input$semanas_fuentes)
     fecha_min = today() - semanas_atras
     fecha_max = today()
     
@@ -1097,7 +1067,6 @@ server <- function(input, output, session) {
              fecha <= fecha_max)
   })
   
-  
   datos_semana_fuente_top_fuentes <- reactive({
     datos_semana_fuente_2() |> 
       distinct(fuente, n_total_fuente) |> 
@@ -1106,8 +1075,6 @@ server <- function(input, output, session) {
   })
   
   datos_semana_fuente_3 <- reactive({
-    # browser()
-    
     top_fuentes <- datos_semana_fuente_top_fuentes() |> 
       slice_max(n_total_fuente,
                 n = input$semana_fuentes_fuentes,
@@ -1115,48 +1082,43 @@ server <- function(input, output, session) {
       pull(1)
     
     datos_semana_fuente_2() |> 
-      # mutate(fuente = fct_lump(fuente, w = n_total_fuente, n = input$semana_fuentes_fuentes, ties.method = "first", 
-      #                          other_level = "Otros")) |>
       mutate(fuente = case_when(fuente %in% top_fuentes ~ fuente,
                                 .default = "Otros")) |> 
       group_by(fuente, semana, fecha, fecha_texto, palabra) |>
       summarize(n = sum(n), .groups = "drop")
   })
   
-  
+  # datos_semana_fuente_4b <- reactive({
   datos_semana_fuente_4 <- reactive({
-    
-    datos1 <- datos_semana_fuente_3() |> 
+    datos_semana_fuente_3() |> 
       # maximo palabras por semana
       group_by(semana, palabra) |> 
       mutate(n_semana = sum(n)) |>
       group_by(semana) |>
       mutate(rank = dense_rank(desc(n_semana))) |> 
       ungroup()
-    
-    cantidad <- input$semana_fuentes_palabras_n
-    
-    ranking <- datos1 |> 
-      filter(rank <= cantidad) |> 
+  })
+  
+  ranking_datos_semana_fuente <- reactive({
+    datos_semana_fuente_4() |> 
+      filter(rank <= local(input$semana_fuentes_palabras_n)) |> 
       group_by(palabra) |> 
       summarize(n = sum(n)) |> 
-      arrange(desc(n)) |> 
+      # arrange(desc(n)) |> 
       # mutate(rank = 1:n()) |> 
       # filter(rank <= cantidad) |>  # cantidad de palabras por semana
-      slice_max(n, n = cantidad) |> 
-      collect()
+      slice_max(n, n = local(input$semana_fuentes_palabras_n)) |> 
+      collect()  
+  })
+  
+  datos_semana_fuente_5 <- reactive({
+    ranking <- ranking_datos_semana_fuente()$palabra
     
-    # browser()
-    datos2 <- datos1 |> 
-      filter(palabra %in% ranking$palabra) |> 
-      # print(n=100)
-      # están malas las semanas
+    datos_semana_fuente_4() |> 
+      filter(palabra %in% local(ranking)) |> 
       group_by(fecha_texto, fuente, palabra) |> 
-      # ungroup() |> 
-      # distinct(semana, fecha, fecha_texto)
       summarize(n = sum(n),
                 fecha = min(fecha)) |> 
-      # distinct(semana, fecha, rank, fuente, .keep_all = TRUE) |>
       # ordenar palabras
       group_by(fecha_texto, palabra) |> 
       mutate(n_palabra_semana = sum(n)) |> 
@@ -1165,19 +1127,21 @@ server <- function(input, output, session) {
       mutate(n_total_fuente = sum(n)) |> 
       ungroup() |> 
       collect()
+  })
+  
+  datos_semana_fuente_6 <- reactive({
+    req(scroll$inicio)
+    message("datos_semana_fuente_4()")
     
-    datos3 <- datos2 |> 
+    datos_semana_fuente_5() |> 
       group_by(fecha_texto) |> 
       mutate(palabra = tidytext::reorder_within(palabra, n_palabra_semana, fecha_texto)) |> 
       ungroup() |> 
       # ordenar fuente
       mutate(fuente = fct_reorder(fuente, n_total_fuente, .desc = T),
              fuente = fct_relevel(fuente, "Otros", after = 0))
-    
-    return(datos3)
-  }) #|> 
-    # bindCache(prensa_otros$fecha,
-              # input$semana_fuentes_palabras_n)
+  }) 
+  # para gráfico barras semana fuente
   
   
   
@@ -1198,7 +1162,7 @@ server <- function(input, output, session) {
     # # entonces sería como desde semana 50 a semana 1
     # # también la resta está mal hecha en consideración de semanas entre dos años
     # # tampoco viene con fecha, habría que filtrar por fecha
-    semanas_atras = weeks(input$semanas_fuentes_palabras+1)
+    semanas_atras = weeks(input$semanas_fuentes_palabras)
     fecha_min = today() - semanas_atras
     fecha_max = today()
     
@@ -1358,8 +1322,9 @@ server <- function(input, output, session) {
   
   
   output$g_semanas <- renderPlot({
-    req(selector_semanas_palabras())
-    req(datos_conteo_semanas_5())
+    # req(selector_semanas_palabras())
+    # req(datos_conteo_semanas_5())
+    req(input$destacar_palabra != "")
     
     message("gráfico líneas semanas")
     
@@ -1392,28 +1357,26 @@ server <- function(input, output, session) {
             hjust = ifelse(inv, 1, 0),
             color = !!sym(variable), group = palabra),
         family = tipografia$sans,
-        bg.colour = color_fondo, bg.r = 0.3, angle = input$angulo, size = as.numeric(input$texto_tamaño), vjust = 0.3, 
+        bg.colour = color_fondo, bg.r = 0.3, 
+        angle = 40, # angle = input$angulo, 
+        size = 2.8, # size = as.numeric(input$texto_tamaño), 
+        vjust = 0.3, 
         position = position_dodge(.dodge), check_overlap = T, show.legend = F) +
       # escalas
       scale_y_continuous(expand = expansion(c(.espaciado_y*0.7, .espaciado_y))) +
       scale_x_date(date_breaks = "weeks", 
                    labels = redactar_fecha,
-                   # date_labels = "%d de %B", 
                    expand = expansion(c(.espaciado_x, .espaciado_x))) +
       guides(color = guide_none()) +
-      # theme_classic() +
       coord_cartesian(clip = "off") +
       theme(panel.grid.major.x = element_line(),
             axis.ticks.x = element_blank(),
             axis.text.y = element_text(family = tipografia$sans, size = .texto_ejes),
             axis.title.y = element_text(family = tipografia$serif, face = "italic"),
-            axis.text.x = element_text(family = tipografia$sans, size = .texto_ejes, hjust = 1, angle = input$angulo),
-            # panel.background = element_rect(fill = color_destacado),
+            axis.text.x = element_text(family = tipografia$sans, size = .texto_ejes, hjust = 1, angle = 40),
             plot.caption = element_text(color = color_detalle)) +
       labs(y = "frecuencia de palabras por semana",
            x = NULL)
-    # title = "Conceptos principales en prensa, por semana", 
-    # caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
     
     # escala porcentual
     if (input$palabras_semanas_tipo == "Porcentaje") {
@@ -1429,21 +1392,23 @@ server <- function(input, output, session) {
         scale_color_manual(values = c(color_texto, color_destacado))
     } else {
       plot <- plot +
-        scale_color_viridis_d(begin = .2, end = .7, option="magma")
+        scale_color_viridis_d(begin = .2, end = .7, option = "magma")
     }
     
     return(plot)
     
   }, res = resolucion) #|> 
-    # bindCache(prensa_otros$fecha, 
+    # bindCache(prensa_otros$fecha,
     #           input$semanas,
     #           input$frecuencia_min,
-    #           input$palabras_semana_max,
-    #           input$palabras_excluir,
     #           input$palabras_semanas_tipo,
-    #           input$destacar_palabra,
-    #           input$angulo,
-    #           input$palabras_semanas_tipo)
+    #           input$destacar_palabra
+    #           # avanzadas
+    #           # input$palabras_excluir,
+    #           # input$palabras_semana_max,
+    #           # input$texto_tamaño,
+    #           # input$angulo
+    # )
   
   
   ## palabras semana ----
@@ -1467,7 +1432,7 @@ server <- function(input, output, session) {
   
   output$g_palabras <- renderPlot({
     # if (length(input$selector_palabras) > 4) {
-    req(datos_conteo_semanas_palabras_2())
+    # req(datos_conteo_semanas_palabras_2())
     # browser()
     
     if (input$tipo_grafico == "Líneas") {
@@ -1573,11 +1538,11 @@ server <- function(input, output, session) {
   })
   
   ## barras semana fuente ----
+  # el más lento de todos
   output$g_semana_fuente <- renderPlot({
-    req(datos_semana_fuente_4())
     req(scroll$inicio)
     
-    plot <- datos_semana_fuente_4() |>
+    plot <- datos_semana_fuente_6() |>
       ggplot(aes(x = n, y = palabra, fill = fuente)) +
       geom_col(width = .7, color = color_fondo) +
       geom_point(aes(color = fuente), alpha = 0) +
@@ -1592,9 +1557,7 @@ server <- function(input, output, session) {
                                   reverse = TRUE,
                                   override.aes = list(alpha = 1, size = 4))) +
       labs(y = "palabras más mencionadas por semana", x = "frecuencia de mención, por fuente",
-           fill = "fuentes\nescritas"
-           # caption = "Elaboración: Bastián Olea Herrera. https://github.com/bastianolea/prensa_chile"
-      )
+           fill = "fuentes\nescritas")
     
     plot <- plot +
       theme(legend.text = element_text(margin = margin(l = 2))) +
@@ -1698,8 +1661,7 @@ server <- function(input, output, session) {
   
   ### correlación fuentes ----
   output$g_cor_fuente <- renderPlot({
-    req(cor_fuente_dato_3())
-    req(scroll$inicio)
+    req(scroll$abajo)
     message("gráfico g_cor_fuente")
     
     dato <- cor_fuente_dato_3() |> 
@@ -1737,7 +1699,6 @@ server <- function(input, output, session) {
   }, res = resolucion)
   
   output$ui_g_cor_fuente <- renderUI({
-    req(cor_fuente_dato_3())
     message("ui correlación fuentes")
     
     div(style = css(margin_bottom = "0px"),
@@ -1752,9 +1713,7 @@ server <- function(input, output, session) {
   
   # sentimiento ----
   output$g_sentimiento <- renderPlot({
-    # browser()
-    req(scroll$inicio)
-    
+    req(scroll$abajo)
     
     if (is.null(input$sentimiento_fuente) & input$sentimiento_tema == "Todos") {
       # sin fuente ni tema
@@ -1817,9 +1776,9 @@ server <- function(input, output, session) {
     
     # ancho texto
     if (input$sentimiento_semanas > 10 | !is.null(input$sentimiento_fuente)) {
-      ancho_texto = 2.2
+      ancho_texto = 2
     } else {
-      ancho_texto = 3
+      ancho_texto = 2.8
     }
     
     # browser()
@@ -1829,13 +1788,13 @@ server <- function(input, output, session) {
       aes(fecha_etiqueta, sentimiento, fill = tipo) +
       geom_col(color = color_fondo, linewidth = 0.6) +
       geom_text(aes(color = tipo_texto,
-                    label = ifelse(sentimiento <= 0, percent(p_negativas, 1), "")), 
+                    label = ifelse(sentimiento <= 0, percent(p_negativas, 0.1), "")), 
                 vjust = 1, size = ancho_texto, nudge_y = -0.04) +
       geom_text(aes(color = tipo_texto,
-                    label = ifelse(sentimiento > 0, percent(p_positivas, 1), "")), 
+                    label = ifelse(sentimiento > 0, percent(p_positivas, 0.1), "")), 
                 vjust = 0, size = ancho_texto, nudge_y = 0.04,
                 show.legend = F) +
-      geom_hline(yintercept = 0, linewidth = 0.7, color = color_texto) +
+      geom_hline(yintercept = 0, linewidth = 0.5, color = color_texto) +
       scale_y_continuous(limits = c(-1.1, 1.1),
                          # expand = expansion(c(0.1, 0.1)),
                          breaks = c(1, 0, -1),
@@ -1905,7 +1864,7 @@ server <- function(input, output, session) {
   })
   
   output$nube_palabras_sentimiento_topicos <- renderWordcloud2({
-    req(scroll$inicio)
+    req(scroll$abajo)
     message("nube palabras_sentimiento_topicos")
     
     palabras_semana_topico_filt() |> 
