@@ -13,11 +13,10 @@ library(purrr)
 library(glue)
 library(lubridate) |> suppressPackageStartupMessages()
 
-source("funciones.R")
-
 # revisar que esté conectado el disco externo
 stopifnot("disco externo desconectado" = file.exists("/Volumes/Externo/R/prensa/"))
 
+source("funciones.R")
 
 # realizar scraping ----
 notificacion("Scraping de prensa", "Iniciando scripts…")

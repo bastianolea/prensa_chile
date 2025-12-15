@@ -66,12 +66,14 @@ ultimos_cambios <- map(directorios$path, ~{
   directorio <- dir_info(.x)
   
   directorio |> 
+    filter(size >= 1024) |> 
     slice_max(modification_time) |> 
     mutate(fuente = stringr::str_extract(path, "scraping/datos/\\w+") |> stringr::str_remove("scraping/datos/")) |> 
     select(fuente, size, modification_time)
 }) |> 
   list_rbind() |> 
-  arrange(modification_time)
+  arrange(modification_time) |> 
+  mutate(hoy = as_date(modification_time) == today())
 
 
 cat("\ncantidad de archivos por fuente:\n"); print(cantidad_archivos, n = Inf)
